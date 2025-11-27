@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
+import org.elnix.dragonlauncher.ui.helpers.RememberHoldToOpenSettings
 
 @Composable
 fun MainScreen(
@@ -36,6 +38,9 @@ fun MainScreen(
     var isDragging by remember { mutableStateOf(false) }
     var size by remember { mutableStateOf(IntSize.Zero) }
 
+    val hold = RememberHoldToOpenSettings(
+        onSettings = onLongPress3Sec
+    )
 
     Box(
         modifier = Modifier
@@ -51,11 +56,6 @@ fun MainScreen(
                     current = down.position
                     isDragging = true
 
-                    val job = scope.launch {
-                        delay(3000)
-                        if (isDragging) onLongPress3Sec()
-                    }
-
                     var pointerId = down.id
 
                     while (true) {
@@ -67,14 +67,14 @@ fun MainScreen(
                                 change.consume()
                                 current = change.position
                             } else {
-                                job.cancel()
+//                                job.cancel()
                                 isDragging = false
                                 start = null
                                 current = null
                                 break
                             }
                         } else {
-                            job.cancel()
+//                            job.cancel()
                             isDragging = false
                             start = null
                             current = null
@@ -84,7 +84,13 @@ fun MainScreen(
                 }
             }
             .onSizeChanged { size = it }
+            .then(hold.pointerModifier)
     ) {
         MainScreenOverlay(start, current, isDragging, size)
+
+        HoldToActivateArc(
+            center = hold.centerProvider(),
+            progress = hold.progressProvider()
+        )
     }
 }

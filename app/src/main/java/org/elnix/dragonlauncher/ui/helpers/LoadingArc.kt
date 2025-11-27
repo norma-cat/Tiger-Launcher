@@ -1,0 +1,33 @@
+package org.elnix.dragonlauncher.ui.helpers
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+
+@Composable
+fun HoldToActivateArc(
+    center: Offset?,
+    progress: Float,     // 0f..1f
+    radius: Float = 150f
+) {
+    if (center == null || progress <= 0f) return
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        drawArc(
+            color = Color(0xFFAF2CE5),
+            startAngle = -90f,
+            sweepAngle = 360f * progress,
+            useCenter = false,
+            topLeft = Offset(center.x - radius, center.y - radius),
+            size = Size(radius * 2, radius * 2),
+            style = Stroke(width = 6f, cap = StrokeCap.Round)
+        )
+    }
+}
