@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import org.elnix.dragonlauncher.ui.MainScreen
+import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,11 +25,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            MainScreen(
-                onLongPress3Sec = {
-                    navigateToSettings.value = true
-                }
-            )
+            DragonLauncherTheme {
+                MainScreen(
+                    onLongPress3Sec = {
+                        navigateToSettings.value = true
+                    }
+                )
+            }
         }
     }
 }

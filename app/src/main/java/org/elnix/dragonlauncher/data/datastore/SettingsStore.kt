@@ -31,6 +31,14 @@ object SettingsStore {
         ctx.settingsStore.edit { it[RGB_LOADING] = enabled }
     }
 
+    private val RGB_LINE = booleanPreferencesKey("rgb_line")
+    fun getRGBLine(ctx: Context): Flow<Boolean> =
+        ctx.settingsStore.data.map { prefs ->
+            prefs[RGB_LINE] ?: true }
+    suspend fun setRGBLine(ctx: Context, enabled: Boolean) {
+        ctx.settingsStore.edit { it[RGB_LINE] = enabled }
+    }
+
     private val DEBUG_INFOS = booleanPreferencesKey("debug_infos")
     fun getDebugInfos(ctx: Context): Flow<Boolean> =
         ctx.settingsStore.data.map { prefs ->

@@ -39,7 +39,7 @@ fun MainScreenOverlay(
 ) {
     val ctx = LocalContext.current
 
-    val rgbLoading by SettingsStore.getRGBLoading(ctx)
+    val rgbLine by SettingsStore.getRGBLine(ctx)
         .collectAsState(initial = true)
 
     val debugInfos by SettingsStore.getDebugInfos(ctx)
@@ -88,7 +88,8 @@ fun MainScreenOverlay(
         lastAngle = angle0to360
 
         lineColor = if (angleLineColor != null) angleLineColor!!
-                    else Color.hsv(angle0to360.toFloat(),1f,1f)
+                    else if (rgbLine) Color.hsv(angle0to360.toFloat(),1f,1f)
+                    else Color.Red
 
     } else {
         dx = 0f; dy = 0f

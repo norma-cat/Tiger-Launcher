@@ -6,14 +6,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import org.elnix.dragonlauncher.ui.AdvancedSettingsScreen
 import org.elnix.dragonlauncher.ui.SettingsScreen
+import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
 
 class AdvancedSettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AdvancedSettingsScreen {
-                finish()
+            DragonLauncherTheme {
+                AdvancedSettingsScreen {
+                    finish()
+                }
             }
         }
     }

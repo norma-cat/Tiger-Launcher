@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import org.elnix.dragonlauncher.ui.SettingsScreen
+import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
 import kotlin.jvm.java
 
 class SettingsActivity : ComponentActivity() {
@@ -25,10 +26,12 @@ class SettingsActivity : ComponentActivity() {
                 }
             }
 
-            SettingsScreen(
-                onAdvSettings = { navigateToAdvancedSettings.value = true }
-            ) {
-                finish()
+            DragonLauncherTheme {
+                SettingsScreen(
+                    onAdvSettings = { navigateToAdvancedSettings.value = true }
+                ) {
+                    finish()
+                }
             }
         }
     }
