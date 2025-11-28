@@ -12,17 +12,19 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.graphics.Color
+import org.elnix.dragonlauncher.data.datastore.SettingsStore
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
 import org.elnix.dragonlauncher.ui.helpers.rememberHoldToOpenSettings
 
@@ -30,7 +32,7 @@ import org.elnix.dragonlauncher.ui.helpers.rememberHoldToOpenSettings
 fun MainScreen(
     onLongPress3Sec: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
+    val ctx = LocalContext.current
 
     var start by remember { mutableStateOf<Offset?>(null) }
     var current by remember { mutableStateOf<Offset?>(null) }
@@ -40,6 +42,10 @@ fun MainScreen(
     val hold = rememberHoldToOpenSettings(
         onSettings = onLongPress3Sec
     )
+
+    val defaultColor = Color.Red
+    val rgbLoading by SettingsStore.getRGBLoading(ctx)
+        .collectAsState(initial = true)
 
     BackHandler { }
 
@@ -57,7 +63,7 @@ fun MainScreen(
                     current = down.position
                     isDragging = true
 
-                    var pointerId = down.id
+                    val pointerId = down.id
 
                     while (true) {
                         val event = awaitPointerEvent()
@@ -68,14 +74,12 @@ fun MainScreen(
                                 change.consume()
                                 current = change.position
                             } else {
-//                                job.cancel()
                                 isDragging = false
                                 start = null
                                 current = null
                                 break
                             }
                         } else {
-//                            job.cancel()
                             isDragging = false
                             start = null
                             current = null
@@ -91,7 +95,9 @@ fun MainScreen(
 
         HoldToActivateArc(
             center = hold.centerProvider(),
-            progress = hold.progressProvider()
+            progress = hold.progressProvider(),
+            defaultColor = defaultColor,
+            rgbLoading = rgbLoading
         )
     }
 }

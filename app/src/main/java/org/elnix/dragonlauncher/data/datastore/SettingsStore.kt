@@ -30,4 +30,12 @@ object SettingsStore {
     suspend fun setRGBLoading(ctx: Context, enabled: Boolean) {
         ctx.settingsStore.edit { it[RGB_LOADING] = enabled }
     }
+
+    private val DEBUG_INFOS = booleanPreferencesKey("debug_infos")
+    fun getDebugInfos(ctx: Context): Flow<Boolean> =
+        ctx.settingsStore.data.map { prefs ->
+            prefs[DEBUG_INFOS] ?: true }
+    suspend fun setDebugInfos(ctx: Context, enabled: Boolean) {
+        ctx.settingsStore.edit { it[DEBUG_INFOS] = enabled }
+    }
 }

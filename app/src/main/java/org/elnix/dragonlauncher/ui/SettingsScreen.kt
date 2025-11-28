@@ -52,6 +52,7 @@ import org.elnix.dragonlauncher.ui.utils.circles.addCircle
 import org.elnix.dragonlauncher.ui.utils.circles.autoSeparate
 import org.elnix.dragonlauncher.ui.utils.circles.randomFreeAngle
 import org.elnix.dragonlauncher.ui.utils.circles.removeCircle
+import org.elnix.dragonlauncher.ui.utils.circles.updatePointPosition
 import java.util.UUID
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -111,7 +112,7 @@ fun SettingsScreen(
         repeat(maxCircleIndex + 1) { index ->
             circles.add(
                 UiCircle(
-                    id = circles.size + 1,
+                    id = index,
                     radius = 200f + (index * 140f),
                     points = mutableStateListOf()
                 )
@@ -270,20 +271,14 @@ fun SettingsScreen(
                                 val sameCirclePoints = points.filter { it.circleNumber == selected.circleNumber }
                                 if (sameCirclePoints.isEmpty()) return@detectDragGestures
 
-                                val dx = change.position.x - center.x
-                                val dy = center.y - change.position.y
-                                var angle = Math.toDegrees(atan2(dx.toDouble(), dy.toDouble()))
-                                if (angle < 0) angle += 360.0
-
-                                val idx = points.indexOf(selected)
-                                if (idx >= 0) {
-                                    points[idx] = selected.copy(angleDeg = angle)
-                                }
-
+                                val p = points.find { it.id == selectedPointId } ?: return@detectDragGestures
+                                updatePointPosition(p, circles, center, change.position)
                                 recomposeTrigger++
+
                             },
                             onDragEnd = {
-                                autoSeparate(points, points.find { it.id == selectedPointId }?.circleNumber ?: return@detectDragGestures)
+                                val p = points.find { it.id == selectedPointId } ?: return@detectDragGestures
+                                autoSeparate(points, p.circleNumber)
                                 selectedPointId = null
                             }
                         )

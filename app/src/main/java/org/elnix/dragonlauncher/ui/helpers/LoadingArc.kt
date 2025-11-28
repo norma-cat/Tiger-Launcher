@@ -14,13 +14,19 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 fun HoldToActivateArc(
     center: Offset?,
     progress: Float,     // 0f..1f
-    radius: Float = 200f
+    radius: Float = 200f,
+    rgbLoading: Boolean,
+    defaultColor: Color
 ) {
     if (center == null || progress <= 0f) return
 
+     val color =
+         if (rgbLoading) Color.hsv(progress * 360f, 1f, 1f)
+         else defaultColor
+
     Canvas(modifier = Modifier.fillMaxSize()) {
         drawArc(
-            color = Color.hsv(progress * 360f, 1f, 1f),
+            color = color,
             startAngle = -90f,
             sweepAngle = 360f * progress,
             useCenter = false,

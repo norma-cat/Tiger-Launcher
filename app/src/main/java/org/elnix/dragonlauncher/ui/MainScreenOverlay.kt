@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +27,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import androidx.compose.ui.text.font.FontWeight
+import org.elnix.dragonlauncher.data.datastore.SettingsStore
 import kotlin.math.hypot
 
 @Composable
@@ -34,6 +37,19 @@ fun MainScreenOverlay(
     isDragging: Boolean,
     surface: IntSize
 ) {
+    val ctx = LocalContext.current
+
+    val rgbLoading by SettingsStore.getRGBLoading(ctx)
+        .collectAsState(initial = true)
+
+    val debugInfos by SettingsStore.getDebugInfos(ctx)
+        .collectAsState(initial = true)
+
+
+    val angleLineColor by SettingsStore.getAngleLineColor(ctx)
+        .collectAsState(initial = null)
+
+
     var lastAngle by remember { mutableStateOf<Double?>(null) }
     var cumulativeAngle by remember { mutableDoubleStateOf(0.0) }   // continuous rotation without jumps
 
@@ -71,8 +87,9 @@ fun MainScreenOverlay(
         }
         lastAngle = angle0to360
 
+        lineColor = if (angleLineColor != null) angleLineColor!!
+                    else Color.hsv(angle0to360.toFloat(),1f,1f)
 
-        lineColor = Color.hsv(angle0to360.toFloat(),1f,1f)
     } else {
         dx = 0f; dy = 0f
         dist = 0f
@@ -91,20 +108,32 @@ fun MainScreenOverlay(
                 .padding(16.dp)
                 .align(Alignment.TopStart)
         ) {
-            Text("start = ${start?.let { "%.1f, %.1f".format(it.x, it.y) } ?: "—"}",
-                color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-            Text("current = ${current?.let { "%.1f, %.1f".format(it.x, it.y) } ?: "—"}",
-                color = Color.White, fontSize = 14.sp)
-            Text("dx = %.1f   dy = %.1f".format(dx, dy),
-                color = Color.White, fontSize = 14.sp)
-            Text("dist = %.1f".format(dist),
-                color = Color.White, fontSize = 14.sp)
-            Text("angle raw = %.1f°".format(angleDeg),
-                color = Color.White, fontSize = 14.sp)
-            Text("angle 0–360 = %.1f°".format(angle0to360),
-                color = Color.White, fontSize = 14.sp)
-            Text("drag = $isDragging, size = ${surface.width}×${surface.height}",
-                color = Color.White, fontSize = 12.sp)
+            if (debugInfos) {
+                Text("start = ${start?.let { "%.1f, %.1f".format(it.x, it.y) } ?: "—"}",
+                    color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text("current = ${current?.let { "%.1f, %.1f".format(it.x, it.y) } ?: "—"}",
+                    color = Color.White, fontSize = 14.sp)
+                Text(
+                    "dx = %.1f   dy = %.1f".format(dx, dy),
+                    color = Color.White, fontSize = 14.sp
+                )
+                Text(
+                    "dist = %.1f".format(dist),
+                    color = Color.White, fontSize = 14.sp
+                )
+                Text(
+                    "angle raw = %.1f°".format(angleDeg),
+                    color = Color.White, fontSize = 14.sp
+                )
+                Text(
+                    "angle 0–360 = %.1f°".format(angle0to360),
+                    color = Color.White, fontSize = 14.sp
+                )
+                Text(
+                    "drag = $isDragging, size = ${surface.width}×${surface.height}",
+                    color = Color.White, fontSize = 12.sp
+                )
+            }
         }
 
         Canvas(modifier = Modifier.fillMaxSize()) {
