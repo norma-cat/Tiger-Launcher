@@ -27,7 +27,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
-import org.elnix.dragonlauncher.AppDrawerActivity
 import org.elnix.dragonlauncher.data.datastore.PrivateSettingsStore
 import org.elnix.dragonlauncher.data.datastore.SettingsStore
 import org.elnix.dragonlauncher.data.datastore.SwipeDataStore

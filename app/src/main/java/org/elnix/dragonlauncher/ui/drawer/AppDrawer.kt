@@ -66,14 +66,13 @@ fun AppDrawerScreen(
     val keyboard = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(true) {
+        awaitFrame()
         focusRequester.requestFocus()
-
-        repeat(3) { attempt ->
-            delay(100 * (attempt + 1).toLong())
-            keyboard?.show()
-        }
+        delay(500)
+        keyboard?.show()
     }
+
 
     Column(
         modifier = Modifier
