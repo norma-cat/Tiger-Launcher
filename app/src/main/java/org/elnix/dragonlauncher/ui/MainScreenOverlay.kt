@@ -1,10 +1,13 @@
 package org.elnix.dragonlauncher.ui
 
+import android.R.attr.action
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.SnackbarDefaults.actionColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,7 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.datastore.SettingsStore
+import kotlin.math.cos
 import kotlin.math.hypot
+import kotlin.math.sin
 
 @Composable
 fun MainScreenOverlay(
@@ -116,24 +121,24 @@ fun MainScreenOverlay(
     var bannerVisible by remember { mutableStateOf(false) }
 
     // Distance thresholds for 3 circles
-    val circleR1 = 90f
-    val circleR2 = 180f
-    val circleR3 = 260f
+    val circleR1 = 400f
+    val circleR2 = 700f
+    val circleR3 = 1300f
 
     // Safe zone = dragging returns close to origin → cancel
-    val cancelZone = 40f
+    val cancelZone = 150f
 
     // The chosen swipe action
     var currentAction: SwipeActionSerializable? by remember { mutableStateOf(null) }
 
-    if (start != null && current != null && isDragging) {
+    val targetCircle =
+        when {
+            dist < circleR1 -> 0
+            dist < circleR2 -> 1
+            else -> 2
+        }
 
-        val targetCircle =
-            when {
-                dist < circleR1 -> 1
-                dist < circleR2 -> 2
-                else -> 3
-            }
+    if (start != null && current != null && isDragging) {
 
         val closestPoint =
             points.filter { it.circleNumber == targetCircle }
@@ -176,33 +181,43 @@ fun MainScreenOverlay(
         Column(
             modifier = Modifier
                 .padding(16.dp)
-                .align(Alignment.TopStart)
+                .align(Alignment.TopStart),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
             if (debugInfos) {
                 Text(
                     text = "start = ${start?.let { "%.1f, %.1f".format(it.x, it.y) } ?: "—"}",
-                    color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                    color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Medium
+                )
                 Text(
                     text = "current = ${current?.let { "%.1f, %.1f".format(it.x, it.y) } ?: "—"}",
-                    color = Color.White, fontSize = 14.sp)
+                    color = Color.White, fontSize = 12.sp)
                 Text(
                     text = "dx = %.1f   dy = %.1f".format(dx, dy),
-                    color = Color.White, fontSize = 14.sp
+                    color = Color.White, fontSize = 12.sp
                 )
                 Text(
                     text = "dist = %.1f".format(dist),
-                    color = Color.White, fontSize = 14.sp
+                    color = Color.White, fontSize = 12.sp
                 )
                 Text(
                     text = "angle raw = %.1f°".format(angleDeg),
-                    color = Color.White, fontSize = 14.sp
+                    color = Color.White, fontSize = 12.sp
                 )
                 Text(
                     text = "angle 0–360 = %.1f°".format(angle0to360),
-                    color = Color.White, fontSize = 14.sp
+                    color = Color.White, fontSize = 12.sp
                 )
                 Text(
                     text = "drag = $isDragging, size = ${surface.width}×${surface.height}",
+                    color = Color.White, fontSize = 12.sp
+                )
+                Text(
+                    text = "target circle = $targetCircle",
+                    color = Color.White, fontSize = 12.sp
+                )
+                Text(
+                    text = "current action = $currentAction",
                     color = Color.White, fontSize = 12.sp
                 )
             }
@@ -256,6 +271,49 @@ fun MainScreenOverlay(
                     size = Size(rect.width, rect.height),
                     style = Stroke(width = 3f)
                 )
+
+                hoveredAction?.let { action ->
+                    drawCircle(
+                        color = Color(0x55FFFFFF),
+                        radius = 200f + (targetCircle * 140f),
+                        center = start,
+                        style = Stroke(4f)
+                    )
+
+
+                    // Draw actual selected point
+                    // find the matching SwipePointSerializable
+                    val point = points.firstOrNull { it.action == action }
+                    if (point != null) {
+
+                        // same circle radii as SettingsScreen
+                        val radius = when (point.circleNumber) {
+                            0 -> 200f
+                            1 -> 340f
+                            else -> 480f
+                        }
+
+                        // compute point position relative to origin
+                        val px = start.x +
+                                radius * sin(Math.toRadians(point.angleDeg)).toFloat()
+                        val py = start.y -
+                                radius * cos(Math.toRadians(point.angleDeg)).toFloat()
+
+                        // draw outer colored point
+                        drawCircle(
+                            color = actionColor(action),
+                            radius = 30f,      // POINT_RADIUS_PX
+                            center = Offset(px, py)
+                        )
+
+                        // draw inner black circle
+                        drawCircle(
+                            color = Color.Black,
+                            radius = 30f - 4f,
+                            center = Offset(px, py)
+                        )
+                    }
+                }
             }
         }
     }
@@ -269,7 +327,7 @@ fun MainScreenOverlay(
             contentAlignment = Alignment.TopCenter
         ) {
             Text(
-                text = hoveredAction.toString(),   // name of action
+                text = hoveredAction.toString(),
                 color = Color.White,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold

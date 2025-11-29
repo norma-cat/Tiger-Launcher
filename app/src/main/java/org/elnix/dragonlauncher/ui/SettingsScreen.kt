@@ -62,7 +62,7 @@ const val MIN_ANGLE_GAP = 18.0
 private const val POINT_RADIUS_PX = 30f
 private const val TOUCH_THRESHOLD_PX = 100f
 
-private fun actionColor(action: SwipeActionSerializable?): Color =
+fun actionColor(action: SwipeActionSerializable?): Color =
     when (action) {
         is SwipeActionSerializable.LaunchApp -> Color(0xFF55AAFF)
         is SwipeActionSerializable.OpenUrl -> Color(0xFF66DD77)
