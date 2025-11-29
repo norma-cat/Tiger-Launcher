@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.data.datastore.PrivateSettingsStore
 import org.elnix.dragonlauncher.data.datastore.SettingsStore
+import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 
@@ -57,10 +58,11 @@ fun AdvancedSettingsScreen(
     val showLaunchingAppIcon by SettingsStore.getShowLaunchingAppIcon(ctx)
         .collectAsState(initial = true)
 
-//    val angleLineColor by SettingsStore.getAngleLineColor(ctx)
-//        .collectAsState(initial = null)
+    val showAppLaunchPreviewCircle by SettingsStore.getShowAppLaunchPreviewCircle(ctx)
+        .collectAsState(initial = true)
 
-//    var hexText by remember { mutableStateOf(toHexWithAlpha(angleLineColor ?: Color.Red)) }
+    val angleLineColor by SettingsStore.getAngleLineColor(ctx)
+        .collectAsState(initial = null)
 
     val hasSeenWelcome by PrivateSettingsStore.getHasSeenWelcome(ctx)
         .collectAsState(initial = false)
@@ -72,7 +74,7 @@ fun AdvancedSettingsScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(WindowInsets.systemBars.asPaddingValues())
-            .imePadding(),
+            .padding(15.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ){
@@ -112,43 +114,26 @@ fun AdvancedSettingsScreen(
         ) { scope.launch { SettingsStore.setShowLaunchingAppIcon(ctx, it) } }
 
 
+        SwitchRow(
+            showAppLaunchPreviewCircle,
+            "Show App launch preview circle",
+        ) { scope.launch { SettingsStore.setShowAppLaunchPreviewCircle(ctx, it) } }
+
+
+        ColorPickerRow(
+            label = "Angle Line Color",
+            defaultColor = Color.Red,
+            currentColor = angleLineColor ?: Color.Transparent
+        ) {
+            scope.launch { SettingsStore.setAngleLineColor(ctx, it) }
+        }
+
+
         TextDivider("Debug")
 
         SwitchRow(
             hasSeenWelcome,
             "Has seen welcome",
         ) { scope.launch { PrivateSettingsStore.setHasSeenWelcome(ctx, it) } }
-
-
-//        OutlinedTextField(
-//            value = hexText,
-//            onValueChange = {
-//                hexText = it
-//                runCatching {
-//                    if (it.startsWith("#")) {
-//                        scope.launch {
-//                            val intValue = hexText.toIntOrNull()
-//                            SettingsStore.setAngleLineColor(ctx, intValue?.let { Color(hexText) })
-//                        }
-//                        angleLineColor = Color(hexText.toColorInt())
-////                        alpha = parseAlpha(it)
-//                    }
-//                }
-//            },
-//            label = { Text("HEX") },
-//            singleLine = true,
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//        OutlinedTextField(
-//            value = angleLineColor?.toArgb()?.toString() ?: "",
-//            onValueChange = { newText: String ->
-//                scope.launch {
-//                    val intValue = newText.toIntOrNull()
-//                    SettingsStore.setAngleLineColor(ctx, intValue?.let { Color(it) })
-//                }
-//            },
-//            label = { Text("Angle line color") },
-//            modifier = Modifier.fillMaxWidth()
-//        )
     }
 }

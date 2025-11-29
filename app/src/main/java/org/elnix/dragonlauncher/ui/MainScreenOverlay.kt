@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.IntOffset
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.datastore.SettingsStore
+import org.elnix.dragonlauncher.ui.theme.circleColor
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionIcon
 import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
@@ -109,7 +110,7 @@ fun MainScreenOverlay(
 
         lineColor = if (angleLineColor != null) angleLineColor!!
                     else if (rgbLine) Color.hsv(angle0to360.toFloat(),1f,1f)
-                    else Color.Red
+                    else circleColor
     } else {
         dx = 0f; dy = 0f
         dist = 0f
@@ -182,8 +183,6 @@ fun MainScreenOverlay(
             bannerVisible = false
         }
     }
-
-    val circleColor = MaterialTheme.colorScheme.primary.copy(0.5f)
 
     Box(Modifier.fillMaxSize()) {
 
@@ -308,7 +307,13 @@ fun MainScreenOverlay(
                         val py = start.y -
                                 radius * cos(Math.toRadians(point.angleDeg)).toFloat()
 
-                        // draw inner black circle
+
+                        drawCircle(
+                            color = circleColor,
+                            radius = 44f,
+                            center = Offset(px, py)
+                        )
+
                         drawCircle(
                             color = Color.Black,
                             radius = 40f,

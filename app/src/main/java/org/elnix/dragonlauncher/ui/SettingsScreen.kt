@@ -59,6 +59,7 @@ import org.elnix.dragonlauncher.data.UiCircle
 import org.elnix.dragonlauncher.data.UiSwipePoint
 import org.elnix.dragonlauncher.data.datastore.SwipeDataStore
 import org.elnix.dragonlauncher.ui.helpers.AddPointDialog
+import org.elnix.dragonlauncher.ui.theme.circleColor
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionIcon
 import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
@@ -92,7 +93,6 @@ fun SettingsScreen(
     var showAddDialog by remember { mutableStateOf(false) }
     var recomposeTrigger by remember { mutableIntStateOf(0) }
 
-    val circleColor = Color(0xFF600000)
 
     var bannerVisible by remember { mutableStateOf(false) }
     val alpha by animateFloatAsState(

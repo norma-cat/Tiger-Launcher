@@ -58,4 +58,11 @@ object SettingsStore {
     suspend fun setShowLaunchingAppIcon(ctx: Context, enabled: Boolean) {
         ctx.settingsStore.edit { it[SHOW_LAUNCHING_APP_ICON] = enabled }
     }
+
+    private val SHOW_APP_LAUNCH_PREVIEW_CIRCLE = booleanPreferencesKey("show_ap_launch_preview_circle")
+    fun getShowAppLaunchPreviewCircle(ctx: Context): Flow<Boolean> =
+        ctx.settingsStore.data.map { it[SHOW_APP_LAUNCH_PREVIEW_CIRCLE] ?: true }
+    suspend fun setShowAppLaunchPreviewCircle(ctx: Context, enabled: Boolean) {
+        ctx.settingsStore.edit { it[SHOW_APP_LAUNCH_PREVIEW_CIRCLE] = enabled }
+    }
 }
