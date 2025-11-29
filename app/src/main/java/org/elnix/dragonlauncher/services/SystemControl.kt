@@ -43,7 +43,7 @@ object SystemControl {
         SystemControlService.INSTANCE = service
     }
 
-    @SuppressLint("WrongConstant", "PrivateApi")
+//    @SuppressLint("WrongConstant", "PrivateApi")
     fun expandNotifications(ctx: Context) {
 //        try {
 //            val statusBarService = ctx.getSystemService("statusbar")
@@ -70,7 +70,7 @@ object SystemControl {
     }
 
 
-    @SuppressLint("WrongConstant", "PrivateApi")
+//    @SuppressLint("WrongConstant", "PrivateApi")
     fun expandQuickSettings(ctx: Context) {
         try {
             val statusBarService = ctx.getSystemService("statusbar")
@@ -80,7 +80,7 @@ object SystemControl {
         } catch (e: Exception) {
             Log.e("SystemControl", "Reflection failed", e)
             // Fallback to notifications if quick settings fails
-//            expandNotifications(ctx)
+            expandNotifications(ctx)
         }
     }
 }
