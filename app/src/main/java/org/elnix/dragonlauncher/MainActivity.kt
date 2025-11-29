@@ -26,6 +26,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navigateToSettings = remember { mutableStateOf(false) }
             val navigateToAppDrawer = remember { mutableStateOf(false) }
+            val navigateToWelcomeScreen = remember { mutableStateOf(false) }
 
 
             LaunchedEffect(navigateToSettings.value) {
@@ -42,10 +43,20 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            LaunchedEffect(navigateToWelcomeScreen.value) {
+                if (navigateToWelcomeScreen.value) {
+                    startActivity(Intent(this@MainActivity, WelcomeActivity::class.java))
+                    navigateToWelcomeScreen.value = false
+                }
+            }
+
             DragonLauncherTheme {
                 MainScreen(
                     onAppDrawer = {
                         navigateToAppDrawer.value = true
+                    },
+                    onGoWelcome = {
+                        navigateToWelcomeScreen.value = true
                     },
                     onLongPress3Sec = {
                         navigateToSettings.value = true

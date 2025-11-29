@@ -16,7 +16,8 @@ val Context.settingsStore by preferencesDataStore("settingsStore")
 object SettingsStore {
     private val ANGLE_LINE_COLOR = intPreferencesKey("angle_line_color")
     fun getAngleLineColor(ctx: Context): Flow<Color?> =
-        ctx.settingsStore.data.map { it[ANGLE_LINE_COLOR]?.let { Color(it) }
+        ctx.settingsStore.data.map { prefs ->
+            prefs[ANGLE_LINE_COLOR]?.let { Color(it) }
         }
     suspend fun setAngleLineColor(ctx: Context, color: Color?) {
         ctx.settingsStore.edit { it[ANGLE_LINE_COLOR] = color?.toArgb() ?: 0 }

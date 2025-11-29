@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.ui
 
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +27,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
+import org.elnix.dragonlauncher.AppDrawerActivity
+import org.elnix.dragonlauncher.data.datastore.PrivateSettingsStore
 import org.elnix.dragonlauncher.data.datastore.SettingsStore
 import org.elnix.dragonlauncher.data.datastore.SwipeDataStore
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
@@ -34,6 +38,7 @@ import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
 @Composable
 fun MainScreen(
     onAppDrawer: () -> Unit,
+    onGoWelcome: () -> Unit,
     onLongPress3Sec: () -> Unit
 ) {
     val ctx = LocalContext.current
@@ -50,6 +55,13 @@ fun MainScreen(
     val defaultColor = Color.Red
     val rgbLoading by SettingsStore.getRGBLoading(ctx)
         .collectAsState(initial = true)
+
+    val hasSeenWelcome by PrivateSettingsStore.getHasSeenWelcome(ctx).collectAsState(initial = true)
+
+
+    LaunchedEffect(hasSeenWelcome) {
+        if (!hasSeenWelcome) onGoWelcome()
+    }
 
     val points by SwipeDataStore.getPointsFlow(ctx).collectAsState(emptyList())
 

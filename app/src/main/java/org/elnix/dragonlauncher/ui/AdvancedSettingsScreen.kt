@@ -29,8 +29,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.elnix.dragonlauncher.data.datastore.PrivateSettingsStore
 import org.elnix.dragonlauncher.data.datastore.SettingsStore
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
+import org.elnix.dragonlauncher.ui.helpers.TextDivider
 
 
 @Composable
@@ -59,6 +61,9 @@ fun AdvancedSettingsScreen(
 //        .collectAsState(initial = null)
 
 //    var hexText by remember { mutableStateOf(toHexWithAlpha(angleLineColor ?: Color.Red)) }
+
+    val hasSeenWelcome by PrivateSettingsStore.getHasSeenWelcome(ctx)
+        .collectAsState(initial = false)
 
     BackHandler { onBack() }
 
@@ -106,6 +111,13 @@ fun AdvancedSettingsScreen(
             "Show App icon",
         ) { scope.launch { SettingsStore.setShowLaunchingAppIcon(ctx, it) } }
 
+
+        TextDivider("Debug")
+
+        SwitchRow(
+            hasSeenWelcome,
+            "Has seen welcome",
+        ) { scope.launch { PrivateSettingsStore.setHasSeenWelcome(ctx, it) } }
 
 
 //        OutlinedTextField(
