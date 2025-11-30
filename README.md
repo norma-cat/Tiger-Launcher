@@ -15,6 +15,7 @@ You can customize your list of fast access apps easily in the settings, and also
   <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpg" width="22%" alt="App ScreenShot 3"/>
   <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpg" width="22%" alt="App ScreenShot 4"/>
 </p>
+
 ## Installation
 
 Get the lastest version on github: [last release](https://github.com/Elnix90/Dragon-Launcher/releases/latest)
