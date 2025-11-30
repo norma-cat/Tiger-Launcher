@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -87,7 +86,7 @@ fun AppDrawerScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(WindowInsets().asPaddingValues())
-            .padding(12.dp)
+            .padding(15.dp)
     ) {
 
         OutlinedTextField(
@@ -112,12 +111,18 @@ fun AppDrawerScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+               .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectVerticalDragGestures { _, _ -> }  // Consume drag
+                }
+        ) {
             items(filtered) { app ->
                 AppItem(
                     app = app,
                     showIcons = showIcons,
-                    onClick = { launchSwipeAction(ctx, app.action) },
+                    onClick = { launchSwipeAction(ctx, app.action); onClose() },
                     onLongClick = { dialogApp = app }
                 )
             }
@@ -133,18 +138,21 @@ fun AppDrawerScreen(
             },
             onOpen = {
                 launchSwipeAction(ctx, app.action)
+                onClose()
             },
             onSettings = {
                 val i = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.parse("package:${app.packageName}")
                 }
                 ctx.startActivity(i)
+                onClose()
             },
             onUninstall = {
                 val intent = Intent(Intent.ACTION_DELETE).apply {
                     data = Uri.parse("package:${app.packageName}")
                 }
                 ctx.startActivity(intent)
+                onClose()
             }
         )
     }

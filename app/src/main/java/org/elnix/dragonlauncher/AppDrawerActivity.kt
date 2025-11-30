@@ -117,4 +117,14 @@ class AppDrawerActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onStop() {
+        finish()
+        super.onStop()
+    }
+
+    override fun onPause() {
+        finish()
+        super.onPause()
+    }
 }
