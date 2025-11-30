@@ -1,13 +1,16 @@
 package org.elnix.dragonlauncher.ui.welcome
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.Settings
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,13 +24,8 @@ import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 @Composable
 fun WelcomePageLauncher() {
     val ctx = LocalContext.current
-    val pm = ctx.packageManager
 
-    val isDefaultLauncher by remember {
-        androidx.compose.runtime.derivedStateOf {
-            isAppDefaultLauncher(pm, ctx.packageName)
-        }
-    }
+    val isDefaultLauncher = remember { mutableStateOf(isAppDefaultLauncher(ctx)) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -42,29 +40,35 @@ fun WelcomePageLauncher() {
 
         Spacer(Modifier.height(32.dp))
 
-
         GradientBigButton(
-            text = if (isDefaultLauncher) "Already Default Launcher"
-                   else "Open Default Launcher Settings",
-            enabled = !isDefaultLauncher,
-            onClick = { ctx.startActivity(Intent(Settings.ACTION_HOME_SETTINGS)) }
+            text = if (isDefaultLauncher.value)
+                "Already Default Launcher"
+            else
+                "Open Default Launcher Settings",
+            enabled = !isDefaultLauncher.value,
+            onClick = {
+                ctx.startActivity(Intent(Settings.ACTION_HOME_SETTINGS))
+
+                // Re-check when user comes back
+                // Using a slight delay avoids checking too early
+                android.os.Handler(android.os.Looper.getMainLooper())
+                    .postDelayed({
+                        isDefaultLauncher.value = isAppDefaultLauncher(ctx)
+                    }, 500)
+            }
         )
     }
 }
 
 
-private fun isAppDefaultLauncher(pm: PackageManager, packageName: String): Boolean {
-    val homeIntent = Intent(Intent.ACTION_MAIN).apply {
-        addCategory(Intent.CATEGORY_HOME)
-    }
 
-    // 1. Check if our app resolves as default
-    val defaultInfo = pm.resolveActivity(homeIntent, PackageManager.MATCH_DEFAULT_ONLY)
-    if (defaultInfo?.activityInfo?.packageName == packageName) {
-        return true
-    }
+private fun isAppDefaultLauncher(context: Context): Boolean {
+    val pm = context.packageManager
+    val myPackage = context.packageName
 
-    // 2. Check if our app appears in ALL possible home launchers
-    val allLaunchers = pm.queryIntentActivities(homeIntent, 0)
-    return allLaunchers.any { it.activityInfo.packageName == packageName }
+    // Resolve the current default launcher for ACTION_MAIN + CATEGORY_HOME
+    val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+    val resolveInfo = pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+
+    return resolveInfo?.activityInfo?.packageName == myPackage
 }
