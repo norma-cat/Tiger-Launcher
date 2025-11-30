@@ -19,11 +19,16 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.MainScreen
 import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
+import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
+import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.utils.AppDrawerViewModel
+import java.util.UUID
 import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
@@ -72,11 +77,42 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
+            val ctx = LocalContext.current
 
             val navigateToSettings = remember { mutableStateOf(false) }
             val navigateToAppDrawer = remember { mutableStateOf(false) }
             val navigateToWelcomeScreen = remember { mutableStateOf(false) }
 
+            val hasInitialized by PrivateSettingsStore.getHasInitialized(ctx)
+                .collectAsState(initial = false)
+
+            LaunchedEffect(hasInitialized) {
+                if (!hasInitialized) {
+                    SwipeSettingsStore.save(ctx,
+                        listOf(
+                            SwipePointSerializable(
+                                circleNumber = 0,
+                                angleDeg = 0.toDouble(),
+                                action = SwipeActionSerializable.OpenAppDrawer,
+                                id = UUID.randomUUID().toString()
+                            ),
+                            SwipePointSerializable(
+                                circleNumber = 1,
+                                angleDeg = 200.toDouble(),
+                                action = SwipeActionSerializable.NotificationShade,
+                                id = UUID.randomUUID().toString()
+                            ),
+                            SwipePointSerializable(
+                                circleNumber = 1,
+                                angleDeg = 160.toDouble(),
+                                action = SwipeActionSerializable.ControlPanel,
+                                id = UUID.randomUUID().toString()
+                            )
+                        )
+                    )
+                    PrivateSettingsStore.setHasInitialized(ctx, true)
+                }
+            }
 
             LaunchedEffect(navigateToSettings.value) {
                 if (navigateToSettings.value) {
@@ -100,7 +136,6 @@ class MainActivity : ComponentActivity() {
             }
 
             // Colors
-            val ctx = LocalContext.current
 
             val primary by ColorSettingsStore.getPrimary(ctx).collectAsState(initial = null)
             val onPrimary by ColorSettingsStore.getOnPrimary(ctx).collectAsState(initial = null)

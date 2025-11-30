@@ -1,6 +1,7 @@
 package org.elnix.dragonlauncher.ui.settings.debug
 
 import android.os.Build
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -8,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
@@ -16,6 +18,7 @@ import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
+import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 
 @Composable
@@ -34,6 +37,8 @@ fun DebugTab(
 
 
     val hasSeenWelcome by PrivateSettingsStore.getHasSeenWelcome(ctx)
+        .collectAsState(initial = false)
+    val hasInitialized by PrivateSettingsStore.getHasInitialized(ctx)
         .collectAsState(initial = false)
 
     val isForceSwitchToggled by DebugSettingsStore.getForceAppLanguageSelector(ctx).collectAsState(initial = false)
@@ -72,6 +77,7 @@ fun DebugTab(
             }
         }
 
+        item { TextDivider("Debug things") }
 
         item {
             Button(
@@ -82,11 +88,24 @@ fun DebugTab(
                             !hasSeenWelcome
                         )
                     }
-                }
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = "Show welcome screen",
                 )
+            }
+        }
+
+        item{
+            SwitchRow(
+                state = hasInitialized,
+                text = "Has inititialized",
+                defaultValue = false
+            ) {
+                scope.launch {
+                    PrivateSettingsStore.setHasInitialized(ctx, it)
+                }
             }
         }
 
