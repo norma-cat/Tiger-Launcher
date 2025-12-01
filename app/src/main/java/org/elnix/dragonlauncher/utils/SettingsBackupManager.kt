@@ -5,6 +5,8 @@ import android.net.Uri
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.elnix.dragonlauncher.data.SwipeJson
+import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.ColorModesSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.LanguageSettingsStore
@@ -28,7 +30,8 @@ object SettingsBackupManager {
                     if (obj.length() > 0) put(key, obj)
                 }
 
-                putIfNotEmpty("actions", mapStringToJson(SwipeSettingsStore.getAll(ctx)))
+
+                putIfNotEmpty("actions", mapActionsToJson(SwipeSettingsStore.getAll(ctx)))
                 putIfNotEmpty("color_mode", mapStringToJson(ColorModesSettingsStore.getAll(ctx)))
                 putIfNotEmpty("color", mapIntToJson(ColorSettingsStore.getAll(ctx)))
                 putIfNotEmpty("debug", mapToJson(DebugSettingsStore.getAll(ctx)))
@@ -71,8 +74,9 @@ object SettingsBackupManager {
 
                 // ------------------ ACTIONS ------------------
                 obj.optJSONObject("actions")?.let {
-                    SwipeSettingsStore.setAll(ctx, jsonToMapString(it))
+                    SwipeSettingsStore.setAll(ctx, jsonToActionsMap(it))
                 }
+
 
                 // ------------------ COLOR MODE ------------------
                 obj.optJSONObject("color_mode")?.let {
@@ -130,4 +134,81 @@ object SettingsBackupManager {
     private fun jsonToMapString(obj: JSONObject) = buildMap {
         obj.keys().forEach { key -> put(key, obj.optString(key, "")) }
     }
+
+
+    private fun mapActionsToJson(map: Map<String, Any>): JSONObject {
+        val obj = JSONObject()
+
+        map.forEach { (key, value) ->
+            when (value) {
+
+                // Case 1: Expected List<SwipePointSerializable>
+                is List<*> -> {
+                    val jsonArray = org.json.JSONArray()
+
+                    value.forEach { element ->
+                        if (element is SwipePointSerializable) {
+                            // Safe: Convert exactly one element to JSON object
+                            val singleJson = SwipeJson.encode(listOf(element))
+                            val jsonObj = JSONObject(singleJson.substring(1, singleJson.length - 1))
+                            jsonArray.put(jsonObj)
+                        } else {
+                            // Ignore invalid element
+                        }
+                    }
+
+                    // Only put valid arrays
+                    if (jsonArray.length() > 0) obj.put(key, jsonArray)
+                }
+
+                // Case 2: Other primitive values (rare in actions, but still safe)
+                is String, is Number, is Boolean -> obj.put(key, value)
+
+                // Case 3: Unknown type → ignore
+                else -> { /* skip */ }
+            }
+        }
+
+        return obj
+    }
+
+
+    private fun jsonToActionsMap(obj: JSONObject): Map<String, Any> = buildMap {
+
+        obj.keys().forEach { key ->
+            when (val value = obj.opt(key)) {
+
+                // Case: JSONArray → convert objects back to SwipePointSerializable safely
+                is org.json.JSONArray -> {
+                    val list = mutableListOf<SwipePointSerializable>()
+
+                    for (i in 0 until value.length()) {
+                        val element = value.optJSONObject(i)
+                        if (element != null) {
+                            try {
+                                val json = element.toString()
+                                val decoded = SwipeJson.decode("[$json]")
+                                list += decoded
+                            } catch (_: Exception) {
+                                // ignore damaged entries
+                            }
+                        }
+                    }
+
+                    if (list.isNotEmpty()) put(key, list)
+                }
+
+                // Case: unexpected primitive → ignore, actions should not store these
+                is String, is Number, is Boolean -> {
+                    // ignore
+                }
+
+                // Case: completely invalid → ignore
+                else -> {
+                    // ignore
+                }
+            }
+        }
+    }
+
 }

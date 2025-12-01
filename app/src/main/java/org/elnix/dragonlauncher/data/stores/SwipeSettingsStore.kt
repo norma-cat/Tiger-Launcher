@@ -43,26 +43,30 @@ object SwipeSettingsStore {
         }
     }
 
-    suspend fun getAll(ctx: Context): Map<String, String> {
+    suspend fun getAll(ctx: Context): Map<String, Any> {
         val prefs = ctx.swipeDataStore.data.first()
-        val defaults = SwipeBackup()
 
-        return buildMap {
-            fun putIfNonDefault(key: String, value: Any?, default: Any?) {
-                if (value != null && value != default) {
-                    put(key, value.toString())
-                }
-            }
+        val points = prefs[POINTS]?.let { json ->
+            SwipeJson.decode(json)
+        } ?: emptyList()
 
-            putIfNonDefault(POINTS.name, prefs[POINTS], defaults.pointsJson)
-        }
+        return mapOf(
+            "points" to points
+        )
     }
 
-    suspend fun setAll(ctx: Context, backup: Map<String, String>) {
+    suspend fun setAll(ctx: Context, backup: Map<String, Any>) {
         ctx.swipeDataStore.edit { prefs ->
-            backup[POINTS.name]?.let { json ->
-                prefs[POINTS] = json
+            val pointsList = backup["points"] as? List<*>
+            if (pointsList != null) {
+                // Re-encode list back to string for DataStore
+                @Suppress("UNCHECKED_CAST")
+                val typed = pointsList as List<SwipePointSerializable>
+                prefs[POINTS] = SwipeJson.encode(typed)
+            } else {
+                prefs.remove(POINTS)
             }
         }
     }
+
 }
