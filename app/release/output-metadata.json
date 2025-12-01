@@ -8,12 +8,196 @@
   "variantName": "release",
   "elements": [
     {
-      "type": "SINGLE",
-      "filters": [],
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        }
+      ],
       "attributes": [],
-      "versionCode": 1,
-      "versionName": "1.0.0",
-      "outputFile": "app-release.apk"
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-armeabi-v7a-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        },
+        {
+          "filterType": "DENSITY",
+          "value": "xxhdpi"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-xxhdpiArmeabi-v7a-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86_64"
+        },
+        {
+          "filterType": "DENSITY",
+          "value": "xxhdpi"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-xxhdpiX86_64-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86_64"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-x86_64-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-arm64-v8a-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        },
+        {
+          "filterType": "DENSITY",
+          "value": "xxhdpi"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-xxhdpiArm64-v8a-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        },
+        {
+          "filterType": "DENSITY",
+          "value": "hdpi"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-hdpiArmeabi-v7a-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        },
+        {
+          "filterType": "DENSITY",
+          "value": "hdpi"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-hdpiArm64-v8a-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86_64"
+        },
+        {
+          "filterType": "DENSITY",
+          "value": "hdpi"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-hdpiX86_64-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86_64"
+        },
+        {
+          "filterType": "DENSITY",
+          "value": "xhdpi"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-xhdpiX86_64-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        },
+        {
+          "filterType": "DENSITY",
+          "value": "xhdpi"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-xhdpiArmeabi-v7a-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        },
+        {
+          "filterType": "DENSITY",
+          "value": "xhdpi"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "app-xhdpiArm64-v8a-release.apk"
     }
   ],
   "elementType": "File",
@@ -22,14 +206,36 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/app-release.dm"
+        "baselineProfiles/1/app-armeabi-v7a-release.dm",
+        "baselineProfiles/1/app-xxhdpiArmeabi-v7a-release.dm",
+        "baselineProfiles/1/app-xxhdpiX86_64-release.dm",
+        "baselineProfiles/1/app-x86_64-release.dm",
+        "baselineProfiles/1/app-arm64-v8a-release.dm",
+        "baselineProfiles/1/app-xxhdpiArm64-v8a-release.dm",
+        "baselineProfiles/1/app-hdpiArmeabi-v7a-release.dm",
+        "baselineProfiles/1/app-hdpiArm64-v8a-release.dm",
+        "baselineProfiles/1/app-hdpiX86_64-release.dm",
+        "baselineProfiles/1/app-xhdpiX86_64-release.dm",
+        "baselineProfiles/1/app-xhdpiArmeabi-v7a-release.dm",
+        "baselineProfiles/1/app-xhdpiArm64-v8a-release.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/app-release.dm"
+        "baselineProfiles/0/app-armeabi-v7a-release.dm",
+        "baselineProfiles/0/app-xxhdpiArmeabi-v7a-release.dm",
+        "baselineProfiles/0/app-xxhdpiX86_64-release.dm",
+        "baselineProfiles/0/app-x86_64-release.dm",
+        "baselineProfiles/0/app-arm64-v8a-release.dm",
+        "baselineProfiles/0/app-xxhdpiArm64-v8a-release.dm",
+        "baselineProfiles/0/app-hdpiArmeabi-v7a-release.dm",
+        "baselineProfiles/0/app-hdpiArm64-v8a-release.dm",
+        "baselineProfiles/0/app-hdpiX86_64-release.dm",
+        "baselineProfiles/0/app-xhdpiX86_64-release.dm",
+        "baselineProfiles/0/app-xhdpiArmeabi-v7a-release.dm",
+        "baselineProfiles/0/app-xhdpiArm64-v8a-release.dm"
       ]
     }
   ],
