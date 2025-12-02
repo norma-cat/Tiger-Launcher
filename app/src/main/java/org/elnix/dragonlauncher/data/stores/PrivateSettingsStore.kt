@@ -16,8 +16,8 @@ object PrivateSettingsStore {
     )
     private val defaults = PrivateSettingsBackup()
 
-    private val HAS_SEEN_WELCOME = booleanPreferencesKey(defaults.hasSeenWelcome.toString())
-    private val HAS_INITIALIZED = booleanPreferencesKey(defaults.hasInitialized.toString())
+    private val HAS_SEEN_WELCOME = booleanPreferencesKey(defaults::hasSeenWelcome.toString())
+    private val HAS_INITIALIZED = booleanPreferencesKey(defaults::hasInitialized.toString())
 
     fun getHasSeenWelcome(ctx: Context): Flow<Boolean> =
         ctx.privateSettingsStore.data.map { prefs ->
@@ -54,24 +54,20 @@ object PrivateSettingsStore {
                 }
             }
 
-            putIfNonDefault(defaults.hasSeenWelcome.toString(), prefs[HAS_SEEN_WELCOME], defaults.hasSeenWelcome)
-            putIfNonDefault(defaults.hasInitialized.toString(), prefs[HAS_INITIALIZED], defaults.hasInitialized)
+            putIfNonDefault(HAS_SEEN_WELCOME.name, prefs[HAS_SEEN_WELCOME], defaults.hasSeenWelcome)
+            putIfNonDefault(HAS_INITIALIZED.name, prefs[HAS_INITIALIZED], defaults.hasInitialized)
         }
     }
 
-    suspend fun setAll(ctx: Context, data: Map<String, String>) {
+    suspend fun setAll(ctx: Context, backup: Map<String, Boolean>) {
         ctx.privateSettingsStore.edit { prefs ->
 
-            data[defaults.hasSeenWelcome.toString()]?.let { raw ->
-                runCatching { raw.toBooleanStrictOrNull() ?: false }
-                    .getOrNull()
-                    ?.let { prefs[HAS_SEEN_WELCOME] = it }
+            backup[HAS_SEEN_WELCOME.name]?.let {
+                prefs[HAS_SEEN_WELCOME] = it
             }
 
-            data[defaults.hasInitialized.toString()]?.let { raw ->
-                runCatching { raw.toBooleanStrictOrNull() ?: false }
-                    .getOrNull()
-                    ?.let { prefs[HAS_INITIALIZED] = it }
+            backup[HAS_INITIALIZED.name]?.let {
+                prefs[HAS_INITIALIZED] = it
             }
         }
     }

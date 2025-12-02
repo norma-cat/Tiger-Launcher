@@ -43,25 +43,11 @@ object SwipeSettingsStore {
         }
     }
 
-    suspend fun getAll(ctx: Context): Map<String, String> {
+    suspend fun getAll(ctx: Context): List<SwipePointSerializable> {
         val prefs = ctx.swipeDataStore.data.first()
-        val raw = prefs[POINTS] ?: return emptyMap()
-
-        val decoded = SwipeJson.decode(raw)
-        val pretty = SwipeJson.encodePretty(decoded)
-
-        return mapOf("points" to pretty)
+        val raw = prefs[POINTS] ?: return emptyList()
+        return SwipeJson.decode(raw)
     }
 
-
-    suspend fun setAll(ctx: Context, backup: Map<String, String>) {
-        val pretty = backup["points"] ?: return
-
-        val decoded = SwipeJson.decode(pretty)
-        val compact = SwipeJson.encode(decoded)
-
-        ctx.swipeDataStore.edit { prefs ->
-            prefs[POINTS] = compact
-        }
-    }
+    // Removed setAll cause i'm using the save function
 }

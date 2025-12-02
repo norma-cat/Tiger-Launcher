@@ -3,11 +3,24 @@ package org.elnix.dragonlauncher.data
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 
-val Context.uiDatastore by preferencesDataStore(name = "uiDatastore")
-val Context.colorModeDatastore by preferencesDataStore("colorModeDatastore")
-val Context.colorDatastore by preferencesDataStore("colorDatastore")
-val Context.privateSettingsStore by preferencesDataStore("privateSettingsStore")
-val Context.swipeDataStore by preferencesDataStore("swipePointsDatastore")
-val Context.debugDatastore by preferencesDataStore("debugDatastore")
-val Context.languageDatastore by preferencesDataStore("languageDatastore")
-val Context.drawerDataStore by preferencesDataStore("drawerDatastore")
+enum class DataStoreName(val value: String, val backupKey: String) {
+    UI("uiDatastore", "ui"),
+    COLOR_MODE("colorModeDatastore", "color_mode"),
+    COLOR("colorDatastore", "color"),
+    PRIVATE_SETTINGS("privateSettingsStore", "debug"),
+    SWIPE("swipePointsDatastore", "actions"),
+    LANGUAGE("languageDatastore", "language"),
+    DRAWER("drawerDatastore", "drawer"),
+
+    DEBUG("debugDatastore", "debug")
+}
+
+val Context.uiDatastore by preferencesDataStore(name = DataStoreName.UI.value)
+val Context.colorModeDatastore by preferencesDataStore(name = DataStoreName.COLOR_MODE.value)
+val Context.colorDatastore by preferencesDataStore(name = DataStoreName.COLOR.value)
+val Context.privateSettingsStore by preferencesDataStore(name = DataStoreName.PRIVATE_SETTINGS.value)
+val Context.swipeDataStore by preferencesDataStore(name = DataStoreName.SWIPE.value)
+val Context.languageDatastore by preferencesDataStore(name = DataStoreName.LANGUAGE.value)
+val Context.drawerDataStore by preferencesDataStore(name = DataStoreName.DRAWER.value)
+val Context.debugDatastore by preferencesDataStore(name = DataStoreName.DEBUG.value)
+

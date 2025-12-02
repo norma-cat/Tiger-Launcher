@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import org.elnix.dragonlauncher.data.ColorCustomisationMode
 import org.elnix.dragonlauncher.data.DefaultThemes
 import org.elnix.dragonlauncher.data.colorDatastore
-import org.elnix.dragonlauncher.data.defaultThemeName
 import org.elnix.dragonlauncher.data.getDefaultColorScheme
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setAngleLineColor
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setBackground

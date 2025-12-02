@@ -24,10 +24,10 @@ object DebugSettingsStore {
     // -------------------------------------------------------------------------
     // Keys
     // -------------------------------------------------------------------------
-    private val DEBUG_ENABLED = booleanPreferencesKey(defaults.debugEnabled.toString())
-    private val DEBUG_INFOS = booleanPreferencesKey(defaults.debugInfos.toString())
+    private val DEBUG_ENABLED = booleanPreferencesKey(defaults::debugEnabled.toString())
+    private val DEBUG_INFOS = booleanPreferencesKey(defaults::debugInfos.toString())
     private val FORCE_APP_LANGUAGE_SELECTOR =
-        booleanPreferencesKey(defaults.forceAppLanguageSelector.toString())
+        booleanPreferencesKey(defaults::forceAppLanguageSelector.toString())
 
     // -------------------------------------------------------------------------
     // Accessors + Mutators
@@ -85,19 +85,19 @@ object DebugSettingsStore {
             }
 
             putIfNonDefault(
-                defaults.debugEnabled.toString(),
+                defaults::debugEnabled.toString(),
                 prefs[DEBUG_ENABLED],
                 defaults.debugEnabled
             )
 
             putIfNonDefault(
-                defaults.debugInfos.toString(),
+                defaults::debugInfos.toString(),
                 prefs[DEBUG_INFOS],
                 defaults.debugInfos
             )
 
             putIfNonDefault(
-                defaults.forceAppLanguageSelector.toString(),
+                defaults::forceAppLanguageSelector.toString(),
                 prefs[FORCE_APP_LANGUAGE_SELECTOR],
                 defaults.forceAppLanguageSelector
             )
@@ -109,13 +109,13 @@ object DebugSettingsStore {
     // -------------------------------------------------------------------------
     suspend fun setAll(ctx: Context, backup: Map<String, Boolean>) {
         ctx.debugDatastore.edit { prefs ->
-            backup[defaults.debugEnabled.toString()]?.let {
+            backup[defaults::debugEnabled.toString()]?.let {
                 prefs[DEBUG_ENABLED] = it
             }
-            backup[defaults.debugInfos.toString()]?.let {
+            backup[defaults::debugInfos.toString()]?.let {
                 prefs[DEBUG_INFOS] = it
             }
-            backup[defaults.forceAppLanguageSelector.toString()]?.let {
+            backup[defaults::forceAppLanguageSelector.toString()]?.let {
                 prefs[FORCE_APP_LANGUAGE_SELECTOR] = it
             }
         }

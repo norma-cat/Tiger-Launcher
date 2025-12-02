@@ -15,21 +15,28 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.data.DataStoreName
 import org.elnix.dragonlauncher.ui.helpers.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.json.JSONObject
 
-
+@Suppress("AssignedValueIsNeverRead")
 @Composable
 fun BackupTab(
     backupVm: BackupViewModel,
@@ -40,15 +47,17 @@ fun BackupTab(
 
     val result by backupVm.result.collectAsState()
 
+    var selectedStoresForExport by remember { mutableStateOf(listOf<DataStoreName>()) }
+    var selectedStoresForImport by remember { mutableStateOf(listOf<DataStoreName>()) }
+    var importJson by remember { mutableStateOf<JSONObject?>(null) }
+    var showImportDialog by remember { mutableStateOf(false) }
+    var showExportDialog by remember { mutableStateOf(false) }
 
     // ------------------------------------------------------------
-    // SETTINGS BACKUP
+    // SETTINGS EXPORT LAUNCHER
     // ------------------------------------------------------------
-
     val settingsExportLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
-            Log.d("BackupManager", "Started settings export 2")
-
             if (uri == null) {
                 backupVm.setResult(
                     BackupResult(
@@ -62,9 +71,8 @@ fun BackupTab(
 
             scope.launch {
                 try {
-                    SettingsBackupManager.exportSettings(ctx, uri)
+                    SettingsBackupManager.exportSettings(ctx, uri, selectedStoresForExport)
                     backupVm.setResult(BackupResult(export = true, error = false))
-
                 } catch (e: Exception) {
                     backupVm.setResult(
                         BackupResult(
@@ -77,9 +85,12 @@ fun BackupTab(
             }
         }
 
+    // ------------------------------------------------------------
+    // SETTINGS IMPORT LAUNCHER (File Picker)
+    // ------------------------------------------------------------
     val settingsImportLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            Log.d("BackupManager", "Started settings import 2")
+            Log.d("BackupManager", "File picked: $uri")
 
             if (uri == null) {
                 backupVm.setResult(
@@ -92,17 +103,33 @@ fun BackupTab(
                 return@rememberLauncherForActivityResult
             }
 
+            // Read JSON from selected file
             scope.launch {
                 try {
-                    SettingsBackupManager.importSettings(ctx, uri)
-                    backupVm.setResult(BackupResult(export = false, error = false))
+                    val jsonString = withContext(Dispatchers.IO) {
+                        ctx.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+                    }
+
+                    if (jsonString.isNullOrBlank()) {
+                        backupVm.setResult(
+                            BackupResult(
+                                export = false,
+                                error = true,
+                                message = "Invalid or empty backup file"
+                            )
+                        )
+                        return@launch
+                    }
+
+                    importJson = JSONObject(jsonString)
+                    showImportDialog = true
 
                 } catch (e: Exception) {
                     backupVm.setResult(
                         BackupResult(
                             export = false,
                             error = true,
-                            message = e.message ?: ""
+                            message = "Failed to read backup file: ${e.message}"
                         )
                     )
                 }
@@ -112,7 +139,6 @@ fun BackupTab(
     // ------------------------------------------------------------
     // UI
     // ------------------------------------------------------------
-
     SettingsLazyHeader(
         title = stringResource(R.string.backup_restore),
         onBack = onBack,
@@ -120,13 +146,55 @@ fun BackupTab(
         resetText = null,
         onReset = null
     ) {
-
         item {
             BackupButtons(
-                exportLabel = stringResource(R.string.export_settings),
-                importLabel = stringResource(R.string.import_settings),
-                onExport = { settingsExportLauncher.launch("notes_settings_backup.json") },
+                onExport = { showExportDialog = true },
                 onImport = { settingsImportLauncher.launch(arrayOf("application/json")) }
+            )
+        }
+    }
+
+    // Export Dialog
+    if (showExportDialog) {
+        ExportSettingsDialog(
+            onDismiss = { showExportDialog = false },
+            onConfirm = { selectedStores ->
+                showExportDialog = false
+                selectedStoresForExport = selectedStores
+                settingsExportLauncher.launch("backup-${System.currentTimeMillis()}.json")
+            }
+        )
+    }
+
+    // Import Dialog (shows after file is picked)
+    importJson?.let { json ->
+        if (showImportDialog) {
+            ImportSettingsDialog(
+                backupJson = json,
+                onDismiss = {
+                    showImportDialog = false
+                    importJson = null
+                },
+                onConfirm = { selectedStores ->
+                    showImportDialog = false
+                    selectedStoresForImport = selectedStores
+
+                    scope.launch {
+                        try {
+                            SettingsBackupManager.importSettingsFromJson(ctx, json , selectedStoresForImport)
+                            backupVm.setResult(BackupResult(export = false, error = false))
+                            importJson = null
+                        } catch (e: Exception) {
+                            backupVm.setResult(
+                                BackupResult(
+                                    export = false,
+                                    error = true,
+                                    message = e.message ?: ""
+                                )
+                            )
+                        }
+                    }
+                }
             )
         }
     }
@@ -134,11 +202,10 @@ fun BackupTab(
     // ------------------------------------------------------------
     // RESULT DIALOG
     // ------------------------------------------------------------
-
-    if (result != null) {
-        val isError = result!!.error
-        val isExport = result!!.export
-        val errorMessage = result!!.message
+    result?.let { res ->
+        val isError = res.error
+        val isExport = res.export
+        val errorMessage = res.message
 
         UserValidation(
             title = when {
@@ -169,8 +236,6 @@ fun BackupTab(
 
 @Composable
 fun BackupButtons(
-    exportLabel: String,
-    importLabel: String,
     onExport: () -> Unit,
     onImport: () -> Unit
 ) {
@@ -182,12 +247,11 @@ fun BackupButtons(
         Button(
             onClick = onExport,
             colors = AppObjectsColors.buttonColors()
-        ) { Text(exportLabel) }
+        ) { Text(stringResource(R.string.export_settings)) }
 
         Button(
             onClick = onImport,
             colors = AppObjectsColors.buttonColors()
-        ) { Text(importLabel) }
+        ) { Text(stringResource(R.string.import_settings)) }
     }
 }
-

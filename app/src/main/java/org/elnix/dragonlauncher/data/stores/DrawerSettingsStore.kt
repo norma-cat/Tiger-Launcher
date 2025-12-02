@@ -25,13 +25,13 @@ object DrawerSettingsStore {
     // Keys
     // -------------------------------------------------------------------------
     private val AUTO_OPEN_SINGLE_MATCH =
-        booleanPreferencesKey(defaults.autoOpenSingleMatch.toString())
+        booleanPreferencesKey(defaults::autoOpenSingleMatch.toString())
 
     private val SHOW_APP_ICONS_IN_DRAWER =
-        booleanPreferencesKey(defaults.showAppIconsInDrawer.toString())
+        booleanPreferencesKey(defaults::showAppIconsInDrawer.toString())
 
     private val SEARCH_BAR_BOTTOM =
-        booleanPreferencesKey(defaults.searchBarBottom.toString())
+        booleanPreferencesKey(defaults::searchBarBottom.toString())
 
     // -------------------------------------------------------------------------
     // Accessors + Mutators
@@ -89,19 +89,19 @@ object DrawerSettingsStore {
             }
 
             putIfNonDefault(
-                defaults.autoOpenSingleMatch.toString(),
+                AUTO_OPEN_SINGLE_MATCH.name,
                 prefs[AUTO_OPEN_SINGLE_MATCH],
                 defaults.autoOpenSingleMatch
             )
 
             putIfNonDefault(
-                defaults.showAppIconsInDrawer.toString(),
+                SHOW_APP_ICONS_IN_DRAWER.name,
                 prefs[SHOW_APP_ICONS_IN_DRAWER],
                 defaults.showAppIconsInDrawer
             )
 
             putIfNonDefault(
-                defaults.searchBarBottom.toString(),
+                SEARCH_BAR_BOTTOM.name,
                 prefs[SEARCH_BAR_BOTTOM],
                 defaults.searchBarBottom
             )
@@ -114,15 +114,15 @@ object DrawerSettingsStore {
     suspend fun setAll(ctx: Context, backup: Map<String, Boolean>) {
         ctx.drawerDataStore.edit { prefs ->
 
-            backup[defaults.autoOpenSingleMatch.toString()]?.let {
+            backup[AUTO_OPEN_SINGLE_MATCH.name]?.let {
                 prefs[AUTO_OPEN_SINGLE_MATCH] = it
             }
 
-            backup[defaults.showAppIconsInDrawer.toString()]?.let {
+            backup[SHOW_APP_ICONS_IN_DRAWER.name]?.let {
                 prefs[SHOW_APP_ICONS_IN_DRAWER] = it
             }
 
-            backup[defaults.searchBarBottom.toString()]?.let {
+            backup[SEARCH_BAR_BOTTOM.name]?.let {
                 prefs[SEARCH_BAR_BOTTOM] = it
             }
         }

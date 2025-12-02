@@ -103,49 +103,49 @@ object UiSettingsStore {
                 }
             }
 
-            putIfNonDefault(defaults::rgbLoading.name, prefs[RGB_LOADING], defaults.rgbLoading)
-            putIfNonDefault(defaults::rgbLine.name, prefs[RGB_LINE], defaults.rgbLine)
-            putIfNonDefault(defaults::showLaunchingAppLabel.name, prefs[SHOW_LAUNCHING_APP_LABEL], defaults.showLaunchingAppLabel)
-            putIfNonDefault(defaults::showLaunchingAppIcon.name, prefs[SHOW_LAUNCHING_APP_ICON], defaults.showLaunchingAppIcon)
-            putIfNonDefault(defaults::showAppLaunchPreviewCircle.name, prefs[SHOW_APP_LAUNCH_PREVIEW], defaults.showAppLaunchPreviewCircle)
-            putIfNonDefault(defaults::fullscreen.name, prefs[FULLSCREEN], defaults.fullscreen)
-            putIfNonDefault(defaults::showAppCirclePreview.name, prefs[SHOW_CIRCLE_PREVIEW], defaults.showAppCirclePreview)
-            putIfNonDefault(defaults::showAppLinePreview.name, prefs[SHOW_LINE_PREVIEW], defaults.showAppLinePreview)
+            putIfNonDefault(RGB_LOADING.name, prefs[RGB_LOADING], defaults.rgbLoading)
+            putIfNonDefault(RGB_LINE.name, prefs[RGB_LINE], defaults.rgbLine)
+            putIfNonDefault(SHOW_LAUNCHING_APP_LABEL.name, prefs[SHOW_LAUNCHING_APP_LABEL], defaults.showLaunchingAppLabel)
+            putIfNonDefault(SHOW_LAUNCHING_APP_ICON.name, prefs[SHOW_LAUNCHING_APP_ICON], defaults.showLaunchingAppIcon)
+            putIfNonDefault(SHOW_APP_LAUNCH_PREVIEW.name, prefs[SHOW_APP_LAUNCH_PREVIEW], defaults.showAppLaunchPreviewCircle)
+            putIfNonDefault(FULLSCREEN.name, prefs[FULLSCREEN], defaults.fullscreen)
+            putIfNonDefault(SHOW_CIRCLE_PREVIEW.name, prefs[SHOW_CIRCLE_PREVIEW], defaults.showAppCirclePreview)
+            putIfNonDefault(SHOW_LINE_PREVIEW.name, prefs[SHOW_LINE_PREVIEW], defaults.showAppLinePreview)
         }
     }
 
     suspend fun setAll(ctx: Context, backup: Map<String, String>) {
         ctx.uiDatastore.edit { prefs ->
 
-            backup[defaults::rgbLoading.name]?.let {
+            backup[RGB_LOADING.name]?.let {
                 prefs[RGB_LOADING] = it.toBoolean()
             }
 
-            backup[defaults::rgbLine.name]?.let {
+            backup[RGB_LINE.name]?.let {
                 prefs[RGB_LINE] = it.toBoolean()
             }
 
-            backup[defaults::showLaunchingAppLabel.name]?.let {
+            backup[SHOW_LAUNCHING_APP_LABEL.name]?.let {
                 prefs[SHOW_LAUNCHING_APP_LABEL] = it.toBoolean()
             }
 
-            backup[defaults::showLaunchingAppIcon.name]?.let {
+            backup[SHOW_LAUNCHING_APP_ICON.name]?.let {
                 prefs[SHOW_LAUNCHING_APP_ICON] = it.toBoolean()
             }
 
-            backup[defaults::showAppLaunchPreviewCircle.name]?.let {
+            backup[SHOW_APP_LAUNCH_PREVIEW.name]?.let {
                 prefs[SHOW_APP_LAUNCH_PREVIEW] = it.toBoolean()
             }
 
-            backup[defaults::fullscreen.name]?.let {
+            backup[FULLSCREEN.name]?.let {
                 prefs[FULLSCREEN] = it.toBoolean()
             }
 
-            backup[defaults::showAppCirclePreview.name]?.let {
+            backup[SHOW_CIRCLE_PREVIEW.name]?.let {
                 prefs[SHOW_CIRCLE_PREVIEW] = it.toBoolean()
             }
 
-            backup[defaults::showAppLinePreview.name]?.let {
+            backup[SHOW_LINE_PREVIEW.name]?.let {
                 prefs[SHOW_LINE_PREVIEW] = it.toBoolean()
             }
         }
