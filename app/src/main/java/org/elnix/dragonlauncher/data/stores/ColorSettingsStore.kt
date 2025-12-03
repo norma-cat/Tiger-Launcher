@@ -4,10 +4,12 @@ package org.elnix.dragonlauncher.data.stores
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import org.elnix.dragonlauncher.data.BackupTypeException
 import org.elnix.dragonlauncher.data.ColorCustomisationMode
 import org.elnix.dragonlauncher.data.DefaultThemes
 import org.elnix.dragonlauncher.data.colorDatastore
@@ -304,29 +306,35 @@ object ColorSettingsStore {
         }
     }
 
-    suspend fun setAll(ctx: Context, data: Map<String, Int>) {
+    suspend fun setAll(ctx: Context, data: Map<String, Any?>) {
         ctx.colorDatastore.edit { prefs ->
-            data[PRIMARY_COLOR.name]?.let { prefs[PRIMARY_COLOR] = it }
-            data[ON_PRIMARY_COLOR.name]?.let { prefs[ON_PRIMARY_COLOR] = it }
-            data[SECONDARY_COLOR.name]?.let { prefs[SECONDARY_COLOR] = it }
-            data[ON_SECONDARY_COLOR.name]?.let { prefs[ON_SECONDARY_COLOR] = it }
-            data[TERTIARY_COLOR.name]?.let { prefs[TERTIARY_COLOR] = it }
-            data[ON_TERTIARY_COLOR.name]?.let { prefs[ON_TERTIARY_COLOR] = it }
-            data[BACKGROUND_COLOR.name]?.let { prefs[BACKGROUND_COLOR] = it }
-            data[ON_BACKGROUND_COLOR.name]?.let { prefs[ON_BACKGROUND_COLOR] = it }
-            data[SURFACE_COLOR.name]?.let { prefs[SURFACE_COLOR] = it }
-            data[ON_SURFACE_COLOR.name]?.let { prefs[ON_SURFACE_COLOR] = it }
-            data[ERROR_COLOR.name]?.let { prefs[ERROR_COLOR] = it }
-            data[ON_ERROR_COLOR.name]?.let { prefs[ON_ERROR_COLOR] = it }
-            data[OUTLINE_COLOR.name]?.let { prefs[OUTLINE_COLOR] = it }
-            data[ANGLE_LINE_COLOR.name]?.let { prefs[ANGLE_LINE_COLOR] = it }
-            data[CIRCLE_COLOR.name]?.let { prefs[CIRCLE_COLOR] = it }
-//            data[EDIT_COLOR.name]?.let { prefs[EDIT_COLOR] = it }
-//            data[COMPLETE_COLOR.name]?.let { prefs[COMPLETE_COLOR] = it }
-//            data[SELECT_COLOR.name]?.let { prefs[SELECT_COLOR] = it }
-//            data[NOTE_TYPE_TEXT.name]?.let { prefs[NOTE_TYPE_TEXT] = it }
-//            data[NOTE_TYPE_CHECKLIST.name]?.let { prefs[NOTE_TYPE_CHECKLIST] = it }
-//            data[NOTE_TYPE_DRAWING.name]?.let { prefs[NOTE_TYPE_DRAWING] = it }
+
+            fun setInt(key: Preferences.Key<Int>, raw: Any?) {
+                if (raw == null) return
+                val intVal = raw as? Int
+                    ?: throw BackupTypeException(key.name, "Int", raw::class.simpleName,raw)
+                prefs[key] = intVal
+            }
+
+            data.forEach { (name, value) ->
+                when (name) {
+                    PRIMARY_COLOR.name        -> setInt(PRIMARY_COLOR, value)
+                    ON_PRIMARY_COLOR.name     -> setInt(ON_PRIMARY_COLOR, value)
+                    SECONDARY_COLOR.name      -> setInt(SECONDARY_COLOR, value)
+                    ON_SECONDARY_COLOR.name   -> setInt(ON_SECONDARY_COLOR, value)
+                    TERTIARY_COLOR.name       -> setInt(TERTIARY_COLOR, value)
+                    ON_TERTIARY_COLOR.name    -> setInt(ON_TERTIARY_COLOR, value)
+                    BACKGROUND_COLOR.name     -> setInt(BACKGROUND_COLOR, value)
+                    ON_BACKGROUND_COLOR.name  -> setInt(ON_BACKGROUND_COLOR, value)
+                    SURFACE_COLOR.name        -> setInt(SURFACE_COLOR, value)
+                    ON_SURFACE_COLOR.name     -> setInt(ON_SURFACE_COLOR, value)
+                    ERROR_COLOR.name          -> setInt(ERROR_COLOR, value)
+                    ON_ERROR_COLOR.name       -> setInt(ON_ERROR_COLOR, value)
+                    OUTLINE_COLOR.name        -> setInt(OUTLINE_COLOR, value)
+                    ANGLE_LINE_COLOR.name     -> setInt(ANGLE_LINE_COLOR, value)
+                    CIRCLE_COLOR.name         -> setInt(CIRCLE_COLOR, value)
+                }
+            }
         }
     }
 }

@@ -1,11 +1,13 @@
 package org.elnix.dragonlauncher.data.stores
 
 import android.content.Context
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import org.elnix.dragonlauncher.data.BackupTypeException
 import org.elnix.dragonlauncher.data.uiDatastore
 
 object UiSettingsStore {
@@ -23,131 +25,147 @@ object UiSettingsStore {
 
     private val defaults = UiSettingsBackup()
 
-    private val RGB_LOADING = booleanPreferencesKey(defaults::rgbLoading.name)
+    private object Keys {
+        val RGB_LOADING = booleanPreferencesKey(UiSettingsBackup::rgbLoading.name)
+        val RGB_LINE = booleanPreferencesKey(UiSettingsBackup::rgbLine.name)
+        val SHOW_LAUNCHING_APP_LABEL = booleanPreferencesKey(UiSettingsBackup::showLaunchingAppLabel.name)
+        val SHOW_LAUNCHING_APP_ICON = booleanPreferencesKey(UiSettingsBackup::showLaunchingAppIcon.name)
+        val SHOW_APP_LAUNCH_PREVIEW = booleanPreferencesKey(UiSettingsBackup::showAppLaunchPreviewCircle.name)
+        val FULLSCREEN = booleanPreferencesKey(UiSettingsBackup::fullscreen.name)
+        val SHOW_CIRCLE_PREVIEW = booleanPreferencesKey(UiSettingsBackup::showAppCirclePreview.name)
+        val SHOW_LINE_PREVIEW = booleanPreferencesKey(UiSettingsBackup::showAppLinePreview.name)
+
+        val ALL = listOf(
+            RGB_LOADING,
+            RGB_LINE,
+            SHOW_LAUNCHING_APP_LABEL,
+            SHOW_LAUNCHING_APP_ICON,
+            SHOW_APP_LAUNCH_PREVIEW,
+            FULLSCREEN,
+            SHOW_CIRCLE_PREVIEW,
+            SHOW_LINE_PREVIEW
+        )
+    }
+
     fun getRGBLoading(ctx: Context): Flow<Boolean> =
-        ctx.uiDatastore.data.map { it[RGB_LOADING] ?: defaults.rgbLoading }
-    suspend fun setRGBLoading(ctx: Context, enabled: Boolean) {
-        ctx.uiDatastore.edit { it[RGB_LOADING] = enabled }
+        ctx.uiDatastore.data.map { it[Keys.RGB_LOADING] ?: defaults.rgbLoading }
+
+    suspend fun setRGBLoading(ctx: Context, value: Boolean) {
+        ctx.uiDatastore.edit { it[Keys.RGB_LOADING] = value }
     }
 
-    private val RGB_LINE = booleanPreferencesKey(defaults::rgbLine.name)
     fun getRGBLine(ctx: Context): Flow<Boolean> =
-        ctx.uiDatastore.data.map { it[RGB_LINE] ?: defaults.rgbLine }
-    suspend fun setRGBLine(ctx: Context, enabled: Boolean) {
-        ctx.uiDatastore.edit { it[RGB_LINE] = enabled }
+        ctx.uiDatastore.data.map { it[Keys.RGB_LINE] ?: defaults.rgbLine }
+
+    suspend fun setRGBLine(ctx: Context, value: Boolean) {
+        ctx.uiDatastore.edit { it[Keys.RGB_LINE] = value }
     }
 
-    private val SHOW_LAUNCHING_APP_LABEL = booleanPreferencesKey(defaults::showLaunchingAppLabel.name)
     fun getShowLaunchingAppLabel(ctx: Context): Flow<Boolean> =
-        ctx.uiDatastore.data.map { it[SHOW_LAUNCHING_APP_LABEL] ?: defaults.showLaunchingAppLabel }
-    suspend fun setShowLaunchingAppLabel(ctx: Context, enabled: Boolean) {
-        ctx.uiDatastore.edit { it[SHOW_LAUNCHING_APP_LABEL] = enabled }
+        ctx.uiDatastore.data.map { it[Keys.SHOW_LAUNCHING_APP_LABEL] ?: defaults.showLaunchingAppLabel }
+
+    suspend fun setShowLaunchingAppLabel(ctx: Context, value: Boolean) {
+        ctx.uiDatastore.edit { it[Keys.SHOW_LAUNCHING_APP_LABEL] = value }
     }
 
-    private val SHOW_LAUNCHING_APP_ICON = booleanPreferencesKey(defaults::showLaunchingAppIcon.name)
     fun getShowLaunchingAppIcon(ctx: Context): Flow<Boolean> =
-        ctx.uiDatastore.data.map { it[SHOW_LAUNCHING_APP_ICON] ?: defaults.showLaunchingAppIcon }
-    suspend fun setShowLaunchingAppIcon(ctx: Context, enabled: Boolean) {
-        ctx.uiDatastore.edit { it[SHOW_LAUNCHING_APP_ICON] = enabled }
+        ctx.uiDatastore.data.map { it[Keys.SHOW_LAUNCHING_APP_ICON] ?: defaults.showLaunchingAppIcon }
+
+    suspend fun setShowLaunchingAppIcon(ctx: Context, value: Boolean) {
+        ctx.uiDatastore.edit { it[Keys.SHOW_LAUNCHING_APP_ICON] = value }
     }
 
-    private val SHOW_APP_LAUNCH_PREVIEW = booleanPreferencesKey(defaults::showAppLaunchPreviewCircle.name)
     fun getShowAppLaunchPreview(ctx: Context): Flow<Boolean> =
-        ctx.uiDatastore.data.map { it[SHOW_APP_LAUNCH_PREVIEW] ?: defaults.showAppLaunchPreviewCircle }
-    suspend fun setShowAppLaunchPreview(ctx: Context, enabled: Boolean) {
-        ctx.uiDatastore.edit { it[SHOW_APP_LAUNCH_PREVIEW] = enabled }
+        ctx.uiDatastore.data.map { it[Keys.SHOW_APP_LAUNCH_PREVIEW] ?: defaults.showAppLaunchPreviewCircle }
+
+    suspend fun setShowAppLaunchPreview(ctx: Context, value: Boolean) {
+        ctx.uiDatastore.edit { it[Keys.SHOW_APP_LAUNCH_PREVIEW] = value }
     }
 
-    private val FULLSCREEN = booleanPreferencesKey(defaults::fullscreen.name)
     fun getFullscreen(ctx: Context): Flow<Boolean> =
-        ctx.uiDatastore.data.map { it[FULLSCREEN] ?: defaults.fullscreen }
-    suspend fun setFullscreen(ctx: Context, enabled: Boolean) {
-        ctx.uiDatastore.edit { it[FULLSCREEN] = enabled }
+        ctx.uiDatastore.data.map { it[Keys.FULLSCREEN] ?: defaults.fullscreen }
+
+    suspend fun setFullscreen(ctx: Context, value: Boolean) {
+        ctx.uiDatastore.edit { it[Keys.FULLSCREEN] = value }
     }
 
-    private val SHOW_CIRCLE_PREVIEW = booleanPreferencesKey(defaults::showAppCirclePreview.name)
     fun getShowCirclePreview(ctx: Context): Flow<Boolean> =
-        ctx.uiDatastore.data.map { it[SHOW_CIRCLE_PREVIEW] ?: defaults.showAppCirclePreview }
-    suspend fun setShowCirclePreview(ctx: Context, enabled: Boolean) {
-        ctx.uiDatastore.edit { it[SHOW_CIRCLE_PREVIEW] = enabled }
+        ctx.uiDatastore.data.map { it[Keys.SHOW_CIRCLE_PREVIEW] ?: defaults.showAppCirclePreview }
+
+    suspend fun setShowCirclePreview(ctx: Context, value: Boolean) {
+        ctx.uiDatastore.edit { it[Keys.SHOW_CIRCLE_PREVIEW] = value }
     }
 
-    private val SHOW_LINE_PREVIEW = booleanPreferencesKey(defaults::showAppLinePreview.name)
     fun getShowLinePreview(ctx: Context): Flow<Boolean> =
-        ctx.uiDatastore.data.map { it[SHOW_LINE_PREVIEW] ?: defaults.showAppLinePreview }
-    suspend fun setShowLinePreview(ctx: Context, enabled: Boolean) {
-        ctx.uiDatastore.edit { it[SHOW_LINE_PREVIEW] = enabled }
+        ctx.uiDatastore.data.map { it[Keys.SHOW_LINE_PREVIEW] ?: defaults.showAppLinePreview }
+
+    suspend fun setShowLinePreview(ctx: Context, value: Boolean) {
+        ctx.uiDatastore.edit { it[Keys.SHOW_LINE_PREVIEW] = value }
     }
+
 
     suspend fun resetAll(ctx: Context) {
         ctx.uiDatastore.edit { prefs ->
-            prefs.remove(RGB_LOADING)
-            prefs.remove(RGB_LINE)
-            prefs.remove(SHOW_LAUNCHING_APP_LABEL)
-            prefs.remove(SHOW_LAUNCHING_APP_ICON)
-            prefs.remove(SHOW_APP_LAUNCH_PREVIEW)
-            prefs.remove(FULLSCREEN)
-            prefs.remove(SHOW_CIRCLE_PREVIEW)
-            prefs.remove(SHOW_LINE_PREVIEW)
+            Keys.ALL.forEach { prefs.remove(it) }
         }
     }
 
-    suspend fun getAll(ctx: Context): Map<String, String> {
+    suspend fun getAll(ctx: Context): Map<String, Any> {
         val prefs = ctx.uiDatastore.data.first()
 
         return buildMap {
 
-            fun putIfNonDefault(key: String, value: Any?, default: Any?) {
-                if (value != null && value != default) {
-                    put(key, value.toString())
-                }
+            fun putIfChanged(key: Preferences.Key<Boolean>, default: Boolean) {
+                val v = prefs[key]
+                if (v != null && v != default) put(key.name, v)
             }
 
-            putIfNonDefault(RGB_LOADING.name, prefs[RGB_LOADING], defaults.rgbLoading)
-            putIfNonDefault(RGB_LINE.name, prefs[RGB_LINE], defaults.rgbLine)
-            putIfNonDefault(SHOW_LAUNCHING_APP_LABEL.name, prefs[SHOW_LAUNCHING_APP_LABEL], defaults.showLaunchingAppLabel)
-            putIfNonDefault(SHOW_LAUNCHING_APP_ICON.name, prefs[SHOW_LAUNCHING_APP_ICON], defaults.showLaunchingAppIcon)
-            putIfNonDefault(SHOW_APP_LAUNCH_PREVIEW.name, prefs[SHOW_APP_LAUNCH_PREVIEW], defaults.showAppLaunchPreviewCircle)
-            putIfNonDefault(FULLSCREEN.name, prefs[FULLSCREEN], defaults.fullscreen)
-            putIfNonDefault(SHOW_CIRCLE_PREVIEW.name, prefs[SHOW_CIRCLE_PREVIEW], defaults.showAppCirclePreview)
-            putIfNonDefault(SHOW_LINE_PREVIEW.name, prefs[SHOW_LINE_PREVIEW], defaults.showAppLinePreview)
+            putIfChanged(Keys.RGB_LOADING, defaults.rgbLoading)
+            putIfChanged(Keys.RGB_LINE, defaults.rgbLine)
+            putIfChanged(Keys.SHOW_LAUNCHING_APP_LABEL, defaults.showLaunchingAppLabel)
+            putIfChanged(Keys.SHOW_LAUNCHING_APP_ICON, defaults.showLaunchingAppIcon)
+            putIfChanged(Keys.SHOW_APP_LAUNCH_PREVIEW, defaults.showAppLaunchPreviewCircle)
+            putIfChanged(Keys.FULLSCREEN, defaults.fullscreen)
+            putIfChanged(Keys.SHOW_CIRCLE_PREVIEW, defaults.showAppCirclePreview)
+            putIfChanged(Keys.SHOW_LINE_PREVIEW, defaults.showAppLinePreview)
         }
     }
 
-    suspend fun setAll(ctx: Context, backup: Map<String, String>) {
+
+    suspend fun setAll(ctx: Context, backup: Map<String, Any?>) {
         ctx.uiDatastore.edit { prefs ->
 
-            backup[RGB_LOADING.name]?.let {
-                prefs[RGB_LOADING] = it.toBoolean()
+            fun applyBoolean(key: Preferences.Key<Boolean>) {
+                val raw = backup[key.name] ?: return
+
+                val boolValue = when (raw) {
+                    is Boolean -> raw
+                    is String -> raw.toBooleanStrictOrNull()
+                        ?: throw BackupTypeException(
+                            key.name,
+                            expected = "Boolean",
+                            actual = "String",
+                            value = raw
+                        )
+                    else -> throw BackupTypeException(
+                        key.name,
+                        expected = "Boolean",
+                        actual = raw::class.simpleName,
+                        value = raw
+                    )
+                }
+
+                prefs[key] = boolValue
             }
 
-            backup[RGB_LINE.name]?.let {
-                prefs[RGB_LINE] = it.toBoolean()
-            }
-
-            backup[SHOW_LAUNCHING_APP_LABEL.name]?.let {
-                prefs[SHOW_LAUNCHING_APP_LABEL] = it.toBoolean()
-            }
-
-            backup[SHOW_LAUNCHING_APP_ICON.name]?.let {
-                prefs[SHOW_LAUNCHING_APP_ICON] = it.toBoolean()
-            }
-
-            backup[SHOW_APP_LAUNCH_PREVIEW.name]?.let {
-                prefs[SHOW_APP_LAUNCH_PREVIEW] = it.toBoolean()
-            }
-
-            backup[FULLSCREEN.name]?.let {
-                prefs[FULLSCREEN] = it.toBoolean()
-            }
-
-            backup[SHOW_CIRCLE_PREVIEW.name]?.let {
-                prefs[SHOW_CIRCLE_PREVIEW] = it.toBoolean()
-            }
-
-            backup[SHOW_LINE_PREVIEW.name]?.let {
-                prefs[SHOW_LINE_PREVIEW] = it.toBoolean()
-            }
+            applyBoolean(Keys.RGB_LOADING)
+            applyBoolean(Keys.RGB_LINE)
+            applyBoolean(Keys.SHOW_LAUNCHING_APP_LABEL)
+            applyBoolean(Keys.SHOW_LAUNCHING_APP_ICON)
+            applyBoolean(Keys.SHOW_APP_LAUNCH_PREVIEW)
+            applyBoolean(Keys.FULLSCREEN)
+            applyBoolean(Keys.SHOW_CIRCLE_PREVIEW)
+            applyBoolean(Keys.SHOW_LINE_PREVIEW)
         }
     }
 }

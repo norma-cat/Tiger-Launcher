@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,10 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.actionTint
 import org.elnix.dragonlauncher.utils.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.actions.actionColor
@@ -41,6 +44,8 @@ fun AddPointDialog(
     onDismiss: () -> Unit,
     onActionSelected: (SwipeActionSerializable) -> Unit
 ) {
+    val ctx = LocalContext.current
+
     var showAppPicker by remember { mutableStateOf(false) }
     var showUrlInput by remember { mutableStateOf(false) }
 
@@ -53,6 +58,10 @@ fun AddPointDialog(
         SwipeActionSerializable.OpenAppDrawer,
         SwipeActionSerializable.OpenDragonLauncherSettings,
     )
+
+    val gridSize by DrawerSettingsStore.getGridSize(ctx)
+        .collectAsState(initial = 1)
+
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -101,6 +110,7 @@ fun AddPointDialog(
     if (showAppPicker) {
         AppPickerDialog(
             viewModel = appsViewModel,
+            gridSize = gridSize,
             onDismiss = { showAppPicker = false },
             onAppSelected = {
                 onActionSelected(it)

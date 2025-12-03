@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.drawer.AppDrawerScreen
-import org.elnix.dragonlauncher.ui.settings.DrawerTab
+import org.elnix.dragonlauncher.ui.settings.appearance.DrawerTab
 import org.elnix.dragonlauncher.ui.settings.appearance.AppearanceTab
 import org.elnix.dragonlauncher.ui.settings.appearance.ColorSelectorTab
 import org.elnix.dragonlauncher.ui.settings.backup.BackupTab
@@ -49,6 +49,13 @@ fun MainAppUi(
     val showAppIconsInDrawer by DrawerSettingsStore.getShowAppIconsInDrawer(ctx)
         .collectAsState(initial = true)
 
+    val showAppLabelsInDrawer by DrawerSettingsStore.getShowAppLabelsInDrawer(ctx)
+        .collectAsState(initial = true)
+
+
+    val gridSize by DrawerSettingsStore.getGridSize(ctx)
+        .collectAsState(initial = 1)
+
     val searchBarBottom by DrawerSettingsStore.getSearchBarBottom(ctx)
         .collectAsState(initial = true)
 
@@ -78,7 +85,13 @@ fun MainAppUi(
             )
         }
 
-        composable(ROUTES.DRAWER) { AppDrawerScreen(appsViewModel, showAppIconsInDrawer, searchBarBottom) { goMainScreen() } }
+        composable(ROUTES.DRAWER) { AppDrawerScreen(
+            appsViewModel = appsViewModel,
+            showIcons = showAppIconsInDrawer,
+            showLabels = showAppLabelsInDrawer,
+            gridSize = gridSize,
+            searchBarBottom = searchBarBottom
+        ) { goMainScreen() } }
 
 
         // Settings + Welcome

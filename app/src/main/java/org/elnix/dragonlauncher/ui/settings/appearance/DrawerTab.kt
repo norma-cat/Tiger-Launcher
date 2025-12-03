@@ -1,4 +1,4 @@
-package org.elnix.dragonlauncher.ui.settings
+package org.elnix.dragonlauncher.ui.settings.appearance
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
+import org.elnix.dragonlauncher.ui.helpers.GridSizeSlider
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 
@@ -26,9 +27,12 @@ fun DrawerTab(onBack: () -> Unit) {
     val showAppIconsInDrawer by DrawerSettingsStore.getShowAppIconsInDrawer(ctx)
         .collectAsState(initial = true)
 
-    val searchBarBottom by DrawerSettingsStore.getSearchBarBottom(ctx)
+    val showAppLabelsInDrawer by DrawerSettingsStore.getShowAppLabelsInDrawer(ctx)
         .collectAsState(initial = true)
 
+
+    val searchBarBottom by DrawerSettingsStore.getSearchBarBottom(ctx)
+        .collectAsState(initial = true)
 
     SettingsLazyHeader(
         title = stringResource(R.string.app_drawer),
@@ -57,9 +61,20 @@ fun DrawerTab(onBack: () -> Unit) {
 
         item {
             SwitchRow(
+                showAppLabelsInDrawer,
+                "Show App Labels in Drawer",
+            ) { scope.launch { DrawerSettingsStore.setShowAppLabelsInDrawer(ctx, it) } }
+        }
+
+        item {
+            SwitchRow(
                 searchBarBottom,
                 "Search bar ${if (searchBarBottom) "Bottom" else "Top"}",
             ) { scope.launch { DrawerSettingsStore.setSearchBarBottom(ctx, it) } }
+        }
+
+        item {
+            GridSizeSlider()
         }
     }
 }

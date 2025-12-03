@@ -3,9 +3,11 @@ package org.elnix.dragonlauncher.data.stores
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import org.elnix.dragonlauncher.data.BackupTypeException
 import org.elnix.dragonlauncher.data.drawerDataStore
 
 object DrawerSettingsStore {
@@ -16,22 +18,41 @@ object DrawerSettingsStore {
     private data class DrawerSettingsBackup(
         val autoOpenSingleMatch: Boolean = true,
         val showAppIconsInDrawer: Boolean = true,
-        val searchBarBottom: Boolean = true
+        val showAppLabelInDrawer: Boolean = true,
+        val searchBarBottom: Boolean = true,
+        val gridSize: Int = 4
     )
 
     private val defaults = DrawerSettingsBackup()
+
+    private object Keys {
+        const val AUTO_OPEN_SINGLE_MATCH = "autoOpenSingleMatch"
+        const val SHOW_APP_ICONS_IN_DRAWER = "showAppIconsInDrawer"
+        const val SHOW_APP_LABEL_IN_DRAWER = "showAppLabelInDrawer"
+        const val SEARCH_BAR_BOTTOM = "searchBarBottom"
+        const val GRID_SIZE = "gridSize"
+    }
+
 
     // -------------------------------------------------------------------------
     // Keys
     // -------------------------------------------------------------------------
     private val AUTO_OPEN_SINGLE_MATCH =
-        booleanPreferencesKey(defaults::autoOpenSingleMatch.toString())
+        booleanPreferencesKey(Keys.AUTO_OPEN_SINGLE_MATCH)
 
     private val SHOW_APP_ICONS_IN_DRAWER =
-        booleanPreferencesKey(defaults::showAppIconsInDrawer.toString())
+        booleanPreferencesKey(Keys.SHOW_APP_ICONS_IN_DRAWER)
+
+    private val SHOW_APP_LABEL_IN_DRAWER =
+        booleanPreferencesKey(Keys.SHOW_APP_LABEL_IN_DRAWER)
+
 
     private val SEARCH_BAR_BOTTOM =
-        booleanPreferencesKey(defaults::searchBarBottom.toString())
+        booleanPreferencesKey(Keys.SEARCH_BAR_BOTTOM)
+
+    private val GRID_SIZE =
+        intPreferencesKey(Keys.GRID_SIZE)
+
 
     // -------------------------------------------------------------------------
     // Accessors + Mutators
@@ -54,6 +75,15 @@ object DrawerSettingsStore {
         ctx.drawerDataStore.edit { it[SHOW_APP_ICONS_IN_DRAWER] = enabled }
     }
 
+    fun getShowAppLabelsInDrawer(ctx: Context): Flow<Boolean> =
+        ctx.drawerDataStore.data.map { prefs ->
+            prefs[SHOW_APP_LABEL_IN_DRAWER] ?: defaults.showAppLabelInDrawer
+        }
+
+    suspend fun setShowAppLabelsInDrawer(ctx: Context, enabled: Boolean) {
+        ctx.drawerDataStore.edit { it[SHOW_APP_LABEL_IN_DRAWER] = enabled }
+    }
+
     fun getSearchBarBottom(ctx: Context): Flow<Boolean> =
         ctx.drawerDataStore.data.map { prefs ->
             prefs[SEARCH_BAR_BOTTOM] ?: defaults.searchBarBottom
@@ -63,6 +93,15 @@ object DrawerSettingsStore {
         ctx.drawerDataStore.edit { it[SEARCH_BAR_BOTTOM] = enabled }
     }
 
+    fun getGridSize(ctx: Context): Flow<Int> =
+        ctx.drawerDataStore.data.map { prefs ->
+            prefs[GRID_SIZE] ?: defaults.gridSize
+        }
+
+    suspend fun setGridSize(ctx: Context, size: Int) {
+        ctx.drawerDataStore.edit { it[GRID_SIZE] = size }
+    }
+
     // -------------------------------------------------------------------------
     // Reset
     // -------------------------------------------------------------------------
@@ -70,40 +109,54 @@ object DrawerSettingsStore {
         ctx.drawerDataStore.edit { prefs ->
             prefs.remove(AUTO_OPEN_SINGLE_MATCH)
             prefs.remove(SHOW_APP_ICONS_IN_DRAWER)
+            prefs.remove(SHOW_APP_LABEL_IN_DRAWER)
             prefs.remove(SEARCH_BAR_BOTTOM)
+            prefs.remove(GRID_SIZE)
         }
     }
 
     // -------------------------------------------------------------------------
     // Backup export
     // -------------------------------------------------------------------------
-    suspend fun getAll(ctx: Context): Map<String, Boolean> {
+    suspend fun getAll(ctx: Context): Map<String, String> {
         val prefs = ctx.drawerDataStore.data.first()
 
         return buildMap {
 
-            fun putIfNonDefault(key: String, value: Boolean?, defaultVal: Boolean) {
+            fun putIfNonDefault(key: String, value: Any?, defaultVal: Any) {
                 if (value != null && value != defaultVal) {
-                    put(key, value)
+                    put(key, value.toString())
                 }
             }
 
             putIfNonDefault(
-                AUTO_OPEN_SINGLE_MATCH.name,
+                Keys.AUTO_OPEN_SINGLE_MATCH,
                 prefs[AUTO_OPEN_SINGLE_MATCH],
                 defaults.autoOpenSingleMatch
             )
 
             putIfNonDefault(
-                SHOW_APP_ICONS_IN_DRAWER.name,
+                Keys.SHOW_APP_ICONS_IN_DRAWER,
                 prefs[SHOW_APP_ICONS_IN_DRAWER],
                 defaults.showAppIconsInDrawer
             )
 
             putIfNonDefault(
-                SEARCH_BAR_BOTTOM.name,
+                Keys.SHOW_APP_LABEL_IN_DRAWER,
+                prefs[SHOW_APP_LABEL_IN_DRAWER],
+                defaults.showAppLabelInDrawer
+            )
+
+            putIfNonDefault(
+                Keys.SEARCH_BAR_BOTTOM,
                 prefs[SEARCH_BAR_BOTTOM],
                 defaults.searchBarBottom
+            )
+
+            putIfNonDefault(
+                Keys.GRID_SIZE,
+                prefs[GRID_SIZE],
+                defaults.gridSize
             )
         }
     }
@@ -111,20 +164,65 @@ object DrawerSettingsStore {
     // -------------------------------------------------------------------------
     // Backup import
     // -------------------------------------------------------------------------
-    suspend fun setAll(ctx: Context, backup: Map<String, Boolean>) {
+    suspend fun setAll(ctx: Context, raw: Map<String, Any?>) {
+
+        fun getBooleanStrict(key: String): Boolean {
+            val v = raw[key] ?: return defaults.run {
+                when (key) {
+                    Keys.AUTO_OPEN_SINGLE_MATCH -> autoOpenSingleMatch
+                    Keys.SHOW_APP_ICONS_IN_DRAWER -> showAppIconsInDrawer
+                    Keys.SHOW_APP_LABEL_IN_DRAWER -> showAppLabelInDrawer
+                    Keys.SEARCH_BAR_BOTTOM -> searchBarBottom
+                    else -> throw BackupTypeException(
+                        key, "Boolean", null, null
+                    )
+                }
+            }
+
+            return v as? Boolean ?: throw BackupTypeException(
+                key = key,
+                expected = "Boolean",
+                actual = v::class.simpleName,
+                value = v
+            )
+        }
+
+        fun getIntStrict(key: String): Int {
+            val v = raw[key] ?: return defaults.gridSize
+
+            return when (v) {
+                is Int -> v
+                is Number -> v.toInt()
+                is String -> v.toIntOrNull()
+                    ?: throw BackupTypeException(
+                        key = key,
+                        expected = "Int",
+                        actual = "String",
+                        value = v
+                    )
+                else -> throw BackupTypeException(
+                    key = key,
+                    expected = "Int",
+                    actual = v::class.simpleName,
+                    value = v
+                )
+            }
+        }
+
+        val backup = DrawerSettingsBackup(
+            autoOpenSingleMatch = getBooleanStrict(Keys.AUTO_OPEN_SINGLE_MATCH),
+            showAppIconsInDrawer = getBooleanStrict(Keys.SHOW_APP_ICONS_IN_DRAWER),
+            showAppLabelInDrawer = getBooleanStrict(Keys.SHOW_APP_LABEL_IN_DRAWER),
+            searchBarBottom = getBooleanStrict(Keys.SEARCH_BAR_BOTTOM),
+            gridSize = getIntStrict(Keys.GRID_SIZE)
+        )
+
         ctx.drawerDataStore.edit { prefs ->
-
-            backup[AUTO_OPEN_SINGLE_MATCH.name]?.let {
-                prefs[AUTO_OPEN_SINGLE_MATCH] = it
-            }
-
-            backup[SHOW_APP_ICONS_IN_DRAWER.name]?.let {
-                prefs[SHOW_APP_ICONS_IN_DRAWER] = it
-            }
-
-            backup[SEARCH_BAR_BOTTOM.name]?.let {
-                prefs[SEARCH_BAR_BOTTOM] = it
-            }
+            prefs[AUTO_OPEN_SINGLE_MATCH] = backup.autoOpenSingleMatch
+            prefs[SHOW_APP_ICONS_IN_DRAWER] = backup.showAppIconsInDrawer
+            prefs[SHOW_APP_LABEL_IN_DRAWER] = backup.showAppLabelInDrawer
+            prefs[SEARCH_BAR_BOTTOM] = backup.searchBarBottom
+            prefs[GRID_SIZE] = backup.gridSize
         }
     }
 }

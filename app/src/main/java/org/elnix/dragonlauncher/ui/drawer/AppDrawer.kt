@@ -5,7 +5,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -34,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
@@ -42,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.delay
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
+import org.elnix.dragonlauncher.ui.helpers.AppGrid
 import org.elnix.dragonlauncher.utils.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
 
@@ -51,6 +49,8 @@ import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
 fun AppDrawerScreen(
     appsViewModel: AppDrawerViewModel,
     showIcons: Boolean,
+    showLabels: Boolean,
+    gridSize: Int,
     searchBarBottom: Boolean,
     onClose: () -> Unit
 ) {
@@ -119,25 +119,20 @@ fun AppDrawerScreen(
             Spacer(Modifier.height(12.dp))
         }
 
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures { _, _ -> }  // Consume drag
-                }
-        ) {
-            items(filtered) { app ->
-                AppItem(
-                    app = app,
-                    showIcons = showIcons,
-                    icons = icons,
-                    onClick = { launchSwipeAction(ctx, app.action); onClose() },
-                    onLongClick = { dialogApp = app }
-                )
+        Box(modifier = Modifier.weight(1f)) {
+            AppGrid(
+                apps = filtered,
+                icons = icons,
+                gridSize = gridSize,
+                txtColor = MaterialTheme.colorScheme.onBackground,
+                showIcons = showIcons,
+                showLabels = showLabels,
+                onLongClick = { dialogApp = it }
+            ) {
+                launchSwipeAction(ctx, it.action)
+                onClose()
             }
         }
-
         if (searchBarBottom) {
 
             Spacer(Modifier.height(12.dp))

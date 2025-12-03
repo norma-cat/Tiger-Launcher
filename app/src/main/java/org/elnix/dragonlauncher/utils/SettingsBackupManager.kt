@@ -98,7 +98,7 @@ object SettingsBackupManager {
                             SwipeSettingsStore.save(ctx, pointsList)
                         }
                         DataStoreName.DRAWER -> obj.optJSONObject(store.backupKey)?.let {
-                            DrawerSettingsStore.setAll(ctx, jsonToBooleanMap(it))
+                            DrawerSettingsStore.setAll(ctx, jsonToStringMap(it))
                         }
                         DataStoreName.COLOR_MODE -> obj.optJSONObject(store.backupKey)?.let {
                             ColorModesSettingsStore.setAll(ctx, jsonToStringMap(it))
@@ -144,7 +144,7 @@ object SettingsBackupManager {
                             SwipeSettingsStore.save(ctx, pointsList)
                         }
                         DataStoreName.DRAWER -> jsonObj.optJSONObject(store.backupKey)?.let {
-                            DrawerSettingsStore.setAll(ctx, jsonToBooleanMap(it))
+                            DrawerSettingsStore.setAll(ctx, jsonToStringMap(it))
                         }
                         DataStoreName.COLOR_MODE -> jsonObj.optJSONObject(store.backupKey)?.let {
                             ColorModesSettingsStore.setAll(ctx, jsonToStringMap(it))

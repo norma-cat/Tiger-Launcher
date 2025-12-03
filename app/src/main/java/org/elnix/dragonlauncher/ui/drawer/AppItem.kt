@@ -18,9 +18,10 @@ import org.elnix.dragonlauncher.utils.actions.actionIcon
 fun AppItem(
     app: AppModel,
     showIcons: Boolean,
+    showLabels: Boolean,
     icons: Map<String, ImageBitmap>,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit
+    onLongClick: (() -> Unit)? = null,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -48,6 +49,6 @@ fun AppItem(
             Spacer(Modifier.width(12.dp))
         }
 
-        Text(app.name, color = Color.White)
+        if (showLabels) { Text(app.name, color = Color.White) }
     }
 }
