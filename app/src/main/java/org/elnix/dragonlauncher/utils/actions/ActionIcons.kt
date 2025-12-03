@@ -63,7 +63,7 @@ fun actionIcon(
 fun actionIconBitmap(
     action: SwipeActionSerializable,
     context: Context,
-    tintColor: Color // Add this!
+    tintColor: Color
 ): ImageBitmap {
     val bitmap = createUntintedBitmap(action, context)
     return if (action is SwipeActionSerializable.LaunchApp || action is SwipeActionSerializable.OpenDragonLauncherSettings) {

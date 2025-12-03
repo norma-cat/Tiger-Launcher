@@ -52,13 +52,14 @@ fun MainAppUi(
     val showAppLabelsInDrawer by DrawerSettingsStore.getShowAppLabelsInDrawer(ctx)
         .collectAsState(initial = true)
 
-
     val gridSize by DrawerSettingsStore.getGridSize(ctx)
         .collectAsState(initial = 1)
 
     val searchBarBottom by DrawerSettingsStore.getSearchBarBottom(ctx)
         .collectAsState(initial = true)
 
+    val initialPage by DrawerSettingsStore.getInitialPage(ctx)
+        .collectAsState(initial = 0)
 
     fun goMainScreen() {
         navController.navigate(ROUTES.MAIN) {
@@ -87,6 +88,7 @@ fun MainAppUi(
 
         composable(ROUTES.DRAWER) { AppDrawerScreen(
             appsViewModel = appsViewModel,
+            initialPage = initialPage,
             showIcons = showAppIconsInDrawer,
             showLabels = showAppLabelsInDrawer,
             gridSize = gridSize,

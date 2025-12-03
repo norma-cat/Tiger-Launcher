@@ -112,7 +112,7 @@ fun AddPointDialog(
 
     if (showAppPicker) {
         AppPickerDialog(
-            viewModel = appsViewModel,
+            appsViewModel = appsViewModel,
             gridSize = gridSize,
             initialPage = initialPage,
             onDismiss = { showAppPicker = false },

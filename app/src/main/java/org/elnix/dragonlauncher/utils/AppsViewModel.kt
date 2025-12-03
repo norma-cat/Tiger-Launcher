@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.utils
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
@@ -37,11 +38,17 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
     val userApps: StateFlow<List<AppModel>> = _apps.map { list ->
         list.filter { !it.isSystem || specialSystemApps.contains(it.packageName) }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    val workProfileApps: StateFlow<List<AppModel>> = _apps.map { list ->
+        list.filter { it.isWorkProfile && !it.isSystem }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
     val systemApps: StateFlow<List<AppModel>> = _apps.map { list ->
         list.filter { it.isSystem }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private val pm: PackageManager = application.packageManager
+    @SuppressLint("StaticFieldLeak")
     private val ctx = application.applicationContext
     private val gson = Gson()
     @Suppress("PrivatePropertyName")
@@ -79,10 +86,22 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
     suspend fun reloadApps(ctx: Context) {
         val installedApps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
             .map { appInfo ->
+
+                val userId = appInfo.uid / 100000  // Extract user ID from UID
+                val isWorkProfile = userId > 10    // Work profiles typically start at user 10+
+
+
+                val enabledState = pm.getApplicationEnabledSetting(appInfo.packageName)
+                val isEnabled = enabledState == PackageManager.COMPONENT_ENABLED_STATE_ENABLED ||
+                enabledState == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+
+
                 AppModel(
                     name = appInfo.loadLabel(pm).toString(),
                     packageName = appInfo.packageName,
-                    isSystem = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+                    isEnabled = isEnabled,
+                    isSystem = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0,
+                    isWorkProfile = isWorkProfile
                 )
             }
             .sortedBy { it.name.lowercase() }
@@ -97,7 +116,7 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
                 ContextCompat.getDrawable(ctx, R.drawable.ic_app_default)!!
             }
 
-            val bmp = loadDrawableAsBitmap(drawable, 48, 48)
+            val bmp = loadDrawableAsBitmap(drawable, 128, 128)
             app.packageName to bmp
         }
 
@@ -109,5 +128,4 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
             prefs[DATASTORE_KEY] = json
         }
     }
-
 }
