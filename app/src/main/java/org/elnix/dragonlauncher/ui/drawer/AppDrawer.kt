@@ -128,15 +128,6 @@ fun AppDrawerScreen(
 
     var isSearchFocused by remember { mutableStateOf(false) }
 
-//    var hasAutoFocused by remember { mutableStateOf(false) }
-//    LaunchedEffect(Unit) {
-//        if (!hasAutoFocused) {
-//            yield()
-//            focusRequester.requestFocus()
-//            keyboardController?.show()
-//            hasAutoFocused = true
-//        }
-//    }
 
     LaunchedEffect(focusRequester) {
         yield()
@@ -221,99 +212,52 @@ fun AppDrawerScreen(
     }
 
 
+    @Composable
+    fun DrawerTextInput() {
+        AppDrawerSearch(
+            searchQuery = searchQuery,
+            onSearchChanged = { query -> searchQuery = query },
+            modifier = Modifier.focusRequester(focusRequester),
+            onEnterPressed = {
+                // Clears the search query, cuz why not, its for efficiency first
+                searchQuery = ""
+            },
+            onFocusStateChanged = { focused ->
+                isSearchFocused = focused
+                // Keyboard visibility is handled by onFocusChanged in AppDrawerSearch for focus gain,
+                // and by scroll logic or IME actions for focus loss/hide.
+            }
+        )
+    }
 
-//    @Composable
-//    fun DrawerTextInput() {
-//        TextField(
-//            value = searchQuery,
-//            onValueChange = { searchQuery = it },
-//            singleLine = true,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .onFocusChanged { focusState ->
-//                    if (focusState.isFocused && !hasAutoFocused) {
-//                        keyboardController?.show()
-//                    }
-//                }
-//                .focusRequester(focusRequester)
-//                .focusable(true),
-//            placeholder = { Text("Search apps…") },
-//            textStyle = LocalTextStyle.current.copy(color = Color.White),
-////            colors = OutlinedTextFieldDefaults.colors(
-////                focusedBorderColor = Color.Transparent,
-////                unfocusedBorderColor = Color.Transparent,
-////                focusedTextColor = Color.White,
-////                unfocusedTextColor = Color.White,
-////                cursorColor = Color.White,
-////                focusedLabelColor = Color.White
-////            ),
-//            trailingIcon = {
-//                if (searchQuery != ""){
-//                    Icon(
-//                        imageVector = Icons.Default.Close,
-//                        contentDescription = "Clear",
-//                        tint = MaterialTheme.colorScheme.error,
-//                        modifier = Modifier
-//                            .clickable { query = TextFieldValue("") }
-//                            .padding(5.dp)
-//                    )
-//                } else {
-//                    Icon(
-//                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-//                        contentDescription = "Close",
-//                        tint = MaterialTheme.colorScheme.primary,
-//                        modifier = Modifier
-//                            .clickable { onClose() }
-//                            .padding(5.dp)
-//                    )
-//                }
-//            }
-//        )
-//    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .clickable(
+                indication = null,
+                interactionSource = null
+            ) {
+                if (!isSearchFocused) {
+                    focusRequester.requestFocus()
+                    keyboardController?.show()
+                } else {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                }
+            }
             .background(MaterialTheme.colorScheme.background)
             .padding(WindowInsets.systemBars.asPaddingValues())
             .padding(15.dp)
     ) {
 
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            AppDrawerSearch(
-                searchQuery = searchQuery,
-                onSearchChanged = { query -> searchQuery = query },
-                modifier = Modifier.focusRequester(focusRequester).weight(1f),
-                onEnterPressed = {
-//                    val appsToOpen =
-//                        if (searchQuery.isEmpty()) uiState.apps else uiState.filteredApps
-//                    if (appsToOpen.isNotEmpty()) handleAppClick(appsToOpen[0])
-                    // Keyboard is hidden by AppDrawerSearch's onSearch action
-                },
-                onFocusStateChanged = { focused ->
-                    isSearchFocused = focused
-                    // Keyboard visibility is handled by onFocusChanged in AppDrawerSearch for focus gain,
-                    // and by scroll logic or IME actions for focus loss/hide.
-                }
-            )
+        if (!searchBarBottom) {
+            DrawerTextInput()
         }
 
-//        if (!searchBarBottom) {
-//            DrawerTextInput()
-//            Spacer(Modifier.height(12.dp))
-//        }
-
         HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.weight(1f)
+            state = pagerState
         ) { pageIndex ->
 
             val list = when (pageIndex) {
@@ -338,27 +282,27 @@ fun AppDrawerScreen(
         }
 
 //        if (searchBarBottom) {
-//            Spacer(Modifier.height(12.dp))
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .imePadding(),
+//                contentAlignment = Alignment.BottomCenter
+//            ) {
+//                DrawerTextInput()
+//            }
+//        }
+    }
+
+//    if (searchBarBottom) {
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .imePadding(),
+//            contentAlignment = Alignment.BottomCenter
+//        ) {
 //            DrawerTextInput()
 //        }
-
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Button(
-            onClick = {
-                focusRequester.requestFocus()
-                keyboardController?.show()
-                println("🔍 DEBUG: Focus requested + Keyboard shown") // ✅ Works!
-            },
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text("DEBUG: Focus + Keyboard")
-        }
-    }
+//    }
 
     if (dialogApp != null) {
         val app = dialogApp!!
@@ -407,7 +351,7 @@ fun AppDrawerSearch(
         onValueChange = onSearchChanged,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .padding(5.dp)
             .onFocusChanged { focusState ->
                 val focused = focusState.isFocused
                 onFocusStateChanged(focused) // Notify parent of focus change
@@ -420,12 +364,13 @@ fun AppDrawerSearch(
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = {
-            keyboardController?.hide() // Hide keyboard on IME "Search" action
+            // Don't hide the keyboard on enter, just clear the search
+//            keyboardController?.hide() // Hide keyboard on IME "Search" action
             onEnterPressed()
         }),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
+            focusedContainerColor = MaterialTheme.colorScheme.background,
+            unfocusedContainerColor = MaterialTheme.colorScheme.background,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
         )

@@ -19,7 +19,7 @@ object DrawerSettingsStore {
         val autoOpenSingleMatch: Boolean = true,
         val showAppIconsInDrawer: Boolean = true,
         val showAppLabelInDrawer: Boolean = true,
-        val searchBarBottom: Boolean = true,
+        val searchBarBottom: Boolean = false,
         val gridSize: Int = 4,
         val initialPAge: Int = 0
     )

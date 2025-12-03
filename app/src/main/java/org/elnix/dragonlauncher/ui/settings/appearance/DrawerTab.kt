@@ -70,6 +70,7 @@ fun DrawerTab(onBack: () -> Unit) {
             SwitchRow(
                 searchBarBottom,
                 "Search bar ${if (searchBarBottom) "Bottom" else "Top"}",
+                enabled = false
             ) { scope.launch { DrawerSettingsStore.setSearchBarBottom(ctx, it) } }
         }
 

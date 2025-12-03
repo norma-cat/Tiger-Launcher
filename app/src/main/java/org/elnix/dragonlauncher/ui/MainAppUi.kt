@@ -55,8 +55,9 @@ fun MainAppUi(
     val gridSize by DrawerSettingsStore.getGridSize(ctx)
         .collectAsState(initial = 1)
 
-    val searchBarBottom by DrawerSettingsStore.getSearchBarBottom(ctx)
-        .collectAsState(initial = true)
+//    val searchBarBottom by DrawerSettingsStore.getSearchBarBottom(ctx)
+//        .collectAsState(initial = true)
+    val searchBarBottom = false
 
     val initialPage by DrawerSettingsStore.getInitialPage(ctx)
         .collectAsState(initial = 0)
