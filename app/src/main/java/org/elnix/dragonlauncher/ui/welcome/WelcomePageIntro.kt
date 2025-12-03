@@ -2,6 +2,7 @@ package org.elnix.dragonlauncher.ui.welcome
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -10,15 +11,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDecoration
 import org.elnix.dragonlauncher.R
 
 @Composable
-fun WelcomePageIntro() {
+fun WelcomePageIntro(onImport: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Spacer(Modifier.weight(1f))
+
         Image(
             painter = painterResource(R.drawable.ic_app_logo),
             contentDescription = "App Logo",
@@ -40,5 +46,17 @@ fun WelcomePageIntro() {
             color = Color(0xFFBBBBBB),
             fontSize = 16.sp
         )
+
+        Spacer(Modifier.weight(1f))
+
+        TextButton(
+            onClick = onImport
+        ) {
+            Text(
+                text = "Import settings",
+                color = MaterialTheme.colorScheme.onBackground.copy(0.5f),
+                textDecoration = TextDecoration.Underline
+            )
+        }
     }
 }

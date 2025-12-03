@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.DataStoreName
+import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 import org.elnix.dragonlauncher.ui.helpers.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
@@ -242,16 +243,18 @@ fun BackupButtons(
     Column(
         Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(15.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        Button(
+        GradientBigButton(
+            text = stringResource(R.string.export_settings),
             onClick = onExport,
-            colors = AppObjectsColors.buttonColors()
-        ) { Text(stringResource(R.string.export_settings)) }
+            modifier = Modifier
+        )
 
-        Button(
+        GradientBigButton(
+            text = stringResource(R.string.import_settings),
             onClick = onImport,
-            colors = AppObjectsColors.buttonColors()
-        ) { Text(stringResource(R.string.import_settings)) }
+            modifier = Modifier
+        )
     }
 }

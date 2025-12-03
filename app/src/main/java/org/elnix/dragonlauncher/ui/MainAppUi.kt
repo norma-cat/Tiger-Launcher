@@ -101,6 +101,7 @@ fun MainAppUi(
 
         composable(ROUTES.WELCOME) {
             WelcomeScreen(
+                backupVm =  backupViewModel,
                 onEnterSettings = { goSettingsRoot() },
                 onEnterApp = { goMainScreen() }
             )
