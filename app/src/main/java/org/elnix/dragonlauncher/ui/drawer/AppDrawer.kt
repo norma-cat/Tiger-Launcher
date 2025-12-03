@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.delay
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
@@ -55,7 +56,10 @@ fun AppDrawerScreen(
     onClose: () -> Unit
 ) {
     val ctx = LocalContext.current
-    val apps by appsViewModel.userApps.collectAsState()
+
+    val userApps by appsViewModel.userApps.collectAsState()
+    val systemApps by appsViewModel.systemApps.collectAsState()
+    val allApps by appsViewModel.allApps.collectAsState()
     val icons by appsViewModel.icons.collectAsState()
 
     val autoLaunchSingleMatch by DrawerSettingsStore.getAutoLaunchSingleMatch(ctx)
@@ -65,8 +69,8 @@ fun AppDrawerScreen(
     var query by remember { mutableStateOf(TextFieldValue("")) }
     var dialogApp by remember { mutableStateOf<AppModel?>(null) }
 
-    val filtered = remember(query.text, apps) {
-        apps.filter { it.name.contains(query.text, ignoreCase = true) }
+    val filtered = remember(query.text, userApps) {
+        userApps.filter { it.name.contains(query.text, ignoreCase = true) }
     }
 
     val keyboard = LocalSoftwareKeyboardController.current
