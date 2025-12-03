@@ -20,7 +20,8 @@ object DrawerSettingsStore {
         val showAppIconsInDrawer: Boolean = true,
         val showAppLabelInDrawer: Boolean = true,
         val searchBarBottom: Boolean = true,
-        val gridSize: Int = 4
+        val gridSize: Int = 4,
+        val initialPAge: Int = 0
     )
 
     private val defaults = DrawerSettingsBackup()
@@ -31,6 +32,8 @@ object DrawerSettingsStore {
         const val SHOW_APP_LABEL_IN_DRAWER = "showAppLabelInDrawer"
         const val SEARCH_BAR_BOTTOM = "searchBarBottom"
         const val GRID_SIZE = "gridSize"
+
+        const val INITIAL_PAGE = "initialPage"
     }
 
 
@@ -52,6 +55,9 @@ object DrawerSettingsStore {
 
     private val GRID_SIZE =
         intPreferencesKey(Keys.GRID_SIZE)
+
+    private val INITIAL_PAGE =
+        intPreferencesKey(Keys.INITIAL_PAGE)
 
 
     // -------------------------------------------------------------------------
@@ -102,6 +108,15 @@ object DrawerSettingsStore {
         ctx.drawerDataStore.edit { it[GRID_SIZE] = size }
     }
 
+    fun getInitialPage(ctx: Context): Flow<Int> =
+        ctx.drawerDataStore.data.map { prefs ->
+            prefs[INITIAL_PAGE] ?: defaults.gridSize
+        }
+
+    suspend fun setInitialPage(ctx: Context, page: Int) {
+        ctx.drawerDataStore.edit { it[INITIAL_PAGE] = page }
+    }
+
     // -------------------------------------------------------------------------
     // Reset
     // -------------------------------------------------------------------------
@@ -112,6 +127,7 @@ object DrawerSettingsStore {
             prefs.remove(SHOW_APP_LABEL_IN_DRAWER)
             prefs.remove(SEARCH_BAR_BOTTOM)
             prefs.remove(GRID_SIZE)
+            prefs.remove(INITIAL_PAGE)
         }
     }
 
@@ -158,6 +174,12 @@ object DrawerSettingsStore {
                 prefs[GRID_SIZE],
                 defaults.gridSize
             )
+
+            putIfNonDefault(
+                Keys.INITIAL_PAGE,
+                prefs[INITIAL_PAGE],
+                defaults.initialPAge
+            )
         }
     }
 
@@ -188,7 +210,15 @@ object DrawerSettingsStore {
         }
 
         fun getIntStrict(key: String): Int {
-            val v = raw[key] ?: return defaults.gridSize
+            val v = raw[key] ?: return defaults.run {
+                when (key) {
+                    Keys.GRID_SIZE -> gridSize
+                    Keys.INITIAL_PAGE -> initialPAge
+                    else -> throw BackupTypeException(
+                        key, "Int", null, null
+                    )
+                }
+            }
 
             return when (v) {
                 is Int -> v
@@ -214,7 +244,8 @@ object DrawerSettingsStore {
             showAppIconsInDrawer = getBooleanStrict(Keys.SHOW_APP_ICONS_IN_DRAWER),
             showAppLabelInDrawer = getBooleanStrict(Keys.SHOW_APP_LABEL_IN_DRAWER),
             searchBarBottom = getBooleanStrict(Keys.SEARCH_BAR_BOTTOM),
-            gridSize = getIntStrict(Keys.GRID_SIZE)
+            gridSize = getIntStrict(Keys.GRID_SIZE),
+            initialPAge = getIntStrict(Keys.INITIAL_PAGE)
         )
 
         ctx.drawerDataStore.edit { prefs ->
@@ -223,6 +254,7 @@ object DrawerSettingsStore {
             prefs[SHOW_APP_LABEL_IN_DRAWER] = backup.showAppLabelInDrawer
             prefs[SEARCH_BAR_BOTTOM] = backup.searchBarBottom
             prefs[GRID_SIZE] = backup.gridSize
+            prefs[INITIAL_PAGE] = backup.initialPAge
         }
     }
 }

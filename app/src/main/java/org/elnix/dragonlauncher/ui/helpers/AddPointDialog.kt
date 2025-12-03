@@ -62,6 +62,9 @@ fun AddPointDialog(
     val gridSize by DrawerSettingsStore.getGridSize(ctx)
         .collectAsState(initial = 1)
 
+    val initialPage by DrawerSettingsStore.getInitialPage(ctx)
+        .collectAsState(initial = 0)
+
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -111,6 +114,7 @@ fun AddPointDialog(
         AppPickerDialog(
             viewModel = appsViewModel,
             gridSize = gridSize,
+            initialPage = initialPage,
             onDismiss = { showAppPicker = false },
             onAppSelected = {
                 onActionSelected(it)

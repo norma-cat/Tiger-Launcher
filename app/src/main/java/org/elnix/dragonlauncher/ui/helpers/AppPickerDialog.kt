@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -33,10 +34,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.drawer.AppItem
 import org.elnix.dragonlauncher.ui.drawer.AppModel
 import org.elnix.dragonlauncher.utils.AppDrawerViewModel
@@ -48,6 +51,7 @@ import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 fun AppPickerDialog(
     viewModel: AppDrawerViewModel,
     gridSize: Int,
+    initialPage: Int,
     onDismiss: () -> Unit,
     onAppSelected: (SwipeActionSerializable.LaunchApp) -> Unit
 ) {
@@ -57,8 +61,20 @@ fun AppPickerDialog(
     val icons by viewModel.icons.collectAsState()
 
     val pages = listOf("User", "System", "All")
-    val pagerState = rememberPagerState(initialPage = 0, pageCount = { pages.size })
+    val pagerState = rememberPagerState(
+        initialPage = initialPage,
+        pageCount = { pages.size }
+    )
+
+    val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(pagerState.currentPage) {
+        scope.launch {
+            DrawerSettingsStore.setInitialPage(ctx, pagerState.currentPage)
+        }
+    }
+
 
     AlertDialog(
         onDismissRequest = onDismiss,
