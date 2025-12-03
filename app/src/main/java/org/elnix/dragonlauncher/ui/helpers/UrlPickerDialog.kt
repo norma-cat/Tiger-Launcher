@@ -1,10 +1,12 @@
 package org.elnix.dragonlauncher.ui.helpers
 
+import android.R.attr.onClick
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 
 @Composable
 fun UrlInputDialog(
@@ -43,20 +46,26 @@ fun UrlInputDialog(
             }
         },
         confirmButton = {
-            Button(onClick = {
-                val ok = text.startsWith("http://") || text.startsWith("https://")
-                if (!ok) {
-                    error = true
-                    return@Button
-                }
-                onUrlSelected(SwipeActionSerializable.OpenUrl(text))
-                onDismiss()
-            }) {
+            Button(
+                onClick = {
+                    val ok = text.startsWith("http://") || text.startsWith("https://")
+                    if (!ok) {
+                        error = true
+                        return@Button
+                    }
+                    onUrlSelected(SwipeActionSerializable.OpenUrl(text))
+                    onDismiss()
+                },
+                colors = AppObjectsColors.buttonColors()
+            ) {
                 Text("OK")
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) { Text("Cancel") }
+            TextButton(
+                onClick = onDismiss,
+                colors = AppObjectsColors.cancelButtonColors()
+            ) { Text("Cancel") }
         },
         containerColor = MaterialTheme.colorScheme.surface
     )

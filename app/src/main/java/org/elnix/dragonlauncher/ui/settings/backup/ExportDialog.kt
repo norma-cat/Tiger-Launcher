@@ -8,6 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.data.DataStoreName
+import org.elnix.dragonlauncher.ui.SETTINGS.COLORS
+import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 
 @Composable
 fun ExportSettingsDialog(
@@ -25,14 +27,20 @@ fun ExportSettingsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            Button(onClick = {
-                onConfirm(allStores.filter { selected[it] == true })
-            }) {
+            Button(
+                onClick = {
+                    onConfirm(allStores.filter { selected[it] == true })
+                },
+                colors = AppObjectsColors.buttonColors()
+            ) {
                 Text("Export")
             }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(
+                onClick = onDismiss,
+                colors = AppObjectsColors.cancelButtonColors()
+            ) { Text("Cancel") }
         },
         title = { Text("Select settings to export") },
         text = {

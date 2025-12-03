@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.data.DataStoreName
+import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.json.JSONObject
 import java.util.Locale
 
@@ -34,14 +35,20 @@ fun ImportSettingsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            Button(onClick = {
-                onConfirm(availableStores.filter { selected[it] == true })
-            }) {
+            Button(
+                onClick = {
+                    onConfirm(availableStores.filter { selected[it] == true })
+                },
+                colors = AppObjectsColors.buttonColors()
+            ) {
                 Text("Import")
             }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(
+                onClick = onDismiss,
+                colors = AppObjectsColors.cancelButtonColors()
+            ) { Text("Cancel") }
         },
         title = { Text("Select settings to import") },
         text = {

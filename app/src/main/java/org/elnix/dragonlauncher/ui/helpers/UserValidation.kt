@@ -37,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.utils.copyToClipboard
 
 
 @Composable
@@ -65,7 +66,7 @@ fun UserValidation(
                 if (cancelText != null) {
                     TextButton(
                         onClick = onCancel,
-                        shape = RoundedCornerShape(12.dp)
+                        colors = AppObjectsColors.cancelButtonColors()
                     ) {
                         Text(
                             cancelText,
@@ -76,7 +77,7 @@ fun UserValidation(
                 }
                 Button(
                     onClick = { onAgree(); if (doNotRemindMeAgain != null && doNotRemindMeAgainChecked) doNotRemindMeAgain() },
-                    shape = RoundedCornerShape(12.dp)
+                    colors = AppObjectsColors.buttonColors()
                 ) {
                     Text(
                         text = validateText,
@@ -150,14 +151,7 @@ fun UserValidation(
                                 contentDescription = "Copy",
                                 modifier = Modifier
                                     .padding(8.dp)
-                                    .clickable {
-
-                                        val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                        val clip = ClipData.newPlainText("Notes Version name", message)
-                                        clipboard.setPrimaryClip(clip)
-
-//                                        clipboard.setText(AnnotatedString(message))
-                                    },
+                                    .clickable { ctx.copyToClipboard(message) },
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
