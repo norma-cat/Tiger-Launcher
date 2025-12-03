@@ -6,6 +6,7 @@ data class AppModel(
     val name: String,
     val packageName: String,
     val isSystem: Boolean,
+    val settings: Map<String, Any> = emptyMap()
 ) {
     val action = SwipeActionSerializable.LaunchApp(packageName)
 }

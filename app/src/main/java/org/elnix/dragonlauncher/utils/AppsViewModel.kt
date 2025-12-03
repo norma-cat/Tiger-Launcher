@@ -24,6 +24,10 @@ val Context.appDrawerDataStore by preferencesDataStore("app_drawer")
 
 class AppDrawerViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val specialSystemApps = setOf(
+        "com.android.settings"
+    )
+
     private val _apps = MutableStateFlow<List<AppModel>>(emptyList())
     private val _icons = MutableStateFlow<Map<String, ImageBitmap>>(emptyMap())
     val icons: StateFlow<Map<String, ImageBitmap>> = _icons
@@ -31,7 +35,7 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
 
     val allApps: StateFlow<List<AppModel>> = _apps.asStateFlow()
     val userApps: StateFlow<List<AppModel>> = _apps.map { list ->
-        list.filter { !it.isSystem }
+        list.filter { !it.isSystem || specialSystemApps.contains(it.packageName) }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val systemApps: StateFlow<List<AppModel>> = _apps.map { list ->
         list.filter { it.isSystem }
