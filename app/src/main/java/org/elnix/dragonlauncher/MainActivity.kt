@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+//        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val controller = WindowInsetsControllerCompat(window, window.decorView)
 
@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         setContent {
             val ctx = LocalContext.current
 

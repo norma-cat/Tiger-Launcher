@@ -31,6 +31,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"
             android:exported="true"
             android:theme="@style/Theme.DragonLauncher">
 
