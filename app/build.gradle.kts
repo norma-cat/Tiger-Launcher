@@ -18,11 +18,29 @@ android {
         versionName = "1.1.1"
     }
 
+    signingConfigs {
+        create("release") {
+            val keystore = System.getenv("KEYSTORE_FILE")
+            val storePass = System.getenv("KEYSTORE_PASSWORD")
+            val alias = System.getenv("KEY_ALIAS")
+            val keyPass = System.getenv("KEY_PASSWORD")
+
+            if (keystore != null && storePass != null && alias != null && keyPass != null) {
+                storeFile = File(keystore)
+                storePassword = storePass
+                keyAlias = alias
+                keyPassword = keyPass
+            } else {
+                println("WARNING: Release signingConfig not fully configured, using debug signing.")
+            }
+        }
+    }
 
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
