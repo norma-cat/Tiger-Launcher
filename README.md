@@ -1,5 +1,8 @@
-# Dragon Launcher - Fast Gesture based android launcher
+<p align="center">
+<img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/icon.jpg" width="22%" alt="App icon"/>
 
+# Dragon Launcher - Fast Gesture based android launcher
+</p>
 Dragon Launcher is a highly customizable Android launcher focused on speed and efficiency.
 
 ## Features
@@ -14,6 +17,10 @@ You can customize your list of fast access apps easily in the settings, and also
   <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpg" width="22%" alt="App ScreenShot 2"/>
   <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpg" width="22%" alt="App ScreenShot 3"/>
   <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpg" width="22%" alt="App ScreenShot 4"/>
+  <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/5.jpg" width="22%" alt="App ScreenShot 5"/>
+  <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/6.jpg" width="22%" alt="App ScreenShot 6"/>
+  <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/7.jpg" width="22%" alt="App ScreenShot 7"/>
+  <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/8.jpg" width="22%" alt="App ScreenShot 8"/>
 </p>
 
 ## Installation
