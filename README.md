@@ -1,9 +1,6 @@
-<div align="center">
-<img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/icon.png" width="22%" alt="App icon"/>
 
-# Dragon Launcher - Fast Gesture based android launcher
+# ![App Icon](./fastlane/metadata/android/en-US/images/icon.png) Dragon Launcher - Fast Gesture based android launcher
 
-</div>
 Dragon Launcher is a highly customizable Android launcher focused on speed and efficiency.
 
 <div align="center">
