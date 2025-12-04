@@ -5,6 +5,10 @@
 </p>
 Dragon Launcher is a highly customizable Android launcher focused on speed and efficiency.
 
+[![GitHub release](https://img.shields.io/github/v/release/Elnix90/Dragon-Launcher.svg?include_prereleases&style=flat-square)](https://github.com/USERNAME/REPO/releases/latest)
+[![GitHub downloads](https://img.shields.io/github/downloads/Elnix90/Dragon-Launcher/total.svg?style=flat-square)](https://github.com/USERNAME/REPO/releases)
+
+
 ## Features
 
 The main Idea of this launcher is to launch your apps via gestures.
@@ -24,6 +28,9 @@ You can customize your list of fast access apps easily in the settings, and also
 </p>
 
 ## Installation
+
+[![Get it on Obtainium](https://fdroid.gitlab.io/obtainium-badges/obtainium.svg)](https://github.com/ImranR98/Obtainium)
+
 
 Get the lastest version on github: [last release](https://github.com/Elnix90/Dragon-Launcher/releases/latest)
 
