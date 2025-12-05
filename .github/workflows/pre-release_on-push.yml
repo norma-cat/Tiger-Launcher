@@ -20,13 +20,12 @@ jobs:
           java-version: 17
           cache: gradle
 
-      # Read versionName from Gradle
       - name: Extract versionName
         id: version
         run: |
-          VER=$(grep -R "versionName" app/build.gradle* | head -n1 | sed 's/.*versionName[ ]*"\(.*\)".*/\1/')
+          VER=$(./gradlew :app:properties | grep "versionName:" | awk '{print $2}')
           echo "versionName=$VER" >> $GITHUB_ENV
-          echo "version=$VER"
+          echo "Detected versionName: $VER"
 
       # Decode keystore
       - name: Decode keystore
