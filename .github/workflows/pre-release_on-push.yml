@@ -23,9 +23,9 @@ jobs:
       - name: Extract versionName
         id: version
         run: |
-          VER=$(./gradlew :app:properties | grep "versionName:" | awk '{print $2}')
+          VER=$(./gradlew :app:printVersionName --console=plain | grep "VERSION_NAME" | cut -d'=' -f2 | tr -d '[:space:]')
           echo "versionName=$VER" >> $GITHUB_ENV
-          echo "Detected versionName: $VER"
+          echo "Detected versionName: $VER" 
 
       # Decode keystore
       - name: Decode keystore
