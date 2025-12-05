@@ -30,6 +30,12 @@ fun DrawerTab(onBack: () -> Unit) {
     val showAppLabelsInDrawer by DrawerSettingsStore.getShowAppLabelsInDrawer(ctx)
         .collectAsState(initial = true)
 
+    val autoShowKeyboardOnDrawer by DrawerSettingsStore.getAutoShowKeyboardOnDrawer(ctx)
+        .collectAsState(initial = false)
+
+    val clickEmptySpaceToRaiseKeyboard by DrawerSettingsStore.getClickEmptySpaceToRaiseKeyboard(ctx)
+        .collectAsState(initial = false)
+
 
     val searchBarBottom by DrawerSettingsStore.getSearchBarBottom(ctx)
         .collectAsState(initial = true)
@@ -72,6 +78,20 @@ fun DrawerTab(onBack: () -> Unit) {
                 "Search bar ${if (searchBarBottom) "Bottom" else "Top"}",
                 enabled = false
             ) { scope.launch { DrawerSettingsStore.setSearchBarBottom(ctx, it) } }
+        }
+
+        item {
+            SwitchRow(
+                autoShowKeyboardOnDrawer,
+                "Auto Show Keyboard on Drawer",
+            ) { scope.launch { DrawerSettingsStore.setAutoShowKeyboardOnDrawer(ctx, it) } }
+        }
+
+        item {
+            SwitchRow(
+                clickEmptySpaceToRaiseKeyboard,
+                "Tap Empty Space to Raise Keyboard",
+            ) { scope.launch { DrawerSettingsStore.setClickEmptySpaceToRaiseKeyboard(ctx, it) } }
         }
 
         item {

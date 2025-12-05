@@ -52,6 +52,9 @@ fun MainAppUi(
     val showAppLabelsInDrawer by DrawerSettingsStore.getShowAppLabelsInDrawer(ctx)
         .collectAsState(initial = true)
 
+    val autoShowKeyboardOnDrawer by DrawerSettingsStore.getAutoShowKeyboardOnDrawer(ctx)
+        .collectAsState(initial = false)
+
     val gridSize by DrawerSettingsStore.getGridSize(ctx)
         .collectAsState(initial = 1)
 
@@ -92,6 +95,7 @@ fun MainAppUi(
             initialPage = initialPage,
             showIcons = showAppIconsInDrawer,
             showLabels = showAppLabelsInDrawer,
+            autoShowKeyboard = autoShowKeyboardOnDrawer,
             gridSize = gridSize,
             searchBarBottom = searchBarBottom
         ) { goMainScreen() } }

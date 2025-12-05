@@ -19,99 +19,99 @@ object DrawerSettingsStore {
         val autoOpenSingleMatch: Boolean = true,
         val showAppIconsInDrawer: Boolean = true,
         val showAppLabelInDrawer: Boolean = true,
-        val searchBarBottom: Boolean = false,
+        val searchBarBottom: Boolean = true,
+        val autoShowKeyboardOnDrawer: Boolean = true,
+        val clickEmptySpaceToRaiseKeyboard: Boolean = false,
         val gridSize: Int = 6,
-        val initialPAge: Int = 0
+        val initialPage: Int = 0
     )
 
     private val defaults = DrawerSettingsBackup()
 
+    // -------------------------------------------------------------------------
+    // Keys
+    // -------------------------------------------------------------------------
     private object Keys {
         const val AUTO_OPEN_SINGLE_MATCH = "autoOpenSingleMatch"
         const val SHOW_APP_ICONS_IN_DRAWER = "showAppIconsInDrawer"
         const val SHOW_APP_LABEL_IN_DRAWER = "showAppLabelInDrawer"
         const val SEARCH_BAR_BOTTOM = "searchBarBottom"
+        const val AUTO_SHOW_KEYBOARD_ON_DRAWER = "autoShowKeyboardOnDrawer"
+        const val CLICK_EMPTY_SPACE_TO_RAISE_KEYBOARD = "clickEmptySpaceToRaiseKeyboard"
         const val GRID_SIZE = "gridSize"
-
         const val INITIAL_PAGE = "initialPage"
     }
 
+    private val AUTO_OPEN_SINGLE_MATCH = booleanPreferencesKey(Keys.AUTO_OPEN_SINGLE_MATCH)
+    private val SHOW_APP_ICONS_IN_DRAWER = booleanPreferencesKey(Keys.SHOW_APP_ICONS_IN_DRAWER)
+    private val SHOW_APP_LABEL_IN_DRAWER = booleanPreferencesKey(Keys.SHOW_APP_LABEL_IN_DRAWER)
+    private val SEARCH_BAR_BOTTOM = booleanPreferencesKey(Keys.SEARCH_BAR_BOTTOM)
+    private val AUTO_SHOW_KEYBOARD_ON_DRAWER =
+        booleanPreferencesKey(Keys.AUTO_SHOW_KEYBOARD_ON_DRAWER)
+    private val CLICK_EMPTY_SPACE_TO_RAISE_KEYBOARD =
+        booleanPreferencesKey(Keys.CLICK_EMPTY_SPACE_TO_RAISE_KEYBOARD)
 
-    // -------------------------------------------------------------------------
-    // Keys
-    // -------------------------------------------------------------------------
-    private val AUTO_OPEN_SINGLE_MATCH =
-        booleanPreferencesKey(Keys.AUTO_OPEN_SINGLE_MATCH)
-
-    private val SHOW_APP_ICONS_IN_DRAWER =
-        booleanPreferencesKey(Keys.SHOW_APP_ICONS_IN_DRAWER)
-
-    private val SHOW_APP_LABEL_IN_DRAWER =
-        booleanPreferencesKey(Keys.SHOW_APP_LABEL_IN_DRAWER)
-
-
-    private val SEARCH_BAR_BOTTOM =
-        booleanPreferencesKey(Keys.SEARCH_BAR_BOTTOM)
-
-    private val GRID_SIZE =
-        intPreferencesKey(Keys.GRID_SIZE)
-
-    private val INITIAL_PAGE =
-        intPreferencesKey(Keys.INITIAL_PAGE)
-
+    private val GRID_SIZE = intPreferencesKey(Keys.GRID_SIZE)
+    private val INITIAL_PAGE = intPreferencesKey(Keys.INITIAL_PAGE)
 
     // -------------------------------------------------------------------------
     // Accessors + Mutators
     // -------------------------------------------------------------------------
     fun getAutoLaunchSingleMatch(ctx: Context): Flow<Boolean> =
-        ctx.drawerDataStore.data.map { prefs ->
-            prefs[AUTO_OPEN_SINGLE_MATCH] ?: defaults.autoOpenSingleMatch
-        }
+        ctx.drawerDataStore.data.map { it[AUTO_OPEN_SINGLE_MATCH] ?: defaults.autoOpenSingleMatch }
 
-    suspend fun setAutoLaunchSingleMatch(ctx: Context, enabled: Boolean) {
-        ctx.drawerDataStore.edit { it[AUTO_OPEN_SINGLE_MATCH] = enabled }
+    suspend fun setAutoLaunchSingleMatch(ctx: Context, v: Boolean) {
+        ctx.drawerDataStore.edit { it[AUTO_OPEN_SINGLE_MATCH] = v }
     }
 
     fun getShowAppIconsInDrawer(ctx: Context): Flow<Boolean> =
-        ctx.drawerDataStore.data.map { prefs ->
-            prefs[SHOW_APP_ICONS_IN_DRAWER] ?: defaults.showAppIconsInDrawer
-        }
+        ctx.drawerDataStore.data.map { it[SHOW_APP_ICONS_IN_DRAWER] ?: defaults.showAppIconsInDrawer }
 
-    suspend fun setShowAppIconsInDrawer(ctx: Context, enabled: Boolean) {
-        ctx.drawerDataStore.edit { it[SHOW_APP_ICONS_IN_DRAWER] = enabled }
+    suspend fun setShowAppIconsInDrawer(ctx: Context, v: Boolean) {
+        ctx.drawerDataStore.edit { it[SHOW_APP_ICONS_IN_DRAWER] = v }
     }
 
     fun getShowAppLabelsInDrawer(ctx: Context): Flow<Boolean> =
-        ctx.drawerDataStore.data.map { prefs ->
-            prefs[SHOW_APP_LABEL_IN_DRAWER] ?: defaults.showAppLabelInDrawer
-        }
+        ctx.drawerDataStore.data.map { it[SHOW_APP_LABEL_IN_DRAWER] ?: defaults.showAppLabelInDrawer }
 
-    suspend fun setShowAppLabelsInDrawer(ctx: Context, enabled: Boolean) {
-        ctx.drawerDataStore.edit { it[SHOW_APP_LABEL_IN_DRAWER] = enabled }
+    suspend fun setShowAppLabelsInDrawer(ctx: Context, v: Boolean) {
+        ctx.drawerDataStore.edit { it[SHOW_APP_LABEL_IN_DRAWER] = v }
     }
 
     fun getSearchBarBottom(ctx: Context): Flow<Boolean> =
-        ctx.drawerDataStore.data.map { prefs ->
-            prefs[SEARCH_BAR_BOTTOM] ?: defaults.searchBarBottom
+        ctx.drawerDataStore.data.map { it[SEARCH_BAR_BOTTOM] ?: defaults.searchBarBottom }
+
+    suspend fun setSearchBarBottom(ctx: Context, v: Boolean) {
+        ctx.drawerDataStore.edit { it[SEARCH_BAR_BOTTOM] = v }
+    }
+
+    fun getAutoShowKeyboardOnDrawer(ctx: Context): Flow<Boolean> =
+        ctx.drawerDataStore.data.map {
+            it[AUTO_SHOW_KEYBOARD_ON_DRAWER] ?: defaults.autoShowKeyboardOnDrawer
         }
 
-    suspend fun setSearchBarBottom(ctx: Context, enabled: Boolean) {
-        ctx.drawerDataStore.edit { it[SEARCH_BAR_BOTTOM] = enabled }
+    suspend fun setAutoShowKeyboardOnDrawer(ctx: Context, v: Boolean) {
+        ctx.drawerDataStore.edit { it[AUTO_SHOW_KEYBOARD_ON_DRAWER] = v }
+    }
+
+    fun getClickEmptySpaceToRaiseKeyboard(ctx: Context): Flow<Boolean> =
+        ctx.drawerDataStore.data.map {
+            it[CLICK_EMPTY_SPACE_TO_RAISE_KEYBOARD] ?: defaults.clickEmptySpaceToRaiseKeyboard
+        }
+
+    suspend fun setClickEmptySpaceToRaiseKeyboard(ctx: Context, v: Boolean) {
+        ctx.drawerDataStore.edit { it[CLICK_EMPTY_SPACE_TO_RAISE_KEYBOARD] = v }
     }
 
     fun getGridSize(ctx: Context): Flow<Int> =
-        ctx.drawerDataStore.data.map { prefs ->
-            prefs[GRID_SIZE] ?: defaults.gridSize
-        }
+        ctx.drawerDataStore.data.map { it[GRID_SIZE] ?: defaults.gridSize }
 
     suspend fun setGridSize(ctx: Context, size: Int) {
         ctx.drawerDataStore.edit { it[GRID_SIZE] = size }
     }
 
     fun getInitialPage(ctx: Context): Flow<Int> =
-        ctx.drawerDataStore.data.map { prefs ->
-            prefs[INITIAL_PAGE] ?: defaults.initialPAge
-        }
+        ctx.drawerDataStore.data.map { it[INITIAL_PAGE] ?: defaults.initialPage }
 
     suspend fun setInitialPage(ctx: Context, page: Int) {
         ctx.drawerDataStore.edit { it[INITIAL_PAGE] = page }
@@ -126,6 +126,8 @@ object DrawerSettingsStore {
             prefs.remove(SHOW_APP_ICONS_IN_DRAWER)
             prefs.remove(SHOW_APP_LABEL_IN_DRAWER)
             prefs.remove(SEARCH_BAR_BOTTOM)
+            prefs.remove(AUTO_SHOW_KEYBOARD_ON_DRAWER)
+            prefs.remove(CLICK_EMPTY_SPACE_TO_RAISE_KEYBOARD)
             prefs.remove(GRID_SIZE)
             prefs.remove(INITIAL_PAGE)
         }
@@ -139,47 +141,20 @@ object DrawerSettingsStore {
 
         return buildMap {
 
-            fun putIfNonDefault(key: String, value: Any?, defaultVal: Any) {
-                if (value != null && value != defaultVal) {
+            fun putIfNonDefault(key: String, value: Any?, def: Any) {
+                if (value != null && value != def) {
                     put(key, value.toString())
                 }
             }
 
-            putIfNonDefault(
-                Keys.AUTO_OPEN_SINGLE_MATCH,
-                prefs[AUTO_OPEN_SINGLE_MATCH],
-                defaults.autoOpenSingleMatch
-            )
-
-            putIfNonDefault(
-                Keys.SHOW_APP_ICONS_IN_DRAWER,
-                prefs[SHOW_APP_ICONS_IN_DRAWER],
-                defaults.showAppIconsInDrawer
-            )
-
-            putIfNonDefault(
-                Keys.SHOW_APP_LABEL_IN_DRAWER,
-                prefs[SHOW_APP_LABEL_IN_DRAWER],
-                defaults.showAppLabelInDrawer
-            )
-
-            putIfNonDefault(
-                Keys.SEARCH_BAR_BOTTOM,
-                prefs[SEARCH_BAR_BOTTOM],
-                defaults.searchBarBottom
-            )
-
-            putIfNonDefault(
-                Keys.GRID_SIZE,
-                prefs[GRID_SIZE],
-                defaults.gridSize
-            )
-
-            putIfNonDefault(
-                Keys.INITIAL_PAGE,
-                prefs[INITIAL_PAGE],
-                defaults.initialPAge
-            )
+            putIfNonDefault(Keys.AUTO_OPEN_SINGLE_MATCH, prefs[AUTO_OPEN_SINGLE_MATCH], defaults.autoOpenSingleMatch)
+            putIfNonDefault(Keys.SHOW_APP_ICONS_IN_DRAWER, prefs[SHOW_APP_ICONS_IN_DRAWER], defaults.showAppIconsInDrawer)
+            putIfNonDefault(Keys.SHOW_APP_LABEL_IN_DRAWER, prefs[SHOW_APP_LABEL_IN_DRAWER], defaults.showAppLabelInDrawer)
+            putIfNonDefault(Keys.SEARCH_BAR_BOTTOM, prefs[SEARCH_BAR_BOTTOM], defaults.searchBarBottom)
+            putIfNonDefault(Keys.AUTO_SHOW_KEYBOARD_ON_DRAWER, prefs[AUTO_SHOW_KEYBOARD_ON_DRAWER], defaults.autoShowKeyboardOnDrawer)
+            putIfNonDefault(Keys.CLICK_EMPTY_SPACE_TO_RAISE_KEYBOARD, prefs[CLICK_EMPTY_SPACE_TO_RAISE_KEYBOARD], defaults.clickEmptySpaceToRaiseKeyboard)
+            putIfNonDefault(Keys.GRID_SIZE, prefs[GRID_SIZE], defaults.gridSize)
+            putIfNonDefault(Keys.INITIAL_PAGE, prefs[INITIAL_PAGE], defaults.initialPage)
         }
     }
 
@@ -189,69 +164,40 @@ object DrawerSettingsStore {
     suspend fun setAll(ctx: Context, raw: Map<String, Any?>) {
 
         fun getBooleanStrict(key: String): Boolean {
-            val v = raw[key] ?: return defaults.run {
-                when (key) {
-                    Keys.AUTO_OPEN_SINGLE_MATCH -> autoOpenSingleMatch
-                    Keys.SHOW_APP_ICONS_IN_DRAWER -> showAppIconsInDrawer
-                    Keys.SHOW_APP_LABEL_IN_DRAWER -> showAppLabelInDrawer
-                    Keys.SEARCH_BAR_BOTTOM -> searchBarBottom
-                    else -> throw BackupTypeException(
-                        key, "Boolean", null, null
-                    )
-                }
+            val v = raw[key] ?: return when (key) {
+                Keys.AUTO_OPEN_SINGLE_MATCH -> defaults.autoOpenSingleMatch
+                Keys.SHOW_APP_ICONS_IN_DRAWER -> defaults.showAppIconsInDrawer
+                Keys.SHOW_APP_LABEL_IN_DRAWER -> defaults.showAppLabelInDrawer
+                Keys.SEARCH_BAR_BOTTOM -> defaults.searchBarBottom
+                Keys.AUTO_SHOW_KEYBOARD_ON_DRAWER -> defaults.autoShowKeyboardOnDrawer
+                Keys.CLICK_EMPTY_SPACE_TO_RAISE_KEYBOARD -> defaults.clickEmptySpaceToRaiseKeyboard
+                else -> throw BackupTypeException(key, "Boolean", null, null)
             }
+
             return when (v) {
                 is Boolean -> v
                 is Number -> v.toInt() != 0
-                is String -> {
-                    val trimmed = v.trim().lowercase()
-                    when (trimmed) {
-                        "true", "1", "yes", "y", "on" -> true
-                        "false", "0", "no", "n", "off" -> false
-                        else -> throw BackupTypeException(
-                            key = key,
-                            expected = "Boolean",
-                            actual = "String",
-                            value = v
-                        )
-                    }
+                is String -> when (v.trim().lowercase()) {
+                    "true", "1", "yes", "y", "on" -> true
+                    "false", "0", "no", "n", "off" -> false
+                    else -> throw BackupTypeException(key, "Boolean", "String", v)
                 }
-                else -> throw BackupTypeException(
-                    key = key,
-                    expected = "Boolean",
-                    actual = v::class.simpleName,
-                    value = v
-                )
+                else -> throw BackupTypeException(key, "Boolean", v::class.simpleName, v)
             }
         }
 
         fun getIntStrict(key: String): Int {
-            val v = raw[key] ?: return defaults.run {
-                when (key) {
-                    Keys.GRID_SIZE -> gridSize
-                    Keys.INITIAL_PAGE -> initialPAge
-                    else -> throw BackupTypeException(
-                        key, "Int", null, null
-                    )
-                }
+            val v = raw[key] ?: return when (key) {
+                Keys.GRID_SIZE -> defaults.gridSize
+                Keys.INITIAL_PAGE -> defaults.initialPage
+                else -> throw BackupTypeException(key, "Int", null, null)
             }
 
             return when (v) {
                 is Int -> v
                 is Number -> v.toInt()
-                is String -> v.toIntOrNull()
-                    ?: throw BackupTypeException(
-                        key = key,
-                        expected = "Int",
-                        actual = "String",
-                        value = v
-                    )
-                else -> throw BackupTypeException(
-                    key = key,
-                    expected = "Int",
-                    actual = v::class.simpleName,
-                    value = v
-                )
+                is String -> v.toIntOrNull() ?: throw BackupTypeException(key, "Int", "String", v)
+                else -> throw BackupTypeException(key, "Int", v::class.simpleName, v)
             }
         }
 
@@ -260,8 +206,10 @@ object DrawerSettingsStore {
             showAppIconsInDrawer = getBooleanStrict(Keys.SHOW_APP_ICONS_IN_DRAWER),
             showAppLabelInDrawer = getBooleanStrict(Keys.SHOW_APP_LABEL_IN_DRAWER),
             searchBarBottom = getBooleanStrict(Keys.SEARCH_BAR_BOTTOM),
+            autoShowKeyboardOnDrawer = getBooleanStrict(Keys.AUTO_SHOW_KEYBOARD_ON_DRAWER),
+            clickEmptySpaceToRaiseKeyboard = getBooleanStrict(Keys.CLICK_EMPTY_SPACE_TO_RAISE_KEYBOARD),
             gridSize = getIntStrict(Keys.GRID_SIZE),
-            initialPAge = getIntStrict(Keys.INITIAL_PAGE)
+            initialPage = getIntStrict(Keys.INITIAL_PAGE)
         )
 
         ctx.drawerDataStore.edit { prefs ->
@@ -269,8 +217,10 @@ object DrawerSettingsStore {
             prefs[SHOW_APP_ICONS_IN_DRAWER] = backup.showAppIconsInDrawer
             prefs[SHOW_APP_LABEL_IN_DRAWER] = backup.showAppLabelInDrawer
             prefs[SEARCH_BAR_BOTTOM] = backup.searchBarBottom
+            prefs[AUTO_SHOW_KEYBOARD_ON_DRAWER] = backup.autoShowKeyboardOnDrawer
+            prefs[CLICK_EMPTY_SPACE_TO_RAISE_KEYBOARD] = backup.clickEmptySpaceToRaiseKeyboard
             prefs[GRID_SIZE] = backup.gridSize
-            prefs[INITIAL_PAGE] = backup.initialPAge
+            prefs[INITIAL_PAGE] = backup.initialPage
         }
     }
 }

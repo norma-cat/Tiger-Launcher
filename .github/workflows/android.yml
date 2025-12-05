@@ -20,10 +20,17 @@ jobs:
           java-version: 17
           cache: gradle
 
+      # Read versionName from Gradle
+      - name: Extract versionName
+        id: version
+        run: |
+          VER=$(grep -R "versionName" app/build.gradle* | head -n1 | sed 's/.*versionName[ ]*"\(.*\)".*/\1/')
+          echo "versionName=$VER" >> $GITHUB_ENV
+          echo "version=$VER"
+
       # Decode keystore
       - name: Decode keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_FILE_B64 }}" | base64 -d > my-release-key.jks
+        run: echo "${{ secrets.KEYSTORE_FILE_B64 }}" | base64 -d > my-release-key.jks
 
       - name: Export signing env
         run: |
@@ -35,12 +42,27 @@ jobs:
       - name: Build Release APK
         run: ./gradlew assembleRelease
 
+      # Rename APK
+      - name: Rename APK with version
+        run: |
+          NEW="DragonLauncher-v${{ env.versionName }}-beta-${{ github.run_number }}.apk"
+          mv app/build/outputs/apk/release/app-release.apk "$NEW"
+          echo "APK_NAME=$NEW" >> $GITHUB_ENV
+
+      # Create tag before release
+      - name: Create tag
+        run: |
+          TAG="v${{ env.versionName }}-beta-${{ github.run_number }}"
+          git tag "$TAG"
+          git push origin "$TAG"
+          echo "TAG_NAME=$TAG" >> $GITHUB_ENV
+
       - name: Upload pre-release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: prerelease-${{ github.run_number }}
-          name: "Pre-release Build #${{ github.run_number }}"
+          tag_name: ${{ env.TAG_NAME }}
+          name: "v${{ env.versionName }}-beta-${{ github.run_number }}"
           prerelease: true
-          files: app/build/outputs/apk/release/app-release.apk
+          files: ${{ env.APK_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
