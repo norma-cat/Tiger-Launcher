@@ -1,7 +1,5 @@
 package org.elnix.dragonlauncher.ui
 
-import android.content.Intent
-import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -206,16 +204,7 @@ fun SettingsScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
 
-        if (showSetDefaultLauncherBanner && !isDefaultLauncher) {
-            SetDefaultLauncherBanner(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                onSetDefaultLauncher = { ctx.startActivity(Intent(Settings.ACTION_HOME_SETTINGS)) },
-                onClose = {
-                    scope.launch { PrivateSettingsStore.setShowSetDefaultLauncherBanner(ctx, false) }
-                }
-            )
-        }
+        if (showSetDefaultLauncherBanner && !isDefaultLauncher) { SetDefaultLauncherBanner() }
 
         Column(
             Modifier

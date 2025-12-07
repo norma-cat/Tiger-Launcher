@@ -112,7 +112,7 @@ fun DebugTab(
 
         item{
             SwitchRow(
-                state = showSetDefaultLauncherBanner,
+                state = !showSetDefaultLauncherBanner,
                 text = "Hide set default launcher banner",
                 defaultValue = true
             ) {

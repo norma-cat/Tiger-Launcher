@@ -49,11 +49,13 @@ import org.elnix.dragonlauncher.data.stores.LanguageSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
+import org.elnix.dragonlauncher.ui.helpers.SetDefaultLauncherBanner
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.ContributorItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.utils.copyToClipboard
+import org.elnix.dragonlauncher.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.utils.showToast
 
 
@@ -72,6 +74,9 @@ fun AdvancedSettingsScreen(
         .collectAsState(initial = false)
     val forceAppLanguageSelector by DebugSettingsStore.getForceAppLanguageSelector(ctx)
         .collectAsState(initial = false)
+
+    val showSetDefaultLauncherBanner by PrivateSettingsStore.getShowSetDefaultLauncherBanner(ctx)
+        .collectAsState(initial = true)
 
 
     var toast by remember { mutableStateOf<Toast?>(null) }
@@ -100,7 +105,8 @@ fun AdvancedSettingsScreen(
                 PrivateSettingsStore.resetAll(ctx)
                 onReset()
             }
-        }
+        },
+        banner = if (showSetDefaultLauncherBanner && !ctx.isDefaultLauncher) { { SetDefaultLauncherBanner() } } else null
     ) {
         item {
             SettingsItem(

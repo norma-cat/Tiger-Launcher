@@ -45,6 +45,7 @@ fun SettingsLazyHeader(
     resetTitle: String = stringResource(R.string.reset_default_settings),
     resetText: String? = stringResource(R.string.reset_settings_in_this_tab),
     reorderState: ReorderableLazyListState? = null,
+    banner: @Composable (() -> Unit)? = null,
     titleContent: (LazyListScope.() -> Unit)? = null,
     bottomContent: (LazyListScope.() -> Unit)? = null,
     content: LazyListScope.() -> Unit
@@ -57,54 +58,61 @@ fun SettingsLazyHeader(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(WindowInsets.systemBars.asPaddingValues())
-            .padding(16.dp)
-            .imePadding(),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        LazyColumn (
+
+        if (banner != null) { banner() }
+
+        Column (
             modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background),
-            verticalArrangement = Arrangement.spacedBy(5.dp)
+                .padding(WindowInsets.systemBars.asPaddingValues())
+                .padding(16.dp)
+                .imePadding(),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            item {
-                SettingsTitle(
-                    title,
-                    helpIcon = { showHelpDialog = true },
-                    resetIcon = if (onReset != null) {
-                        { showResetDialog = true }
-                    } else null,
-                ) { onBack() }
-            }
-
-            if (titleContent != null) titleContent()
-        }
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(bottom = if (bottomContent != null) 0.dp else 400.dp),
-            modifier = if (reorderState != null) {
-                modifier
-                    .reorderable(reorderState)
-                    .detectReorderAfterLongPress(reorderState)
-            } else modifier,
-            state = reorderState?.listState ?: rememberLazyListState()
-        ) {
-            content()
-        }
-
-        bottomContent?.let {
-            LazyColumn(
+            LazyColumn (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .background(MaterialTheme.colorScheme.background),
+                verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                it()
+                item {
+                    SettingsTitle(
+                        title,
+                        helpIcon = { showHelpDialog = true },
+                        resetIcon = if (onReset != null) {
+                            { showResetDialog = true }
+                        } else null,
+                    ) { onBack() }
+                }
+
+                if (titleContent != null) titleContent()
             }
-            Spacer(Modifier.height(400.dp))
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                contentPadding = PaddingValues(bottom = if (bottomContent != null) 0.dp else 400.dp),
+                modifier = if (reorderState != null) {
+                    modifier
+                        .reorderable(reorderState)
+                        .detectReorderAfterLongPress(reorderState)
+                } else modifier,
+                state = reorderState?.listState ?: rememberLazyListState()
+            ) {
+                content()
+            }
+
+            bottomContent?.let {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    it()
+                }
+                Spacer(Modifier.height(400.dp))
+            }
         }
     }
 
