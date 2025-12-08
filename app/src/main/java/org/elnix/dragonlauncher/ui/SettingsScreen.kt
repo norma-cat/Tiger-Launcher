@@ -41,8 +41,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
@@ -60,6 +62,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
@@ -107,6 +110,13 @@ val MIN_ANGLE_GAP = listOf(
     11.0
 )
 
+@Immutable
+data class CircleData(
+    val name: String,
+    val color: Color,
+    val radius: Int
+)
+
 private const val POINT_RADIUS_PX = 40f
 private const val TOUCH_THRESHOLD_PX = 100f
 
@@ -146,19 +156,14 @@ fun SettingsScreen(
     val cancelZone by UiSettingsStore.getCancelZoneDragDistance(ctx)
         .collectAsState(initial = 150)
 
-    val circleColors = remember { listOf(Color.Red, Color.Green, Color.Blue) }
-
-    var dragRadii by remember {
-        mutableStateOf(listOf(circleR1, circleR2, cancelZone))
-    }
-
-    // 3. Update the list whenever any of the collected flows change.
-    LaunchedEffect(circleR1, circleR2, cancelZone) {
-        dragRadii = listOf(
-            circleR1,
-            circleR2,
-            cancelZone
-        )
+    val circleDataList by remember {
+        derivedStateOf {
+            listOf(
+                CircleData("circleR1", Color.Green, circleR1),
+                CircleData("circleR2", Color.Red, circleR2),
+                CircleData("cancelZone", Color.Gray, cancelZone)
+            )
+        }
     }
 
     var isCircleDistanceMode by remember { mutableStateOf(false) }
@@ -174,6 +179,9 @@ fun SettingsScreen(
     )
 
     var availableWidth by remember { mutableFloatStateOf(0f) }
+
+
+    val backgroundColor = MaterialTheme.colorScheme.background
 
 
     // Load
@@ -317,7 +325,7 @@ fun SettingsScreen(
                             )
 
                             drawCircle(
-                                color = Color.Black,
+                                color = backgroundColor,
                                 radius = POINT_RADIUS_PX,
                                 center = Offset(px, py)
                             )
@@ -347,7 +355,7 @@ fun SettingsScreen(
                             )
 
                             drawCircle(
-                                color = Color.Black,
+                                color = backgroundColor,
                                 radius = POINT_RADIUS_PX,
                                 center = Offset(px, py)
                             )
@@ -364,13 +372,26 @@ fun SettingsScreen(
                     }
                 } else {
                     Canvas(Modifier.fillMaxSize()) {
-                        dragRadii.forEachIndexed { index, radius ->
+                        circleDataList.sortedBy { it.radius }.reversed().forEach { circleData ->
 
-                            val color = circleColors.getOrElse(index) { Color.Gray }
+//                            val color = circleColors.getOrElse(index) { Color.Gray }
 
                             drawCircle(
-                                color = color,
-                                radius = radius.toFloat(),
+                                color = backgroundColor,
+                                radius = circleData.radius.toFloat(),
+                                center = center,
+                                style = Fill
+                            )
+                            drawCircle(
+                                color = circleData.color.copy(0.1f),
+                                radius = circleData.radius.toFloat(),
+                                center = center,
+                                style = Fill
+                            )
+
+                            drawCircle(
+                                color = circleData.color,
+                                radius = circleData.radius.toFloat(),
                                 center = center,
                                 style = Stroke(4f)
                             )
@@ -697,8 +718,8 @@ fun SettingsScreen(
                     value = circleR1,
                     valueRange = 0f..1000f,
                     showValue = false,
-                    color = circleColors[0],
-                    onReset = { scope.launch {UiSettingsStore.setFirstCircleDragDistance(ctx, 400) } }
+                    color = circleDataList.find { it.name == "circleR1" }!!.color,
+                    onReset = { scope.launch { UiSettingsStore.setFirstCircleDragDistance(ctx, 400) } }
                 ) {
                     scope.launch { UiSettingsStore.setFirstCircleDragDistance(ctx, it) }
                 }
@@ -708,8 +729,8 @@ fun SettingsScreen(
                     value = circleR2,
                     valueRange = 0f..1000f,
                     showValue = false,
-                    color = circleColors[1],
-                    onReset = { scope.launch {UiSettingsStore.setSecondCircleDragDistance(ctx, 700) } }
+                    color = circleDataList.find { it.name == "circleR2" }!!.color,
+                    onReset = { scope.launch { UiSettingsStore.setSecondCircleDragDistance(ctx, 700) } }
                 ) {
                     scope.launch { UiSettingsStore.setSecondCircleDragDistance(ctx, it) }
                 }
@@ -719,8 +740,8 @@ fun SettingsScreen(
                     value = cancelZone,
                     valueRange = 0f..1000f,
                     showValue = false,
-                    color = circleColors[2],
-                    onReset = { scope.launch {UiSettingsStore.setCancelZoneDragDistance(ctx, 150) } }
+                    color = circleDataList.find { it.name == "cancelZone" }!!.color,
+                    onReset = { scope.launch { UiSettingsStore.setCancelZoneDragDistance(ctx, 150) } }
                 ) {
                     scope.launch { UiSettingsStore.setCancelZoneDragDistance(ctx, it) }
                 }
