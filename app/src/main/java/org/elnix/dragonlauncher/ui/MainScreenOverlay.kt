@@ -290,26 +290,26 @@ fun MainScreenOverlay(
                         center = current,
                         style = Fill
                     )
+                }
 
-                    if (showAppAnglePreview) {
-                        val arcRadius = 72f
-                        val rect = Rect(
-                            start.x - arcRadius,
-                            start.y - arcRadius,
-                            start.x + arcRadius,
-                            start.y + arcRadius
-                        )
+                if (showAppAnglePreview) {
+                    val arcRadius = 72f
+                    val rect = Rect(
+                        start.x - arcRadius,
+                        start.y - arcRadius,
+                        start.x + arcRadius,
+                        start.y + arcRadius
+                    )
 
-                        drawArc(
-                            color = lineColor,
-                            startAngle = -90f,
-                            sweepAngle = sweepAngle,
-                            useCenter = false,
-                            topLeft = rect.topLeft,
-                            size = Size(rect.width, rect.height),
-                            style = Stroke(width = 3f)
-                        )
-                    }
+                    drawArc(
+                        color = lineColor,
+                        startAngle = -90f,
+                        sweepAngle = sweepAngle,
+                        useCenter = false,
+                        topLeft = rect.topLeft,
+                        size = Size(rect.width, rect.height),
+                        style = Stroke(width = 3f)
+                    )
                 }
 
                 if (showAppCirclePreview || showAppLinePreview || showAppLaunchPreview) {
