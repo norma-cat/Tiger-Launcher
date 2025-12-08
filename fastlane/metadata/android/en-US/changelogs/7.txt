@@ -1,0 +1,1 @@
+Added new banner "Set as default launcher" when not, Added circles drag distance customization feature, Corrected some minor bugs
