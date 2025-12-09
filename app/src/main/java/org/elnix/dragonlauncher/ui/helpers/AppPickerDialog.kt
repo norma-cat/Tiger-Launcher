@@ -70,7 +70,25 @@ fun AppPickerDialog(
         onDismissRequest = onDismiss,
         title = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Select App")
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    Text(
+                        text = "Select App",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    IconButton(
+                        onClick = { scope.launch { appsViewModel.reloadApps(ctx) } },
+                        colors = AppObjectsColors.iconButtonColors()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.RestartAlt,
+                            contentDescription = "Reload apps"
+                        )
+                    }
+                }
 
                 Spacer(Modifier.height(6.dp))
 
