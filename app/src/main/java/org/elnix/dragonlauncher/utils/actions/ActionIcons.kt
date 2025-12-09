@@ -1,7 +1,6 @@
 package org.elnix.dragonlauncher.utils.actions
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -13,6 +12,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
@@ -56,6 +56,9 @@ fun actionIcon(
 
     SwipeActionSerializable.OpenDragonLauncherSettings ->
         painterResource(R.drawable.dragon_launcher_foreground)
+
+    SwipeActionSerializable.Lock -> painterResource(R.drawable.ic_action_lock)
+    is SwipeActionSerializable.OpenFile -> painterResource(R.drawable.ic_action_open_file)
 }
 
 
@@ -97,14 +100,15 @@ private fun createUntintedBitmap(action: SwipeActionSerializable, context: Conte
 
         SwipeActionSerializable.OpenDragonLauncherSettings ->
             loadDrawableResAsBitmap(context, R.drawable.dragon_launcher_foreground)
+
+        SwipeActionSerializable.Lock -> loadDrawableResAsBitmap(context, R.drawable.ic_action_lock)
+        is SwipeActionSerializable.OpenFile -> loadDrawableResAsBitmap(context, R.drawable.ic_action_open_file)
     }
 }
 
 
 private fun tintBitmap(original: ImageBitmap, color: Color): ImageBitmap {
-    val bitmap = Bitmap.createBitmap(
-        original.width, original.height, Bitmap.Config.ARGB_8888
-    )
+    val bitmap = createBitmap(original.width, original.height)
     val canvas = Canvas(bitmap)
     val paint = android.graphics.Paint().apply {
         colorFilter = android.graphics.PorterDuffColorFilter(
@@ -119,7 +123,7 @@ private fun tintBitmap(original: ImageBitmap, color: Color): ImageBitmap {
 
 // Fallback: Create a simple colored square if all else fails
 private fun createDefaultBitmap(): ImageBitmap {
-    val bitmap = Bitmap.createBitmap(48, 48, Bitmap.Config.ARGB_8888)
+    val bitmap = createBitmap(48, 48)
     val canvas = Canvas(bitmap)
     canvas.drawColor(Color.Gray.toArgb())
     return bitmap.asImageBitmap()
@@ -141,7 +145,7 @@ fun loadDrawableAsBitmap(
 ): ImageBitmap {
     // Adaptive icon support
     val bmp = if (drawable is android.graphics.drawable.AdaptiveIconDrawable) {
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(width, height)
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)

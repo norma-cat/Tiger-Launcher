@@ -48,11 +48,13 @@ fun AddPointDialog(
 
     var showAppPicker by remember { mutableStateOf(false) }
     var showUrlInput by remember { mutableStateOf(false) }
+    var showFilePicker by remember { mutableStateOf(false) }
 
     // All actions except those requiring special sub-dialogs
     val actions = listOf(
         SwipeActionSerializable.LaunchApp(""),
         SwipeActionSerializable.OpenUrl(""),
+        SwipeActionSerializable.OpenFile(""),
         SwipeActionSerializable.NotificationShade,
         SwipeActionSerializable.ControlPanel,
         SwipeActionSerializable.OpenAppDrawer,
@@ -95,6 +97,15 @@ fun AddPointDialog(
                             Spacer(Modifier.height(8.dp))
                         }
 
+                        // Open File picker to choose a file
+                        is SwipeActionSerializable.OpenFile -> {
+                            AddPointRow(
+                                action = action,
+                                onSelected = { showFilePicker = true }
+                            )
+                            Spacer(Modifier.height(8.dp))
+                        }
+
                         // Direct actions
                         else -> {
                             AddPointRow(
@@ -132,6 +143,16 @@ fun AddPointDialog(
             }
         )
     }
+
+    if (showFilePicker) {
+        FilePickerDialog(
+            onDismiss = { showFilePicker = false },
+            onFileSelected = {
+                onActionSelected(it)
+                showFilePicker = false
+            }
+        )
+    }
 }
 
 
@@ -148,6 +169,7 @@ fun AddPointRow(
     val name = when(action) {
         is SwipeActionSerializable.LaunchApp -> "Open App"
         is SwipeActionSerializable.OpenUrl -> "Open Url"
+        is SwipeActionSerializable.OpenFile -> "Open File"
         else -> actionLabel(action)
     }
 

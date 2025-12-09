@@ -1,6 +1,14 @@
 package org.elnix.dragonlauncher.data
 
-import com.google.gson.*
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonNull
+import com.google.gson.JsonObject
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
@@ -17,10 +25,12 @@ data class SwipePointSerializable(
 sealed class SwipeActionSerializable {
     data class LaunchApp(val packageName: String) : SwipeActionSerializable()
     data class OpenUrl(val url: String) : SwipeActionSerializable()
+    data class OpenFile(val filePath: String, val mimeType: String? = null) : SwipeActionSerializable()
     object NotificationShade : SwipeActionSerializable()
     object ControlPanel : SwipeActionSerializable()
     object OpenAppDrawer : SwipeActionSerializable()
     object  OpenDragonLauncherSettings: SwipeActionSerializable()
+    object Lock: SwipeActionSerializable()
 }
 
 // Gson type adapter for sealed class
@@ -41,10 +51,16 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
                 obj.addProperty("type", "OpenUrl")
                 obj.addProperty("url", src.url)
             }
+            is SwipeActionSerializable.OpenFile -> {
+                obj.addProperty("type", "OpenFile")
+                obj.addProperty("filePath", src.filePath)
+                obj.addProperty("mimeType", src.mimeType)
+            }
             SwipeActionSerializable.NotificationShade -> obj.addProperty("type", "NotificationShade")
             SwipeActionSerializable.ControlPanel -> obj.addProperty("type", "ControlPanel")
             SwipeActionSerializable.OpenAppDrawer -> obj.addProperty("type", "OpenAppDrawer")
             SwipeActionSerializable.OpenDragonLauncherSettings -> obj.addProperty("type", "OpenDragonLauncherSettings")
+            SwipeActionSerializable.Lock -> obj.addProperty("type", "Lock")
         }
         return obj
     }
@@ -59,10 +75,15 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
         return when (obj.get("type").asString) {
             "LaunchApp" -> SwipeActionSerializable.LaunchApp(obj.get("packageName").asString)
             "OpenUrl" -> SwipeActionSerializable.OpenUrl(obj.get("url").asString)
+            "OpenFile" -> SwipeActionSerializable.OpenFile(
+                obj.get("filePath").asString,
+                obj.get("mimeType")?.asString
+            )
             "NotificationShade" -> SwipeActionSerializable.NotificationShade
             "ControlPanel" -> SwipeActionSerializable.ControlPanel
             "OpenAppDrawer" -> SwipeActionSerializable.OpenAppDrawer
             "OpenDragonLauncherSettings" -> SwipeActionSerializable.OpenDragonLauncherSettings
+            "Lock" -> SwipeActionSerializable.Lock
             else -> null
         }
     }

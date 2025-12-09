@@ -35,5 +35,8 @@ fun actionLabel(action: SwipeActionSerializable): String {
 
         SwipeActionSerializable.OpenDragonLauncherSettings ->
             "Dragon Launcher Settings"
+
+        SwipeActionSerializable.Lock -> "Lock"
+        is SwipeActionSerializable.OpenFile -> action.filePath
     }
 }
