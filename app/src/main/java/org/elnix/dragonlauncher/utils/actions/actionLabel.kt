@@ -2,7 +2,9 @@ package org.elnix.dragonlauncher.utils.actions
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.utils.getFilePathFromUri
 
 @Composable
 fun actionLabel(action: SwipeActionSerializable): String {
@@ -35,5 +37,8 @@ fun actionLabel(action: SwipeActionSerializable): String {
 
         SwipeActionSerializable.OpenDragonLauncherSettings ->
             "Dragon Launcher Settings"
+
+        SwipeActionSerializable.Lock -> "Lock"
+        is SwipeActionSerializable.OpenFile -> getFilePathFromUri(ctx, action.uri.toUri())
     }
 }

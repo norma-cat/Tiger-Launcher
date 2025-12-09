@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.core.net.toUri
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.services.SystemControl
+import org.elnix.dragonlauncher.utils.hasUriPermission
 import org.elnix.dragonlauncher.utils.showToast
 
 
@@ -17,6 +18,7 @@ class AppLaunchException(message: String, cause: Throwable? = null) : Exception(
 fun launchSwipeAction(
     ctx: Context,
     action: SwipeActionSerializable?,
+    onReselectFile: (() -> Unit)? = null,
     onAppSettings: (() -> Unit)? = null,
     onAppDrawer: (() -> Unit)? = null
 ) {
@@ -62,5 +64,33 @@ fun launchSwipeAction(
         }
 
         SwipeActionSerializable.OpenDragonLauncherSettings -> onAppSettings?.invoke()
+        SwipeActionSerializable.Lock -> null// TODO("Lock the phone (maybe using admin rights or accessibility")
+        is SwipeActionSerializable.OpenFile -> {
+            try {
+                val uri = action.uri.toUri()
+
+                if (!ctx.hasUriPermission(uri)) {
+                    ctx.showToast("Please reselect the file to allow access")
+                    onReselectFile?.invoke()
+                    return
+                }
+
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, action.mimeType ?: "*/*")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+
+                if (intent.resolveActivity(ctx.packageManager) != null) {
+                    ctx.startActivity(intent)
+                } else {
+                    ctx.showToast("No app available to open this file")
+                }
+
+            } catch (e: Exception) {
+                ctx.showToast("Unable to open file: ${e.message}")
+//                Log.e("OpenFile", e.toString())
+            }
+        }
     }
 }

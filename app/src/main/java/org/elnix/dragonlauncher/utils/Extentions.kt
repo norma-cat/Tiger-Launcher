@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
+import android.net.Uri
 import android.widget.Toast
 import org.elnix.dragonlauncher.R
 
@@ -70,3 +71,38 @@ val Context.isDefaultLauncher: Boolean
         // 3. Check if the resolved activity belongs to your application's package
         return resolveInfo?.activityInfo?.packageName == packageName
     }
+
+
+
+//
+//fun hasAllFilesAccess(context: Context): Boolean {
+//    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//        // Android 11+
+//        Environment.isExternalStorageManager()
+//    } else {
+//        // Android 10 and below (uses old READ/WRITE)
+//        ContextCompat.checkSelfPermission(
+//            context,
+//            Manifest.permission.READ_EXTERNAL_STORAGE
+//        ) == PackageManager.PERMISSION_GRANTED
+//    }
+//}
+//
+//// Request function (requires an Activity or the activity result launcher equivalent)
+//fun requestAllFilesAccess(activity: Activity) {
+//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//        // Intent to redirect the user to the "All files access" setting
+//        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+//        val uri = Uri.fromParts("package", activity.packageName, null)
+//        intent.data = uri
+//        activity.startActivity(intent)
+//    }
+//    // For older APIs, the standard permission request dialog is used.
+//}
+
+
+
+fun Context.hasUriPermission(uri: Uri): Boolean {
+    val perms = contentResolver.persistedUriPermissions
+    return perms.any { it.uri == uri && it.isReadPermission }
+}
