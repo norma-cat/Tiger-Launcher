@@ -533,7 +533,7 @@ fun SettingsScreen(
                         Icons.Outlined.Grid3x3
                     },
                     contentDescription = "Snap to rounded angles",
-                    tint = MaterialTheme.colorScheme.primary.copy(if (snapPoints) 1f else 0.5f),
+                    tint = MaterialTheme.colorScheme.primary.copy(if (snapPoints) 1f else 0.2f),
                     modifier = Modifier
                         .clip(CircleShape)
                         .clickable {
@@ -542,11 +542,11 @@ fun SettingsScreen(
                             }
                         }
                         .background(
-                            MaterialTheme.colorScheme.primary.copy(if (snapPoints) 0.2f else 0.1f)
+                            MaterialTheme.colorScheme.primary.copy(if (snapPoints) 0.2f else 0f)
                         )
                         .border(
                             width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary.copy(if (snapPoints) 1f else 0.5f),
+                            color = MaterialTheme.colorScheme.primary.copy(if (snapPoints) 1f else 0.2f),
                             shape = CircleShape
                         )
                         .padding(15.dp)
