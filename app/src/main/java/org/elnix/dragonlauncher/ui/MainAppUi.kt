@@ -104,7 +104,7 @@ fun MainAppUi(
 
 
     val showSetDefaultLauncherBanner by PrivateSettingsStore.getShowSetDefaultLauncherBanner(ctx)
-        .collectAsState(initial = true)
+        .collectAsState(initial = false)
 
 
     val lifecycleOwner = LocalLifecycleOwner.current
