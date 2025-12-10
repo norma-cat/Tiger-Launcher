@@ -19,12 +19,15 @@ object AmoledDefault : ThemeColors {
     override val Outline = OnPrimary
     override val AngleLineColor = Color.Red
     override val CircleColor = Color(0xFF960000)
-//    override val Complete = Color(0xFF388E3C)
-//    override val Select = Color(0xFF0F7AC5)
-//
-//    override val NoteTypeText = Color(0xFF05609D)
-//    override val NoteTypeChecklist = Color(0xFF6318A4)
-//    override val NoteTypeDrawing = Color(0xFFFD0990)
+    override val LaunchAppColor = Color(0xFF55AAFF)
+    override val OpenUrlColor = Color(0xFF66DD77)
+    override val NotificationShadeColor = Color(0xFFFFBB44)
+    override val ControlPanelColor = Color(0xFFFF6688)
+    override val OpenAppDrawerColor = Color(0xFFDD55FF)
+    override val LauncherSettingsColor = Color.Red
+    override val LockColor = Color(0xFF555555)
+    override val OpenFileColor = Color(0xFF00FFF7)
+
 }
 
 object DarkDefault : ThemeColors {
@@ -50,12 +53,15 @@ object DarkDefault : ThemeColors {
 
     override val AngleLineColor = Color.Red
     override val CircleColor = Color(0xFF960000)
-//    override val Complete = Color(0xFF81C784)
-//    override val Select = Color(0xFF0F7AC5)
-//
-//    override val NoteTypeText = Color(0xFF05609D)
-//    override val NoteTypeChecklist = Color(0xFF6318A4)
-//    override val NoteTypeDrawing = Color(0xFFFD0990)
+    override val LaunchAppColor = Color(0xFF55AAFF)
+    override val OpenUrlColor = Color(0xFF66DD77)
+    override val NotificationShadeColor = Color(0xFFFFBB44)
+    override val ControlPanelColor = Color(0xFFFF6688)
+    override val OpenAppDrawerColor = Color(0xFFDD55FF)
+    override val LauncherSettingsColor = Color.Red
+    override val LockColor = Color(0xFF555555)
+    override val OpenFileColor = Color(0xFF00FFF7)
+
 }
 
 
@@ -75,10 +81,13 @@ object LightDefault : ThemeColors {
     override val Outline = Color.Black.copy(alpha = 0.8f)
     override val AngleLineColor = Color.Red
     override val CircleColor = Color(0xFF960000)
-//    override val Complete = Color(0xFF388E3C)
-//    override val Select = Color(0xFF0F7AC5)
-//
-//    override val NoteTypeText = Color(0xFF05609D)
-//    override val NoteTypeChecklist = Color(0xFF6318A4)
-//    override val NoteTypeDrawing = Color(0xFFFD0990)
+    override val LaunchAppColor = Color(0xFF55AAFF)
+    override val OpenUrlColor = Color(0xFF66DD77)
+    override val NotificationShadeColor = Color(0xFFFFBB44)
+    override val ControlPanelColor = Color(0xFFFF6688)
+    override val OpenAppDrawerColor = Color(0xFFDD55FF)
+    override val LauncherSettingsColor = Color.Red
+    override val LockColor = Color(0xFF555555)
+    override val OpenFileColor = Color(0xFF00FFF7)
+
 }

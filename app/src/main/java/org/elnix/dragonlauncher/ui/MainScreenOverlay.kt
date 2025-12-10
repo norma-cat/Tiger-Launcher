@@ -50,6 +50,8 @@ import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
+import org.elnix.dragonlauncher.ui.theme.ExtraColors
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionIcon
 import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
@@ -99,6 +101,8 @@ fun MainScreenOverlay(
 
 
     val backgroundColor = MaterialTheme.colorScheme.background
+    val extraColors = LocalExtraColors.current
+
 
     var lastAngle by remember { mutableStateOf<Double?>(null) }
     var cumulativeAngle by remember { mutableDoubleStateOf(0.0) }   // continuous rotation without jumps
@@ -300,6 +304,9 @@ fun MainScreenOverlay(
             }
         }
 
+        val colorAction = if (hoveredAction != null) actionColor(hoveredAction!!.action, extraColors) else Color.Unspecified
+
+
         Canvas(modifier = Modifier.fillMaxSize()) {
             if (start != null && current != null) {
 
@@ -331,7 +338,7 @@ fun MainScreenOverlay(
                         image = actionIconBitmap(
                             action = currentAction,
                             context = ctx,
-                            tintColor = actionColor(currentAction)
+                            tintColor = colorAction
                         ),
                         dstOffset = IntOffset(start.x.toInt() - 28, start.y.toInt() - 28),
                         dstSize = IntSize(56, 56)
@@ -406,7 +413,7 @@ fun MainScreenOverlay(
                                 image = actionIconBitmap(
                                     action = action,
                                     context = ctx,
-                                    tintColor = actionColor(action)
+                                    tintColor = colorAction
                                 ),
                                 dstOffset = IntOffset(px.toInt() - 28, py.toInt() - 28),
                                 dstSize = IntSize(56, 56)
@@ -437,14 +444,14 @@ fun MainScreenOverlay(
                     Icon(
                         painter = actionIcon(currentAction, icons),
                         contentDescription = actionLabel(currentAction),
-                        tint = actionTint(currentAction),
+                        tint = actionTint(currentAction, extraColors),
                         modifier = Modifier.size(22.dp)
                     )
                 }
                 if (showLaunchingAppLabel) {
                     Text(
                         text = actionLabel(currentAction),
-                        color = actionColor(currentAction),
+                        color = actionColor(currentAction, extraColors),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -468,10 +475,10 @@ fun MainScreenOverlay(
 //    }
 }
 
-fun actionTint(action: SwipeActionSerializable): Color =
+fun actionTint(action: SwipeActionSerializable, extraColors: ExtraColors): Color =
     when (action) {
         is SwipeActionSerializable.LaunchApp, SwipeActionSerializable.OpenDragonLauncherSettings  -> Color.Unspecified
-        else -> actionColor(action)
+        else -> actionColor(action, extraColors)
     }
 
 

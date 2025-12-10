@@ -135,12 +135,16 @@ class MainActivity : ComponentActivity() {
 
             val angleLineColor by ColorSettingsStore.getAngleLineColor(ctx).collectAsState(initial = null)
             val circleColor by ColorSettingsStore.getCircleColor(ctx).collectAsState(initial = null)
-//            val completeColor by ColorSettingsStore.getComplete(ctx).collectAsState(initial = null)
-//
-//            val customSelect by ColorSettingsStore.getSelect(ctx).collectAsState(initial = null)
-//            val customNoteTypeText by ColorSettingsStore.getNoteTypeText(ctx).collectAsState(initial = null)
-//            val customNoteTypeChecklist by ColorSettingsStore.getNoteTypeChecklist(ctx).collectAsState(initial = null)
-//            val customNoteTypeDrawing by ColorSettingsStore.getNoteTypeDrawing(ctx).collectAsState(initial = null)
+
+            val launchAppColor by ColorSettingsStore.getLaunchAppColor(ctx).collectAsState(initial = null)
+            val openUrlColor by ColorSettingsStore.getOpenUrlColor(ctx).collectAsState(initial = null)
+            val notificationShadeColor by ColorSettingsStore.getNotificationShadeColor(ctx).collectAsState(initial = null)
+            val controlPanelColor by ColorSettingsStore.getControlPanelColor(ctx).collectAsState(initial = null)
+            val openAppDrawerColor by ColorSettingsStore.getOpenAppDrawerColor(ctx).collectAsState(initial = null)
+            val launcherSettingsColor by ColorSettingsStore.getLauncherSettingsColor(ctx).collectAsState(initial = null)
+            val lockColor by ColorSettingsStore.getLockColor(ctx).collectAsState(initial = null)
+            val openFileColor by ColorSettingsStore.getOpenFileColor(ctx).collectAsState(initial = null)
+
 
             DragonLauncherTheme(
                 customPrimary = primary,
@@ -158,11 +162,15 @@ class MainActivity : ComponentActivity() {
                 customOutline = outline,
                 customAngleLineColor = angleLineColor,
                 customCircleColor = circleColor,
-//                customComplete = completeColor,
-//                customSelect =customSelect,
-//                customNoteTypeText = customNoteTypeText,
-//                customNoteTypeCheckList = customNoteTypeChecklist,
-//                customNoteTypeDrawing = customNoteTypeDrawing
+
+                customLaunchAppColor = launchAppColor,
+                customOpenUrlColor = openUrlColor,
+                customNotificationShadeColor = notificationShadeColor,
+                customControlPanelColor = controlPanelColor,
+                customOpenAppDrawerColor = openAppDrawerColor,
+                customLauncherSettingsColor = launcherSettingsColor,
+                customLockColor = lockColor,
+                customOpenFileColor = openFileColor,
             ) {
 
                 val navController = rememberNavController()

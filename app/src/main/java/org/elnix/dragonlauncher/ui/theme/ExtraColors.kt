@@ -6,24 +6,29 @@ import androidx.compose.ui.graphics.Color
 data class ExtraColors(
     val angleLine: Color,
     val circle: Color,
-//    val complete: Color,
-//    val select: Color,
-//
-//    val noteTypeText : Color,
-//    val noteTypeChecklist : Color,
-//    val noteTypeDrawing : Color,
-
+    val launchApp: Color,
+    val openUrl: Color,
+    val notificationShade: Color,
+    val controlPanel: Color,
+    val openAppDrawer: Color,
+    val launcherSettings: Color,
+    val lock: Color,
+    val openFile: Color,
 )
+
 
 // default fallback values
 val LocalExtraColors = staticCompositionLocalOf {
     ExtraColors(
         angleLine = AmoledDefault.AngleLineColor,
         circle = AmoledDefault.CircleColor,
-//        complete = AmoledDefault.Complete,
-//        select = AmoledDefault.Select,
-//        noteTypeText = AmoledDefault.NoteTypeText,
-//        noteTypeChecklist = AmoledDefault.NoteTypeChecklist,
-//        noteTypeDrawing = AmoledDefault.NoteTypeDrawing,
+        launchApp = AmoledDefault.LaunchAppColor,
+        openUrl = AmoledDefault.OpenUrlColor,
+        notificationShade = AmoledDefault.NotificationShadeColor,
+        controlPanel = AmoledDefault.ControlPanelColor,
+        openAppDrawer = AmoledDefault.OpenAppDrawerColor,
+        launcherSettings = AmoledDefault.LauncherSettingsColor,
+        lock = AmoledDefault.LockColor,
+        openFile = AmoledDefault.OpenFileColor
     )
 }

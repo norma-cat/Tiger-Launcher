@@ -17,13 +17,21 @@ import org.elnix.dragonlauncher.data.getDefaultColorScheme
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setAngleLineColor
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setBackground
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setCircleColor
+import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setControlPanelColor
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setError
+import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setLaunchAppColor
+import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setLauncherSettingsColor
+import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setLockColor
+import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setNotificationShadeColor
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOnBackground
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOnError
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOnPrimary
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOnSecondary
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOnSurface
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOnTertiary
+import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOpenAppDrawerColor
+import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOpenFileColor
+import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOpenUrlColor
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOutline
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setPrimary
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setSecondary
@@ -43,21 +51,21 @@ object ColorSettingsStore {
     private val ON_TERTIARY_COLOR = intPreferencesKey("on_tertiary_color")
     private val BACKGROUND_COLOR = intPreferencesKey("background_color")
     private val ON_BACKGROUND_COLOR = intPreferencesKey("on_background_color")
-
     private val SURFACE_COLOR = intPreferencesKey("surface_color")
     private val ON_SURFACE_COLOR = intPreferencesKey("on_surface_color")
     private val ERROR_COLOR = intPreferencesKey("error_color")
     private val ON_ERROR_COLOR = intPreferencesKey("on_error_color")
-
     private val OUTLINE_COLOR = intPreferencesKey("outline_color")
-
     private val ANGLE_LINE_COLOR = intPreferencesKey("delete_color")
     private val CIRCLE_COLOR = intPreferencesKey("circle_color")
-//    private val COMPLETE_COLOR = intPreferencesKey("complete_color")
-//    private val SELECT_COLOR = intPreferencesKey("select_color")
-//    private val NOTE_TYPE_CHECKLIST= intPreferencesKey("note_type_checklist")
-//    private val NOTE_TYPE_TEXT = intPreferencesKey("note_type_text")
-//    private val NOTE_TYPE_DRAWING = intPreferencesKey("note_type_drawing")
+    private val LAUNCH_APP_COLOR = intPreferencesKey("launch_app_color")
+    private val OPEN_URL_COLOR = intPreferencesKey("open_url_color")
+    private val NOTIFICATION_SHADE_COLOR = intPreferencesKey("notification_shade_color")
+    private val CONTROL_PANEL_COLOR = intPreferencesKey("control_panel_color")
+    private val OPEN_APP_DRAWER_COLOR = intPreferencesKey("open_app_drawer_color")
+    private val LAUNCHER_SETTINGS_COLOR = intPreferencesKey("launcher_settings_color")
+    private val LOCK_COLOR = intPreferencesKey("lock_color")
+    private val OPEN_FILE_COLOR = intPreferencesKey("open_file_color")
 
 
 
@@ -173,41 +181,64 @@ object ColorSettingsStore {
     suspend fun setCircleColor(ctx: Context, color: Color) {
         ctx.colorDatastore.edit { it[CIRCLE_COLOR] = color.toArgb() }
     }
-//
-//    fun getComplete(ctx: Context) =
-//        ctx.colorDatastore.data.map { it[COMPLETE_COLOR]?.let { color -> Color(color) } }
-//
-//    suspend fun setComplete(ctx: Context, color: Color) {
-//        ctx.colorDatastore.edit { it[COMPLETE_COLOR] = color.toArgb() }
-//    }
-//
-//    fun getSelect(ctx: Context) =
-//        ctx.colorDatastore.data.map { it[SELECT_COLOR]?.let { color -> Color(color) } }
-//
-//    suspend fun setSelect(ctx: Context, color: Color) {
-//        ctx.colorDatastore.edit { it[SELECT_COLOR] = color.toArgb() }
-//    }
 
-//    fun getNoteTypeText(ctx: Context) =
-//        ctx.colorDatastore.data.map { it[NOTE_TYPE_TEXT]?.let { color -> Color(color) } }
-//
-//    suspend fun setNoteTypeText(ctx: Context, color: Color) {
-//        ctx.colorDatastore.edit { it[NOTE_TYPE_TEXT] = color.toArgb() }
-//    }
-//
-//    fun getNoteTypeChecklist(ctx: Context) =
-//        ctx.colorDatastore.data.map { it[NOTE_TYPE_CHECKLIST]?.let { color -> Color(color) } }
-//
-//    suspend fun setNoteTypeChecklist(ctx: Context, color: Color) {
-//        ctx.colorDatastore.edit { it[NOTE_TYPE_CHECKLIST] = color.toArgb() }
-//    }
-//
-//    fun getNoteTypeDrawing(ctx: Context) =
-//        ctx.colorDatastore.data.map { it[NOTE_TYPE_DRAWING]?.let { color -> Color(color) } }
-//
-//    suspend fun setNoteTypeDrawing(ctx: Context, color: Color) {
-//        ctx.colorDatastore.edit { it[NOTE_TYPE_DRAWING] = color.toArgb() }
-//    }
+    fun getLaunchAppColor(ctx: Context) =
+        ctx.colorDatastore.data.map { it[LAUNCH_APP_COLOR]?.let { c -> Color(c) } }
+
+    suspend fun setLaunchAppColor(ctx: Context, color: Color) {
+        ctx.colorDatastore.edit { it[LAUNCH_APP_COLOR] = color.toArgb() }
+    }
+
+    fun getOpenUrlColor(ctx: Context) =
+        ctx.colorDatastore.data.map { it[OPEN_URL_COLOR]?.let { c -> Color(c) } }
+
+    suspend fun setOpenUrlColor(ctx: Context, color: Color) {
+        ctx.colorDatastore.edit { it[OPEN_URL_COLOR] = color.toArgb() }
+    }
+
+    fun getNotificationShadeColor(ctx: Context) =
+        ctx.colorDatastore.data.map { it[NOTIFICATION_SHADE_COLOR]?.let { c -> Color(c) } }
+
+    suspend fun setNotificationShadeColor(ctx: Context, color: Color) {
+        ctx.colorDatastore.edit { it[NOTIFICATION_SHADE_COLOR] = color.toArgb() }
+    }
+
+    fun getControlPanelColor(ctx: Context) =
+        ctx.colorDatastore.data.map { it[CONTROL_PANEL_COLOR]?.let { c -> Color(c) } }
+
+    suspend fun setControlPanelColor(ctx: Context, color: Color) {
+        ctx.colorDatastore.edit { it[CONTROL_PANEL_COLOR] = color.toArgb() }
+    }
+
+    fun getOpenAppDrawerColor(ctx: Context) =
+        ctx.colorDatastore.data.map { it[OPEN_APP_DRAWER_COLOR]?.let { c -> Color(c) } }
+
+    suspend fun setOpenAppDrawerColor(ctx: Context, color: Color) {
+        ctx.colorDatastore.edit { it[OPEN_APP_DRAWER_COLOR] = color.toArgb() }
+    }
+
+    fun getLauncherSettingsColor(ctx: Context) =
+        ctx.colorDatastore.data.map { it[LAUNCHER_SETTINGS_COLOR]?.let { c -> Color(c) } }
+
+    suspend fun setLauncherSettingsColor(ctx: Context, color: Color) {
+        ctx.colorDatastore.edit { it[LAUNCHER_SETTINGS_COLOR] = color.toArgb() }
+    }
+
+    fun getLockColor(ctx: Context) =
+        ctx.colorDatastore.data.map { it[LOCK_COLOR]?.let { c -> Color(c) } }
+
+    suspend fun setLockColor(ctx: Context, color: Color) {
+        ctx.colorDatastore.edit { it[LOCK_COLOR] = color.toArgb() }
+    }
+
+    fun getOpenFileColor(ctx: Context) =
+        ctx.colorDatastore.data.map { it[OPEN_FILE_COLOR]?.let { c -> Color(c) } }
+
+    suspend fun setOpenFileColor(ctx: Context, color: Color) {
+        ctx.colorDatastore.edit { it[OPEN_FILE_COLOR] = color.toArgb() }
+    }
+
+
 
 
 
@@ -243,12 +274,18 @@ object ColorSettingsStore {
         setOnError(ctx, random())
         setOutline(ctx, random())
         setAngleLineColor(ctx, random())
-//        setEdit(ctx, random())
-//        setComplete(ctx, random())
-//        setNoteTypeText(ctx, random())
-//        setNoteTypeChecklist(ctx, random())
-//        setNoteTypeDrawing(ctx, random())
+        setCircleColor(ctx, random())
+
+        setLaunchAppColor(ctx, random())
+        setOpenUrlColor(ctx, random())
+        setNotificationShadeColor(ctx, random())
+        setControlPanelColor(ctx, random())
+        setOpenAppDrawerColor(ctx, random())
+        setLauncherSettingsColor(ctx, random())
+        setLockColor(ctx, random())
+        setOpenFileColor(ctx, random())
     }
+
     suspend fun resetAll(ctx: Context) {
         ctx.colorDatastore.edit { prefs ->
             prefs.remove(PRIMARY_COLOR)
@@ -266,14 +303,18 @@ object ColorSettingsStore {
             prefs.remove(OUTLINE_COLOR)
             prefs.remove(ANGLE_LINE_COLOR)
             prefs.remove(CIRCLE_COLOR)
-//            prefs.remove(EDIT_COLOR)
-//            prefs.remove(COMPLETE_COLOR)
-//            prefs.remove(SELECT_COLOR)
-//            prefs.remove(NOTE_TYPE_CHECKLIST)
-//            prefs.remove(NOTE_TYPE_TEXT)
-//            prefs.remove(NOTE_TYPE_DRAWING)
+
+            prefs.remove(LAUNCH_APP_COLOR)
+            prefs.remove(OPEN_URL_COLOR)
+            prefs.remove(NOTIFICATION_SHADE_COLOR)
+            prefs.remove(CONTROL_PANEL_COLOR)
+            prefs.remove(OPEN_APP_DRAWER_COLOR)
+            prefs.remove(LAUNCHER_SETTINGS_COLOR)
+            prefs.remove(LOCK_COLOR)
+            prefs.remove(OPEN_FILE_COLOR)
         }
     }
+
     suspend fun getAll(ctx: Context): Map<String, Int> {
         val prefs = ctx.colorDatastore.data.first()
         val colorMode = ColorModesSettingsStore.getColorCustomisationMode(ctx).first()
@@ -303,6 +344,15 @@ object ColorSettingsStore {
             putIfNonDefault(OUTLINE_COLOR.name,        prefs[OUTLINE_COLOR],        default.Outline)
             putIfNonDefault(ANGLE_LINE_COLOR.name,     prefs[ANGLE_LINE_COLOR],     default.AngleLineColor)
             putIfNonDefault(CIRCLE_COLOR.name,         prefs[CIRCLE_COLOR],         default.CircleColor)
+
+            putIfNonDefault(LAUNCH_APP_COLOR.name,        prefs[LAUNCH_APP_COLOR],        default.LaunchAppColor)
+            putIfNonDefault(OPEN_URL_COLOR.name,          prefs[OPEN_URL_COLOR],          default.OpenUrlColor)
+            putIfNonDefault(NOTIFICATION_SHADE_COLOR.name,prefs[NOTIFICATION_SHADE_COLOR],default.NotificationShadeColor)
+            putIfNonDefault(CONTROL_PANEL_COLOR.name,     prefs[CONTROL_PANEL_COLOR],     default.ControlPanelColor)
+            putIfNonDefault(OPEN_APP_DRAWER_COLOR.name,   prefs[OPEN_APP_DRAWER_COLOR],   default.OpenAppDrawerColor)
+            putIfNonDefault(LAUNCHER_SETTINGS_COLOR.name, prefs[LAUNCHER_SETTINGS_COLOR], default.LauncherSettingsColor)
+            putIfNonDefault(LOCK_COLOR.name,              prefs[LOCK_COLOR],              default.LockColor)
+            putIfNonDefault(OPEN_FILE_COLOR.name,         prefs[OPEN_FILE_COLOR],         default.OpenFileColor)
         }
     }
 
@@ -333,8 +383,18 @@ object ColorSettingsStore {
                     OUTLINE_COLOR.name        -> setInt(OUTLINE_COLOR, value)
                     ANGLE_LINE_COLOR.name     -> setInt(ANGLE_LINE_COLOR, value)
                     CIRCLE_COLOR.name         -> setInt(CIRCLE_COLOR, value)
+
+                    LAUNCH_APP_COLOR.name        -> setInt(LAUNCH_APP_COLOR, value)
+                    OPEN_URL_COLOR.name          -> setInt(OPEN_URL_COLOR, value)
+                    NOTIFICATION_SHADE_COLOR.name -> setInt(NOTIFICATION_SHADE_COLOR, value)
+                    CONTROL_PANEL_COLOR.name     -> setInt(CONTROL_PANEL_COLOR, value)
+                    OPEN_APP_DRAWER_COLOR.name   -> setInt(OPEN_APP_DRAWER_COLOR, value)
+                    LAUNCHER_SETTINGS_COLOR.name -> setInt(LAUNCHER_SETTINGS_COLOR, value)
+                    LOCK_COLOR.name              -> setInt(LOCK_COLOR, value)
+                    OPEN_FILE_COLOR.name         -> setInt(OPEN_FILE_COLOR, value)
                 }
             }
+
         }
     }
 }
@@ -356,9 +416,13 @@ private suspend fun applyThemeColors(ctx: Context, colors: ThemeColors) {
     setOutline(ctx, colors.Outline)
     setAngleLineColor(ctx, colors.AngleLineColor)
     setCircleColor(ctx, colors.CircleColor)
-//    setEdit(ctx, colors.Edit)
-//    setComplete(ctx, colors.Complete)
-//    setNoteTypeText(ctx,colors.NoteTypeText)
-//    setNoteTypeChecklist(ctx,colors.NoteTypeChecklist)
-//    setNoteTypeDrawing(ctx,colors.NoteTypeDrawing)
+
+    setLaunchAppColor(ctx, colors.LaunchAppColor)
+    setOpenUrlColor(ctx, colors.OpenUrlColor)
+    setNotificationShadeColor(ctx, colors.NotificationShadeColor)
+    setControlPanelColor(ctx, colors.ControlPanelColor)
+    setOpenAppDrawerColor(ctx, colors.OpenAppDrawerColor)
+    setLauncherSettingsColor(ctx, colors.LauncherSettingsColor)
+    setLockColor(ctx, colors.LockColor)
+    setOpenFileColor(ctx, colors.OpenFileColor)
 }

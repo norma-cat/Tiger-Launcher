@@ -32,6 +32,7 @@ import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.actionTint
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionIcon
@@ -162,6 +163,9 @@ fun AddPointRow(
     action: SwipeActionSerializable,
     onSelected: () -> Unit
 ) {
+    val extraColors = LocalExtraColors.current
+
+
     val icon = when(action) {
         is SwipeActionSerializable.LaunchApp -> painterResource(R.drawable.ic_app_grid)
         else -> actionIcon(action)
@@ -178,7 +182,7 @@ fun AddPointRow(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(actionColor(action).copy(0.5f))
+            .background(actionColor(action, extraColors).copy(0.5f))
             .clickable { onSelected() }
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -191,7 +195,7 @@ fun AddPointRow(
         Icon(
             painter = icon,
             contentDescription = action.toString(),
-            tint = actionTint(action),
+            tint = actionTint(action, extraColors),
             modifier = Modifier.size(30.dp)
         )
     }

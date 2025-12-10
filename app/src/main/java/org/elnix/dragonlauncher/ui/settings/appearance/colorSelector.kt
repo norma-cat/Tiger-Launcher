@@ -92,12 +92,15 @@ fun ColorSelectorTab(
 
     val angleLineColor by ColorSettingsStore.getAngleLineColor(ctx).collectAsState(initial = null)
     val circleColor by ColorSettingsStore.getCircleColor(ctx).collectAsState(initial = null)
-//    val completeColor by ColorSettingsStore.getComplete(ctx).collectAsState(initial = null)
-//
-//    val customSelect by ColorSettingsStore.getSelect(ctx).collectAsState(initial = null)
-//    val customNoteTypeText by ColorSettingsStore.getNoteTypeText(ctx).collectAsState(initial = null)
-//    val customNoteTypeChecklist by ColorSettingsStore.getNoteTypeChecklist(ctx).collectAsState(initial = null)
-//    val customNoteTypeDrawing by ColorSettingsStore.getNoteTypeDrawing(ctx).collectAsState(initial = null)
+
+    val launchAppColor by ColorSettingsStore.getLaunchAppColor(ctx).collectAsState(initial = null)
+    val openUrlColor by ColorSettingsStore.getOpenUrlColor(ctx).collectAsState(initial = null)
+    val notificationShadeColor by ColorSettingsStore.getNotificationShadeColor(ctx).collectAsState(initial = null)
+    val controlPanelColor by ColorSettingsStore.getControlPanelColor(ctx).collectAsState(initial = null)
+    val openAppDrawerColor by ColorSettingsStore.getOpenAppDrawerColor(ctx).collectAsState(initial = null)
+    val launcherSettingsColor by ColorSettingsStore.getLauncherSettingsColor(ctx).collectAsState(initial = null)
+    val lockColor by ColorSettingsStore.getLockColor(ctx).collectAsState(initial = null)
+    val openFileColor by ColorSettingsStore.getOpenFileColor(ctx).collectAsState(initial = null)
 
 
     val colorCustomisationMode by ColorModesSettingsStore.getColorCustomisationMode(ctx).collectAsState(initial = ColorCustomisationMode.DEFAULT)
@@ -365,48 +368,70 @@ fun ColorSelectorTab(
                     ) { scope.launch { ColorSettingsStore.setCircleColor(ctx, it) } }
                 }
 
-//                item {
-//                    ColorPickerRow(
-//                        label = stringResource(R.string.complete_color),
-//                        defaultColor = AmoledDefault.Complete,
-//                        currentColor = complete ?: LocalExtraColors.current.complete
-//                    ) { scope.launch { ColorSettingsStore.setComplete(ctx, it) } }
-//                }
-//
-//                item {
-//                    ColorPickerRow(
-//                        label = stringResource(R.string.select_color),
-//                        defaultColor = AmoledDefault.Select,
-//                        currentColor = select ?: LocalExtraColors.current.select
-//                    ) { scope.launch { ColorSettingsStore.setSelect(ctx, it) } }
-//                }
-//
-//                item {
-//                    ColorPickerRow(
-//                        label = stringResource(R.string.note_type_text),
-//                        defaultColor = AmoledDefault.NoteTypeText,
-//                        currentColor = noteTypeText
-//                            ?: LocalExtraColors.current.noteTypeText
-//                    ) { scope.launch { ColorSettingsStore.setNoteTypeText(ctx, it) } }
-//                }
-//
-//                item {
-//                    ColorPickerRow(
-//                        label = stringResource(R.string.note_type_checklist),
-//                        defaultColor = AmoledDefault.NoteTypeChecklist,
-//                        currentColor = noteTypeChecklist
-//                            ?: LocalExtraColors.current.noteTypeChecklist
-//                    ) { scope.launch { ColorSettingsStore.setNoteTypeChecklist(ctx, it) } }
-//                }
-//
-//                item {
-//                    ColorPickerRow(
-//                        label = stringResource(R.string.note_type_drawing),
-//                        defaultColor = AmoledDefault.NoteTypeDrawing,
-//                        currentColor = noteTypeDrawing
-//                            ?: LocalExtraColors.current.noteTypeDrawing
-//                    ) { scope.launch { ColorSettingsStore.setNoteTypeDrawing(ctx, it) } }
-//                }
+                item {
+                    ColorPickerRow(
+                        label = stringResource(R.string.launch_app_color),
+                        defaultColor = AmoledDefault.LaunchAppColor,
+                        currentColor = launchAppColor ?: LocalExtraColors.current.launchApp
+                    ) { scope.launch { ColorSettingsStore.setLaunchAppColor(ctx, it) } }
+                }
+
+                item {
+                    ColorPickerRow(
+                        label = stringResource(R.string.open_url_color),
+                        defaultColor = AmoledDefault.OpenUrlColor,
+                        currentColor = openUrlColor ?: LocalExtraColors.current.openUrl
+                    ) { scope.launch { ColorSettingsStore.setOpenUrlColor(ctx, it) } }
+                }
+
+                item {
+                    ColorPickerRow(
+                        label = stringResource(R.string.notification_shade_color),
+                        defaultColor = AmoledDefault.NotificationShadeColor,
+                        currentColor = notificationShadeColor ?: LocalExtraColors.current.notificationShade
+                    ) { scope.launch { ColorSettingsStore.setNotificationShadeColor(ctx, it) } }
+                }
+
+                item {
+                    ColorPickerRow(
+                        label = stringResource(R.string.control_panel_color),
+                        defaultColor = AmoledDefault.ControlPanelColor,
+                        currentColor = controlPanelColor ?: LocalExtraColors.current.controlPanel
+                    ) { scope.launch { ColorSettingsStore.setControlPanelColor(ctx, it) } }
+                }
+
+                item {
+                    ColorPickerRow(
+                        label = stringResource(R.string.open_app_drawer_color),
+                        defaultColor = AmoledDefault.OpenAppDrawerColor,
+                        currentColor = openAppDrawerColor ?: LocalExtraColors.current.openAppDrawer
+                    ) { scope.launch { ColorSettingsStore.setOpenAppDrawerColor(ctx, it) } }
+                }
+
+                item {
+                    ColorPickerRow(
+                        label = stringResource(R.string.launcher_settings_color),
+                        defaultColor = AmoledDefault.LauncherSettingsColor,
+                        currentColor = launcherSettingsColor ?: LocalExtraColors.current.launcherSettings
+                    ) { scope.launch { ColorSettingsStore.setLauncherSettingsColor(ctx, it) } }
+                }
+
+                item {
+                    ColorPickerRow(
+                        label = stringResource(R.string.lock_color),
+                        defaultColor = AmoledDefault.LockColor,
+                        currentColor = lockColor ?: LocalExtraColors.current.lock
+                    ) { scope.launch { ColorSettingsStore.setLockColor(ctx, it) } }
+                }
+
+                item {
+                    ColorPickerRow(
+                        label = stringResource(R.string.open_file_color),
+                        defaultColor = AmoledDefault.OpenFileColor,
+                        currentColor = openFileColor ?: LocalExtraColors.current.openFile
+                    ) { scope.launch { ColorSettingsStore.setOpenFileColor(ctx, it) } }
+                }
+
             }
 
             ColorCustomisationMode.NORMAL -> {

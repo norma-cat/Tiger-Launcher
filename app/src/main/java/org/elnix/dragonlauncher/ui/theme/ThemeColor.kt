@@ -17,12 +17,16 @@ interface ThemeColors {
     val Error: Color
     val OnError: Color
     val Outline: Color
+
     val AngleLineColor: Color
     val CircleColor: Color
-//    val Complete: Color
-//    val Select: Color
-//
-//    val NoteTypeText : Color
-//    val NoteTypeChecklist : Color
-//    val NoteTypeDrawing : Color
+
+    val LaunchAppColor: Color
+    val OpenUrlColor: Color
+    val NotificationShadeColor: Color
+    val ControlPanelColor: Color
+    val OpenAppDrawerColor: Color
+    val LauncherSettingsColor: Color
+    val LockColor: Color
+    val OpenFileColor: Color
 }

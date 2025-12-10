@@ -58,9 +58,14 @@
     <string name="circle_color">Circle Color</string>
     <string name="complete_color">Complete Color</string>
     <string name="select_color">Select Color</string>
-    <string name="note_type_text">Text Note</string>
-    <string name="note_type_checklist">Checklist</string>
-    <string name="note_type_drawing">Drawing</string>
+    <string name="launch_app_color">Launch App Color</string>
+    <string name="open_url_color">Open URL Color</string>
+    <string name="notification_shade_color">Notification Shade Color</string>
+    <string name="control_panel_color">Control Panel Color</string>
+    <string name="open_app_drawer_color">App Drawer Color</string>
+    <string name="launcher_settings_color">Launcher Settings Color</string>
+    <string name="lock_color">Lock Color</string>
+    <string name="open_file_color">Open File Color</string>
     <string name="reset_to_default_colors_explanation">This will restore all colors to their original default values</string>
     <string name="make_every_colors_random_explanation">Generate completely random colors for all theme elements</string>
     <string name="text_color">Text Color</string>

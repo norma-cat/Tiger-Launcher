@@ -1,3 +1,5 @@
+@file:Suppress("AssignedValueIsNeverRead")
+
 package org.elnix.dragonlauncher.ui.colors
 
 import androidx.compose.foundation.background
@@ -159,7 +161,7 @@ fun ColorPickerRow(
                     Spacer(Modifier.width(15.dp))
 
                     Text(
-                        text = "Choose $label color}",
+                        text = label,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }

@@ -87,6 +87,7 @@ import org.elnix.dragonlauncher.ui.helpers.AddPointDialog
 import org.elnix.dragonlauncher.ui.helpers.RepeatingPressButton
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionIcon
@@ -182,6 +183,7 @@ fun SettingsScreen(
 
 
     val backgroundColor = MaterialTheme.colorScheme.background
+    val extraColors = LocalExtraColors.current
 
 
     // Load
@@ -334,7 +336,7 @@ fun SettingsScreen(
                                 image = actionIconBitmap(
                                     action = p.action,
                                     context = ctx,
-                                    tintColor = actionColor(p.action)
+                                    tintColor = actionColor(p.action, extraColors)
                                 ),
                                 dstOffset = IntOffset(px.toInt() - 28, py.toInt() - 28),
                                 dstSize = IntSize(56, 56)
@@ -363,7 +365,7 @@ fun SettingsScreen(
                                 image = actionIconBitmap(
                                     action = p.action,
                                     context = ctx,
-                                    tintColor = actionColor(p.action)
+                                    tintColor = actionColor(p.action, extraColors)
                                 ),
                                 dstOffset = IntOffset(px.toInt() - 28, py.toInt() - 28),
                                 dstSize = IntSize(56, 56)
@@ -795,12 +797,12 @@ fun SettingsScreen(
                 Icon(
                     painter = actionIcon(currentAction, icons),
                     contentDescription = actionLabel(currentAction),
-                    tint = actionTint(currentAction),
+                    tint = actionTint(currentAction, extraColors),
                     modifier = Modifier.size(22.dp)
                 )
                 Text(
                     text = actionLabel(currentAction),
-                    color = actionColor(currentAction),
+                    color = actionColor(currentAction, extraColors),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )

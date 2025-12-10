@@ -61,11 +61,15 @@ fun DragonLauncherTheme(
     customOutline: Color? = null,
     customAngleLineColor: Color? = null,
     customCircleColor: Color? = null,
-//    customComplete: Color? = null,
-//    customSelect: Color? = null,
-//    customNoteTypeText: Color? = null,
-//    customNoteTypeCheckList: Color? = null,
-//    customNoteTypeDrawing: Color? = null,
+    customLaunchAppColor: Color? = null,
+    customOpenUrlColor: Color? = null,
+    customNotificationShadeColor: Color? = null,
+    customControlPanelColor: Color? = null,
+    customOpenAppDrawerColor: Color? = null,
+    customLauncherSettingsColor: Color? = null,
+    customLockColor: Color? = null,
+    customOpenFileColor: Color? = null,
+
     content: @Composable () -> Unit
 ) {
     val primary = customPrimary ?: AmoledDefault.Primary
@@ -90,22 +94,31 @@ fun DragonLauncherTheme(
 
     val angleLine = customAngleLineColor ?: AmoledDefault.AngleLineColor
     val circle = customCircleColor ?: AmoledDefault.CircleColor
-//    val complete = customComplete ?: AmoledDefault.Complete
-//    val select = customSelect ?: AmoledDefault.Select
-//
-//    val noteTypeText = customNoteTypeText ?: AmoledDefault.NoteTypeText
-//    val noteTypeChecklist = customNoteTypeCheckList ?: AmoledDefault.NoteTypeChecklist
-//    val noteTypeDrawing = customNoteTypeDrawing ?: AmoledDefault.NoteTypeDrawing
 
+    val launchApp = customLaunchAppColor ?: AmoledDefault.LaunchAppColor
+    val openUrl = customOpenUrlColor ?: AmoledDefault.OpenUrlColor
+    val notificationShade = customNotificationShadeColor ?: AmoledDefault.NotificationShadeColor
+    val controlPanel = customControlPanelColor ?: AmoledDefault.ControlPanelColor
+    val openAppDrawer = customOpenAppDrawerColor ?: AmoledDefault.OpenAppDrawerColor
+    val launcherSettings = customLauncherSettingsColor ?: AmoledDefault.LauncherSettingsColor
+    val lock = customLockColor ?: AmoledDefault.LockColor
+    val openFile = customOpenFileColor ?: AmoledDefault.OpenFileColor
+
+
+// Add to ExtraColors
     val extraColors = ExtraColors(
         angleLine,
         circle,
-//        complete,
-//        select,
-//        noteTypeText,
-//        noteTypeChecklist,
-//        noteTypeDrawing
+        launchApp,
+        openUrl,
+        notificationShade,
+        controlPanel,
+        openAppDrawer,
+        launcherSettings,
+        lock,
+        openFile
     )
+
 
     val colorScheme = generateColorScheme(
         primary = primary,
