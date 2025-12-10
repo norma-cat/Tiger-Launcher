@@ -1,13 +1,10 @@
 package org.elnix.dragonlauncher.ui.helpers.settings
 
-import android.R.attr.description
-import android.R.attr.enabled
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,12 +28,16 @@ fun SettingsItem(
     comingSoon: Boolean = false,
     icon: ImageVector? = null,
     leadIcon: ImageVector? = null,
+    onLongClick: (() -> Unit)? = null,
     onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(enabled) { onClick() }
+            .combinedClickable(
+                enabled,
+                onLongClick = onLongClick
+            ) { onClick() }
             .background(
                 color = MaterialTheme.colorScheme.surface.adjustBrightness(if (enabled) 1f else 0.5f),
                 shape = RoundedCornerShape(12.dp)

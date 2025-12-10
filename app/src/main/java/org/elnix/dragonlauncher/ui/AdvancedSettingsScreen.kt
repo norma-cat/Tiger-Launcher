@@ -192,7 +192,8 @@ fun AdvancedSettingsScreen(
             SettingsItem(
                 title = stringResource(R.string.source_code),
                 icon = Icons.Default.Code,
-                leadIcon = Icons.AutoMirrored.Filled.Launch
+                leadIcon = Icons.AutoMirrored.Filled.Launch,
+                onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher")}
             ) { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher") }
         }
 
@@ -201,7 +202,8 @@ fun AdvancedSettingsScreen(
                 title = stringResource(R.string.check_for_update),
                 description = stringResource(R.string.check_for_updates_text),
                 icon = Icons.Default.Update,
-                leadIcon = Icons.AutoMirrored.Filled.Launch
+                leadIcon = Icons.AutoMirrored.Filled.Launch,
+                onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher/releases/latest")}
             ) { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/releases/latest") }
         }
 
@@ -210,7 +212,8 @@ fun AdvancedSettingsScreen(
                 title = stringResource(R.string.report_a_bug),
                 description =stringResource(R.string.open_an_issue_on_github),
                 icon = Icons.Default.ReportProblem,
-                leadIcon = Icons.AutoMirrored.Filled.Launch
+                leadIcon = Icons.AutoMirrored.Filled.Launch,
+                onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher/issues/new")}
             ) { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/issues/new") }
         }
 

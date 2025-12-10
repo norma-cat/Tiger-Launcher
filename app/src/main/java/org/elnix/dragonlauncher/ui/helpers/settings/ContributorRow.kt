@@ -3,7 +3,7 @@ package org.elnix.dragonlauncher.ui.helpers.settings
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import org.elnix.dragonlauncher.utils.copyToClipboard
 import org.elnix.dragonlauncher.utils.openUrl
 
 @Composable
@@ -41,7 +42,9 @@ fun ContributorItem(
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .clickable { ctx.openUrl(githubUrl) }
+            .combinedClickable(
+                onLongClick = { ctx.copyToClipboard(githubUrl) }
+            ) { ctx.openUrl(githubUrl) }
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp)
