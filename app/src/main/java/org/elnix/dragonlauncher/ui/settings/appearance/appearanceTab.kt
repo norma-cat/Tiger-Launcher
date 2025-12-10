@@ -175,7 +175,7 @@ fun AppearanceTab(
                 showValue = true,
                 valueRange = 0f..360f,
                 color = MaterialTheme.colorScheme.primary,
-                onReset = { scope.launch { UiSettingsStore.setMinAngleFromAPointToActivateIt(ctx, 0) } }
+                onReset = { scope.launch { UiSettingsStore.setMinAngleFromAPointToActivateIt(ctx, 30) } }
             ) {
                 scope.launch { UiSettingsStore.setMinAngleFromAPointToActivateIt(ctx, it) }
             }
