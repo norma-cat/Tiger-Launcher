@@ -11,10 +11,15 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Launch
 import androidx.compose.material.icons.automirrored.filled.Notes
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ColorLens
@@ -24,6 +29,8 @@ import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.filled.Update
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -55,7 +63,9 @@ import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.ContributorItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.elnix.dragonlauncher.utils.copyToClipboard
+import org.elnix.dragonlauncher.utils.getVersionCode
 import org.elnix.dragonlauncher.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.utils.openUrl
 import org.elnix.dragonlauncher.utils.showToast
@@ -71,6 +81,7 @@ fun AdvancedSettingsScreen(
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val versionCode = getVersionCode(ctx)
 
     val isDebugModeEnabled by DebugSettingsStore.getDebugEnabled(ctx)
         .collectAsState(initial = false)
@@ -182,10 +193,33 @@ fun AdvancedSettingsScreen(
         item { TextDivider(stringResource(R.string.about)) }
 
         item {
-            SettingsItem(
-                title = stringResource(R.string.changelogs),
-                icon = Icons.AutoMirrored.Filled.Notes
-            ) { navController.navigate(SETTINGS.CHANGELOGS) }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                SettingsItem(
+                    title = stringResource(R.string.changelogs),
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.AutoMirrored.Filled.Notes
+                ) { navController.navigate(SETTINGS.CHANGELOGS) }
+
+                IconButton(
+                    onClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/changelogs/${versionCode}.txt") },
+                    colors = AppObjectsColors.iconButtonColors(
+                        backgroundColor = MaterialTheme.colorScheme.surface
+                    ),
+                    modifier = Modifier
+                        .size(52.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                        contentDescription = "Open link in github",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+
+                }
+            }
         }
 
         item {

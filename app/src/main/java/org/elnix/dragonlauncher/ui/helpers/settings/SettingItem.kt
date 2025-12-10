@@ -23,6 +23,7 @@ import org.elnix.dragonlauncher.utils.colors.adjustBrightness
 @Composable
 fun SettingsItem(
     title: String,
+    modifier: Modifier = Modifier,
     description: String? = null,
     enabled: Boolean = true,
     comingSoon: Boolean = false,
@@ -32,7 +33,7 @@ fun SettingsItem(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
                 enabled,
