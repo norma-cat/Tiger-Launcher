@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -35,14 +36,13 @@ fun SettingsItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
             .combinedClickable(
                 enabled,
-                onLongClick = onLongClick
-            ) { onClick() }
-            .background(
-                color = MaterialTheme.colorScheme.surface.adjustBrightness(if (enabled) 1f else 0.5f),
-                shape = RoundedCornerShape(12.dp)
+                onLongClick = onLongClick,
+                onClick = onClick
             )
+            .background(MaterialTheme.colorScheme.surface.adjustBrightness(if (enabled) 1f else 0.5f),)
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
