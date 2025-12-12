@@ -97,4 +97,12 @@
     <string name="changelogs_help">The list of updates the app got since the first version</string>
     <string name="whats_new">What\'s new</string>
     <string name="left_drawer_action">Left Drawer action</string>
+    <string name="right_drawer_action">Right Drawer Action</string>
+    <string name="left_action_width">Left Action Width</string>
+    <string name="right_action_width">Right Action Width</string>
+    <string name="drawer_actions_width">Drawer Actions Width</string>
+    <string name="drawer_actions">Drawer Actions</string>
+    <string name="close_drawer">Close Drawer</string>
+    <string name="toggle_kb">Toggle Keyboard</string>
+    <string name="behavior">Behavior</string>
 </resources>

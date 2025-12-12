@@ -16,7 +16,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -103,14 +102,17 @@ fun MainAppUi(
     val searchBarBottom = false
 
 
+
     val leftDrawerAction by DrawerSettingsStore.getLeftDrawerAction(ctx)
         .collectAsState(initial = DrawerActions.TOGGLE_KB)
 
     val rightDrawerAction by DrawerSettingsStore.getRightDrawerAction(ctx)
         .collectAsState(initial = DrawerActions.CLOSE)
 
-    val leftDrawerSize = 75.dp
-    val rightDrawerSize = 75.dp
+    val leftDrawerWidth by DrawerSettingsStore.getLeftDrawerWidth(ctx)
+        .collectAsState(initial = 0.1f)
+    val rightDrawerWidth  by DrawerSettingsStore.getRightDrawerWidth(ctx)
+        .collectAsState(initial = 0.1f)
 
     val initialPage by DrawerSettingsStore.getInitialPage(ctx)
         .collectAsState(initial = 0)
@@ -200,9 +202,9 @@ fun MainAppUi(
                 gridSize = gridSize,
                 searchBarBottom = searchBarBottom,
                 leftAction = leftDrawerAction,
-                leftSize = leftDrawerSize,
+                leftWidth = leftDrawerWidth,
                 rightAction = rightDrawerAction,
-                rightSize = rightDrawerSize,
+                rightWidth = rightDrawerWidth,
             ) { goMainScreen() } }
 
 
@@ -227,7 +229,7 @@ fun MainAppUi(
 
 
             composable(SETTINGS.APPEARANCE) { AppearanceTab(navController) { goAdvSettingsRoot() } }
-            composable(SETTINGS.DRAWER) { DrawerTab { goAdvSettingsRoot() } }
+            composable(SETTINGS.DRAWER) { DrawerTab(appsViewModel) { goAdvSettingsRoot() } }
             composable(SETTINGS.COLORS) { ColorSelectorTab { goAdvSettingsRoot() } }
             composable(SETTINGS.DEBUG) { DebugTab(navController, { goWelcome() } ) { goAdvSettingsRoot() } }
             composable(SETTINGS.LANGUAGE) { LanguageTab { goAdvSettingsRoot() } }

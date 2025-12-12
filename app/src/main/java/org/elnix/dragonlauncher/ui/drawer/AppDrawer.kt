@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -44,7 +43,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
@@ -70,9 +68,9 @@ fun AppDrawerScreen(
     gridSize: Int,
     searchBarBottom: Boolean,
     leftAction: DrawerActions,
-    leftSize: Dp,
+    leftWidth: Float,
     rightAction: DrawerActions,
-    rightSize: Dp,
+    rightWidth: Float,
     onClose: () -> Unit
 ) {
     val ctx = LocalContext.current
@@ -275,8 +273,7 @@ fun AppDrawerScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(leftSize)
-//                        .background(Color.Red)
+                        .fillMaxWidth(leftWidth)
                         .clickable { launchDrawerAction(leftAction) }
                 )
             }
@@ -285,7 +282,6 @@ fun AppDrawerScreen(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f)
-                    .padding(15.dp)
             ) {
                 HorizontalPager(
                     state = pagerState
@@ -328,8 +324,7 @@ fun AppDrawerScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(rightSize)
-//                        .background(Color.Red)
+                        .fillMaxWidth(rightWidth)
                         .clickable { launchDrawerAction(rightAction) }
                 )
             }
