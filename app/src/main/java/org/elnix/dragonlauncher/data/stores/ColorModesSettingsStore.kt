@@ -7,12 +7,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.elnix.dragonlauncher.data.BackupTypeException
+import org.elnix.dragonlauncher.data.BaseSettingsStore
 import org.elnix.dragonlauncher.data.ColorCustomisationMode
 import org.elnix.dragonlauncher.data.DefaultThemes
 import org.elnix.dragonlauncher.data.colorModeDatastore
 import org.elnix.dragonlauncher.data.helpers.ColorPickerMode
 
-object ColorModesSettingsStore {
+object ColorModesSettingsStore : BaseSettingsStore() {
+
+    override val name: String = "Color Modes"
 
     // -------------------------------------------------------------------------
     // Backup data class
@@ -74,7 +77,7 @@ object ColorModesSettingsStore {
     // -------------------------------------------------------------------------
     // Reset
     // -------------------------------------------------------------------------
-    suspend fun resetAll(ctx: Context) {
+    override suspend fun resetAll(ctx: Context) {
         ctx.colorModeDatastore.edit { prefs ->
             prefs.remove(COLOR_PICKER_MODE)
             prefs.remove(COLOR_CUSTOMISATION_MODE)

@@ -4,10 +4,12 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import org.elnix.dragonlauncher.data.BaseSettingsStore
 import org.elnix.dragonlauncher.data.languageDatastore
 
-object LanguageSettingsStore {
+object LanguageSettingsStore : BaseSettingsStore() {
+    override val name: String = "Language"
+
     private val KEY_LANG = stringPreferencesKey("pref_app_language")
 
     suspend fun setLanguageTag(ctx: Context, tag: String?) {
@@ -19,7 +21,7 @@ object LanguageSettingsStore {
     suspend fun getLanguageTag(ctx: Context): String? =
         ctx.languageDatastore.data.first()[KEY_LANG]
 
-    suspend fun resetAll(ctx: Context) {
+    override suspend fun resetAll(ctx: Context) {
         ctx.languageDatastore.edit { prefs ->
             prefs.remove(KEY_LANG)
         }

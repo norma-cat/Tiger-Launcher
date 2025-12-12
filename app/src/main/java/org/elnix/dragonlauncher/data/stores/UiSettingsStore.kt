@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.elnix.dragonlauncher.data.BackupTypeException
+import org.elnix.dragonlauncher.data.BaseSettingsStore
 import org.elnix.dragonlauncher.data.uiDatastore
 
-object UiSettingsStore {
+object UiSettingsStore : BaseSettingsStore() {
+    override val name: String = "Ui"
 
     private data class UiSettingsBackup(
         val rgbLoading: Boolean = true,
@@ -191,7 +193,7 @@ object UiSettingsStore {
     // --------------------------------
 
 
-    suspend fun resetAll(ctx: Context) {
+    override suspend fun resetAll(ctx: Context) {
         ctx.uiDatastore.edit { prefs ->
             Keys.ALL.forEach { prefs.remove(it) }
         }

@@ -7,10 +7,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.elnix.dragonlauncher.data.BaseSettingsStore
 import org.elnix.dragonlauncher.data.privateSettingsStore
 import org.elnix.dragonlauncher.data.uiDatastore
 
-object PrivateSettingsStore {
+object PrivateSettingsStore : BaseSettingsStore() {
+    override val name: String = "Private"
 
     // ---------------------------------------------------------
     // Backup structure
@@ -117,7 +119,7 @@ object PrivateSettingsStore {
     // ---------------------------------------------------------
     // Reset
     // ---------------------------------------------------------
-    suspend fun resetAll(ctx: Context) {
+    override suspend fun resetAll(ctx: Context) {
         ctx.privateSettingsStore.edit { prefs ->
             prefs.remove(HAS_SEEN_WELCOME)
             prefs.remove(HAS_INITIALIZED)

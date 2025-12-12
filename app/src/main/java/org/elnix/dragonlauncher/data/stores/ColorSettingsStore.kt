@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.elnix.dragonlauncher.data.BackupTypeException
+import org.elnix.dragonlauncher.data.BaseSettingsStore
 import org.elnix.dragonlauncher.data.ColorCustomisationMode
 import org.elnix.dragonlauncher.data.DefaultThemes
 import org.elnix.dragonlauncher.data.colorDatastore
@@ -42,7 +43,8 @@ import org.elnix.dragonlauncher.ui.theme.AmoledDefault
 import org.elnix.dragonlauncher.ui.theme.ThemeColors
 import org.elnix.dragonlauncher.utils.colors.randomColor
 
-object ColorSettingsStore {
+object ColorSettingsStore : BaseSettingsStore() {
+    override val name: String = "Colors"
 
     private val PRIMARY_COLOR = intPreferencesKey("primary_color")
     private val ON_PRIMARY_COLOR = intPreferencesKey("on_primary_color")
@@ -296,7 +298,7 @@ object ColorSettingsStore {
         setReloadColor(ctx, random())
     }
 
-    suspend fun resetAll(ctx: Context) {
+    override suspend fun resetAll(ctx: Context) {
         ctx.colorDatastore.edit { prefs ->
             prefs.remove(PRIMARY_COLOR)
             prefs.remove(ON_PRIMARY_COLOR)

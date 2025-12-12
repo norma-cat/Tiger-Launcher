@@ -8,9 +8,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.elnix.dragonlauncher.data.BackupTypeException
+import org.elnix.dragonlauncher.data.BaseSettingsStore
 import org.elnix.dragonlauncher.data.drawerDataStore
 
-object DrawerSettingsStore {
+object DrawerSettingsStore : BaseSettingsStore() {
+    override val name: String = "Drawer"
 
     // -------------------------------------------------------------------------
     // Backup data class
@@ -120,7 +122,7 @@ object DrawerSettingsStore {
     // -------------------------------------------------------------------------
     // Reset
     // -------------------------------------------------------------------------
-    suspend fun resetAll(ctx: Context) {
+    override suspend fun resetAll(ctx: Context) {
         ctx.drawerDataStore.edit { prefs ->
             prefs.remove(AUTO_OPEN_SINGLE_MATCH)
             prefs.remove(SHOW_APP_ICONS_IN_DRAWER)

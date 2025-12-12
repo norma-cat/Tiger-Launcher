@@ -5,11 +5,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import org.elnix.dragonlauncher.data.BaseSettingsStore
 import org.elnix.dragonlauncher.data.SwipeJson
 import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.swipeDataStore
 
-object SwipeSettingsStore {
+object SwipeSettingsStore : BaseSettingsStore() {
+    override val name: String = "Swipe"
 
 //    data class SwipeBackup(
 //        val pointsJson: String? = null
@@ -37,7 +39,7 @@ object SwipeSettingsStore {
     }
 
 
-    suspend fun resetAll(ctx: Context) {
+    override suspend fun resetAll(ctx: Context) {
         ctx.swipeDataStore.edit { prefs ->
             prefs.remove(POINTS)
         }

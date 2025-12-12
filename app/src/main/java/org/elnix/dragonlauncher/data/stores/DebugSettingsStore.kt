@@ -7,9 +7,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.elnix.dragonlauncher.data.BackupTypeException
+import org.elnix.dragonlauncher.data.BaseSettingsStore
 import org.elnix.dragonlauncher.data.debugDatastore
 
-object DebugSettingsStore {
+object DebugSettingsStore : BaseSettingsStore() {
+
+    override val name: String = "Debug"
 
     // -------------------------------------------------------------------------
     // Backup data class
@@ -68,7 +71,7 @@ object DebugSettingsStore {
     // -------------------------------------------------------------------------
     // Reset
     // -------------------------------------------------------------------------
-    suspend fun resetAll(ctx: Context) {
+    override suspend fun resetAll(ctx: Context) {
         ctx.debugDatastore.edit { prefs ->
             prefs.remove(DEBUG_ENABLED)
             prefs.remove(DEBUG_INFOS)
