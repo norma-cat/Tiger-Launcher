@@ -108,6 +108,7 @@ fun AdvancedSettingsScreen(
                 ColorModesSettingsStore.resetAll(ctx)
                 ColorSettingsStore.resetAll(ctx)
                 DrawerSettingsStore.resetAll(ctx)
+                WorkspaceSettingsStore.resetAll(ctx)
 
                 // Small delay to allow the default apps to load before initializing
                 delay(200)
