@@ -26,6 +26,7 @@ import org.elnix.dragonlauncher.R
 /**
  * Show a toast message with flexible input types
  * @param message Can be a String, StringRes Int, or null
+ * @param resId A resource Id, of a text
  * @param duration Toast duration (LENGTH_SHORT or LENGTH_LONG)
  */
 fun Context.showToast(

@@ -112,4 +112,6 @@
     <string name="delete_workspace">Delete Workspace</string>
     <string name="are_you_sure_to_delete_workspace">Are you sure to delete workspace</string>
     <string name="search_apps">Search Apps</string>
+    <string name="remove_from_workspace">Remove From Workspace</string>
+    <string name="system_workspace_cant_edit">System Workspace, can\'t edit</string>
 </resources>

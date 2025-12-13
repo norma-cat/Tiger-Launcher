@@ -71,7 +71,6 @@ fun AddPointDialog(
         .collectAsState(initial = 1)
     val showIcons by DrawerSettingsStore.getShowAppIconsInDrawer(ctx)
         .collectAsState(initial = true)
-
     val showLabels by DrawerSettingsStore.getShowAppLabelsInDrawer(ctx)
         .collectAsState(initial = true)
 

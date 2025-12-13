@@ -102,17 +102,6 @@ class WorkspaceViewModel(application: Application) : AndroidViewModel(applicatio
         persist()
     }
 
-    /** Toggle workspace enabled state */
-    fun toggleWorkspaceEnabled(id: String) {
-        val current = _state.value.workspaces.find { it.id == id }?.enabled ?: true
-        setWorkspaceEnabled(id, !current)
-    }
-
-    /** Check if workspace is enabled */
-    fun isWorkspaceEnabled(id: String): Boolean {
-        return _state.value.workspaces.find { it.id == id }?.enabled ?: true
-    }
-
     fun createWorkspace(name: String) {
         _state.value = _state.value.copy(
             workspaces = _state.value.workspaces +
@@ -145,6 +134,31 @@ class WorkspaceViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun setWorkspaceOrder(newOrder: List<Workspace>) {
         _state.value = _state.value.copy(workspaces = newOrder)
+        persist()
+    }
+
+
+    // Apps operations
+    fun addAppToWorkspace(workspaceId: String, packageName: String) {
+        _state.value = _state.value.copy(
+            workspaces = _state.value.workspaces.map { ws ->
+                if (ws.id == workspaceId && ws.type == WorkspaceType.CUSTOM) {
+                    if (packageName in ws.appIds) ws
+                    else ws.copy(appIds = ws.appIds + packageName)
+                } else ws
+            }
+        )
+        persist()
+    }
+
+    fun removeAppFromWorkspace(workspaceId: String, packageName: String) {
+        _state.value = _state.value.copy(
+            workspaces = _state.value.workspaces.map { ws ->
+                if (ws.id == workspaceId && ws.type == WorkspaceType.CUSTOM) {
+                    ws.copy(appIds = ws.appIds - packageName)
+                } else ws
+            }
+        )
         persist()
     }
 

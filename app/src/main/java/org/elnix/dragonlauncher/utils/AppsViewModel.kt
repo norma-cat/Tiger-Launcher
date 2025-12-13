@@ -73,17 +73,18 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
         overrides: Map<String, AppOverride>
     ): Flow<List<AppModel>> =
         allApps.map { list ->
-            list
-                .filter { app ->
-                    when (workspace.type) {
-                        WorkspaceType.ALL, WorkspaceType.CUSTOM -> true
-                        WorkspaceType.USER -> !app.isSystem && !app.isWorkProfile
-                        WorkspaceType.SYSTEM -> app.isSystem
-                        WorkspaceType.WORK -> app.isWorkProfile
-                    }
-                }
-                .map { resolveApp(it, overrides) }
+            val filtered = when (workspace.type) {
+                WorkspaceType.ALL -> list
+                WorkspaceType.USER -> list.filter { !it.isSystem && !it.isWorkProfile }
+                WorkspaceType.SYSTEM -> list.filter { it.isSystem }
+                WorkspaceType.WORK -> list.filter { it.isWorkProfile }
+                WorkspaceType.CUSTOM ->
+                    list.filter { it.packageName in workspace.appIds }
+            }
+
+            filtered.map { resolveApp(it, overrides) }
         }
+
 
 
     private fun loadApps() {
