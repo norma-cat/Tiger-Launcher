@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.filled.Update
+import androidx.compose.material.icons.filled.Workspaces
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -162,6 +163,14 @@ fun AdvancedSettingsScreen(
             }
         }
 
+        item {
+            SettingsItem(
+                title = stringResource(R.string.workspaces),
+                icon = Icons.Default.Workspaces
+            ) {
+                navController.navigate(SETTINGS.WORKSPACE)
+            }
+        }
 
         item {
             SettingsItem(

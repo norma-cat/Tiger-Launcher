@@ -12,3 +12,50 @@ data class AppModel(
 ) {
     val action = SwipeActionSerializable.LaunchApp(packageName)
 }
+
+
+enum class WorkspaceType {
+    ALL,
+    USER,
+    SYSTEM,
+    WORK,
+    CUSTOM
+}
+
+data class Workspace(
+    val id: String,
+    val name: String,
+    val type: WorkspaceType,
+    val appIds: List<String>,
+    val enabled: Boolean
+)
+
+
+data class AppOverride(
+    val packageName: String,
+    val customLabel: String? = null,
+    val customIconUri: String? = null
+)
+
+
+
+data class WorkspaceState(
+    val workspaces: List<Workspace>,
+    val appOverrides: Map<String, AppOverride>
+)
+
+fun resolveApp(
+    app: AppModel,
+    overrides: Map<String, AppOverride>
+): AppModel {
+    val o = overrides[app.packageName] ?: return app
+    return app.copy(name = o.customLabel ?: app.name)
+}
+
+
+val defaultWorkspaces = listOf(
+    Workspace("all", "All Apps", WorkspaceType.ALL, emptyList(), true),
+    Workspace("user", "User Apps", WorkspaceType.USER, emptyList(), true),
+    Workspace("system", "System Apps", WorkspaceType.SYSTEM, emptyList(), true),
+    Workspace("work", "Work Apps", WorkspaceType.WORK, emptyList(), true)
+)

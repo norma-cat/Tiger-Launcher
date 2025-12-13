@@ -20,9 +20,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.data.helpers.DrawerActions
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
@@ -36,6 +38,8 @@ import org.elnix.dragonlauncher.ui.settings.backup.BackupTab
 import org.elnix.dragonlauncher.ui.settings.backup.BackupViewModel
 import org.elnix.dragonlauncher.ui.settings.debug.DebugTab
 import org.elnix.dragonlauncher.ui.settings.language.LanguageTab
+import org.elnix.dragonlauncher.ui.settings.workspace.WorkspaceDetailScreen
+import org.elnix.dragonlauncher.ui.settings.workspace.WorkspaceListScreen
 import org.elnix.dragonlauncher.ui.welcome.WelcomeScreen
 import org.elnix.dragonlauncher.ui.whatsnew.ChangelogsScreen
 import org.elnix.dragonlauncher.ui.whatsnew.WhatsNewBottomSheet
@@ -43,6 +47,7 @@ import org.elnix.dragonlauncher.utils.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.getVersionCode
 import org.elnix.dragonlauncher.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.utils.loadChangelogs
+import org.elnix.dragonlauncher.utils.workspace.WorkspaceViewModel
 
 // -------------------- SETTINGS --------------------
 
@@ -51,7 +56,9 @@ object SETTINGS {
     const val ADVANCED_ROOT = "settings/advanced"
     const val APPEARANCE = "settings/advanced/appearance"
     const val COLORS = "settings/advanced/appearance/colors"
-    const val DRAWER = "settings/drawer"
+    const val DRAWER = "settings/advanced/drawer"
+    const val WORKSPACE = "settings/advanced/workspace"
+    const val WORKSPACE_DETAIL = "settings/advanced/workspace/{id}"
     const val BACKUP = "settings/advanced/backup"
     const val DEBUG = "/advanced/debug"
     const val LANGUAGE = "settings/advanced/language"
@@ -69,6 +76,7 @@ object ROUTES {
 fun MainAppUi(
     backupViewModel: BackupViewModel,
     appsViewModel: AppDrawerViewModel,
+    workspaceViewModel: WorkspaceViewModel,
     navController: NavHostController
 ) {
     val ctx = LocalContext.current
@@ -113,9 +121,6 @@ fun MainAppUi(
         .collectAsState(initial = 0.1f)
     val rightDrawerWidth  by DrawerSettingsStore.getRightDrawerWidth(ctx)
         .collectAsState(initial = 0.1f)
-
-    val initialPage by DrawerSettingsStore.getInitialPage(ctx)
-        .collectAsState(initial = 0)
 
 
     val showSetDefaultLauncherBanner by PrivateSettingsStore.getShowSetDefaultLauncherBanner(ctx)
@@ -195,7 +200,7 @@ fun MainAppUi(
 
             composable(ROUTES.DRAWER) { AppDrawerScreen(
                 appsViewModel = appsViewModel,
-                initialPage = initialPage,
+                workspaceViewModel = workspaceViewModel,
                 showIcons = showAppIconsInDrawer,
                 showLabels = showAppLabelsInDrawer,
                 autoShowKeyboard = autoShowKeyboardOnDrawer,
@@ -221,20 +226,47 @@ fun MainAppUi(
             composable(SETTINGS.ROOT) {
                 SettingsScreen(
                     appsViewModel = appsViewModel,
+                    workspaceViewModel = workspaceViewModel,
                     onAdvSettings = { goAdvSettingsRoot() },
                     onBack = { goMainScreen() }
                 )
             }
             composable(SETTINGS.ADVANCED_ROOT) { AdvancedSettingsScreen(navController, onReset = { goMainScreen() } ) { goSettingsRoot() } }
 
-
             composable(SETTINGS.APPEARANCE) { AppearanceTab(navController) { goAdvSettingsRoot() } }
-            composable(SETTINGS.DRAWER) { DrawerTab(appsViewModel) { goAdvSettingsRoot() } }
-            composable(SETTINGS.COLORS) { ColorSelectorTab { goAdvSettingsRoot() } }
-            composable(SETTINGS.DEBUG) { DebugTab(navController, { goWelcome() } ) { goAdvSettingsRoot() } }
-            composable(SETTINGS.LANGUAGE) { LanguageTab { goAdvSettingsRoot() } }
-            composable(SETTINGS.BACKUP) { BackupTab(backupViewModel) { goAdvSettingsRoot() } }
+            composable(SETTINGS.DRAWER)     { DrawerTab(appsViewModel) { goAdvSettingsRoot() } }
+            composable(SETTINGS.COLORS)     { ColorSelectorTab { goAdvSettingsRoot() } }
+            composable(SETTINGS.DEBUG)      { DebugTab(navController, onShowWelcome = { goWelcome() } ) { goAdvSettingsRoot() } }
+            composable(SETTINGS.LANGUAGE)   { LanguageTab { goAdvSettingsRoot() } }
+            composable(SETTINGS.BACKUP)     { BackupTab(backupViewModel) { goAdvSettingsRoot() } }
             composable(SETTINGS.CHANGELOGS) { ChangelogsScreen { goAdvSettingsRoot() } }
+
+            composable(SETTINGS.WORKSPACE) {
+                WorkspaceListScreen(
+                    workspaceViewModel = workspaceViewModel,
+                    onOpenWorkspace = { id ->
+                        navController.navigate(
+                            SETTINGS.WORKSPACE_DETAIL.replace("{id}", id)
+                        )
+                    },
+                    onBack = { goAdvSettingsRoot() }
+                )
+            }
+
+            composable(
+                SETTINGS.WORKSPACE_DETAIL,
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { backStack ->
+                WorkspaceDetailScreen(
+                    workspaceId = backStack.arguments!!.getString("id")!!,
+                    appsViewModel = appsViewModel,
+                    workspaceViewModel = workspaceViewModel,
+                    showIcons = showAppIconsInDrawer,
+                    showLabels = showAppLabelsInDrawer,
+                    gridSize = gridSize,
+                    onBack = { navController.popBackStack() }
+                )
+            }
         }
     }
 

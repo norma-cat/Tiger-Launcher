@@ -38,11 +38,13 @@ import org.elnix.dragonlauncher.utils.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionIcon
 import org.elnix.dragonlauncher.utils.actions.actionLabel
+import org.elnix.dragonlauncher.utils.workspace.WorkspaceViewModel
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable
 fun AddPointDialog(
     appsViewModel: AppDrawerViewModel,
+    workspaceViewModel: WorkspaceViewModel,
     onDismiss: () -> Unit,
     onActionSelected: (SwipeActionSerializable) -> Unit
 ) {
@@ -67,10 +69,6 @@ fun AddPointDialog(
 
     val gridSize by DrawerSettingsStore.getGridSize(ctx)
         .collectAsState(initial = 1)
-
-    val initialPage by DrawerSettingsStore.getInitialPage(ctx)
-        .collectAsState(initial = 0)
-
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -131,8 +129,8 @@ fun AddPointDialog(
     if (showAppPicker) {
         AppPickerDialog(
             appsViewModel = appsViewModel,
+            workspaceViewModel = workspaceViewModel,
             gridSize = gridSize,
-            initialPage = initialPage,
             onDismiss = { showAppPicker = false },
             onAppSelected = {
                 onActionSelected(it)

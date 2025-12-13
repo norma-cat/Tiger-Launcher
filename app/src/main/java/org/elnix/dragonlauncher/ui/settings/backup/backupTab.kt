@@ -37,13 +37,13 @@ import org.json.JSONObject
 @Suppress("AssignedValueIsNeverRead")
 @Composable
 fun BackupTab(
-    backupVm: BackupViewModel,
+    backupViewModel: BackupViewModel,
     onBack: () -> Unit
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val result by backupVm.result.collectAsState()
+    val result by backupViewModel.result.collectAsState()
 
     var selectedStoresForExport by remember { mutableStateOf(listOf<DataStoreName>()) }
     var selectedStoresForImport by remember { mutableStateOf(listOf<DataStoreName>()) }
@@ -57,7 +57,7 @@ fun BackupTab(
     val settingsExportLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
             if (uri == null) {
-                backupVm.setResult(
+                backupViewModel.setResult(
                     BackupResult(
                         export = true,
                         error = true,
@@ -70,9 +70,9 @@ fun BackupTab(
             scope.launch {
                 try {
                     SettingsBackupManager.exportSettings(ctx, uri, selectedStoresForExport)
-                    backupVm.setResult(BackupResult(export = true, error = false))
+                    backupViewModel.setResult(BackupResult(export = true, error = false))
                 } catch (e: Exception) {
-                    backupVm.setResult(
+                    backupViewModel.setResult(
                         BackupResult(
                             export = true,
                             error = true,
@@ -91,7 +91,7 @@ fun BackupTab(
             Log.d("BackupManager", "File picked: $uri")
 
             if (uri == null) {
-                backupVm.setResult(
+                backupViewModel.setResult(
                     BackupResult(
                         export = false,
                         error = true,
@@ -109,7 +109,7 @@ fun BackupTab(
                     }
 
                     if (jsonString.isNullOrBlank()) {
-                        backupVm.setResult(
+                        backupViewModel.setResult(
                             BackupResult(
                                 export = false,
                                 error = true,
@@ -123,7 +123,7 @@ fun BackupTab(
                     showImportDialog = true
 
                 } catch (e: Exception) {
-                    backupVm.setResult(
+                    backupViewModel.setResult(
                         BackupResult(
                             export = false,
                             error = true,
@@ -180,10 +180,10 @@ fun BackupTab(
                     scope.launch {
                         try {
                             SettingsBackupManager.importSettingsFromJson(ctx, json , selectedStoresForImport)
-                            backupVm.setResult(BackupResult(export = false, error = false))
+                            backupViewModel.setResult(BackupResult(export = false, error = false))
                             importJson = null
                         } catch (e: Exception) {
-                            backupVm.setResult(
+                            backupViewModel.setResult(
                                 BackupResult(
                                     export = false,
                                     error = true,
@@ -222,7 +222,7 @@ fun BackupTab(
             cancelText = null,
             copy = isError,
             onCancel = {},
-            onAgree = { backupVm.setResult(null) }
+            onAgree = { backupViewModel.setResult(null) }
         )
     }
 }

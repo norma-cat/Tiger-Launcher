@@ -98,6 +98,7 @@ import org.elnix.dragonlauncher.utils.circles.normalizeAngle
 import org.elnix.dragonlauncher.utils.circles.randomFreeAngle
 import org.elnix.dragonlauncher.utils.circles.updatePointPosition
 import org.elnix.dragonlauncher.utils.colors.adjustBrightness
+import org.elnix.dragonlauncher.utils.workspace.WorkspaceViewModel
 import java.math.RoundingMode
 import java.util.UUID
 import kotlin.math.cos
@@ -126,6 +127,7 @@ private const val TOUCH_THRESHOLD_PX = 100f
 @Composable
 fun SettingsScreen(
     appsViewModel: AppDrawerViewModel,
+    workspaceViewModel: WorkspaceViewModel,
     onAdvSettings: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -763,6 +765,7 @@ fun SettingsScreen(
     if (showAddDialog) {
         AddPointDialog(
             appsViewModel = appsViewModel,
+            workspaceViewModel = workspaceViewModel,
             onDismiss = {
                 showAddDialog = false
             },

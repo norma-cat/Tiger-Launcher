@@ -29,12 +29,15 @@ import org.elnix.dragonlauncher.ui.MainAppUi
 import org.elnix.dragonlauncher.ui.settings.backup.BackupViewModel
 import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
 import org.elnix.dragonlauncher.utils.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.workspace.WorkspaceViewModel
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
 
     private val appsViewModel : AppDrawerViewModel by viewModels()
+
     private val backupViewModel : BackupViewModel by viewModels()
+    private val workspaceViewModel : WorkspaceViewModel by viewModels()
 
     private var navControllerHolder = mutableStateOf<NavHostController?>(null)
 
@@ -180,6 +183,7 @@ class MainActivity : ComponentActivity() {
                 MainAppUi(
                     backupViewModel = backupViewModel,
                     appsViewModel = appsViewModel,
+                    workspaceViewModel = workspaceViewModel,
                     navController = navController
                 )
             }

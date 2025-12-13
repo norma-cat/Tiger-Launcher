@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.KeyboardActions
@@ -30,9 +29,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -45,23 +42,20 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import org.elnix.dragonlauncher.data.helpers.DrawerActions
-import org.elnix.dragonlauncher.data.helpers.DrawerActions.CLOSE
-import org.elnix.dragonlauncher.data.helpers.DrawerActions.NONE
-import org.elnix.dragonlauncher.data.helpers.DrawerActions.TOGGLE_KB
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
 import org.elnix.dragonlauncher.utils.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
+import org.elnix.dragonlauncher.utils.workspace.WorkspaceViewModel
 
 @Suppress("AssignedValueIsNeverRead")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AppDrawerScreen(
     appsViewModel: AppDrawerViewModel,
-    initialPage: Int,
+    workspaceViewModel: WorkspaceViewModel,
     showIcons: Boolean,
     showLabels: Boolean,
     autoShowKeyboard: Boolean,
@@ -74,180 +68,77 @@ fun AppDrawerScreen(
     onClose: () -> Unit
 ) {
     val ctx = LocalContext.current
-    val scope = rememberCoroutineScope()
 
-    val userApps by appsViewModel.userApps.collectAsState()
-    val workApps by appsViewModel.workProfileApps.collectAsState()
-    val systemApps by appsViewModel.systemApps.collectAsState()
-    val allApps by appsViewModel.allApps.collectAsState()
+    val workspaceState by workspaceViewModel.enabledState.collectAsState()
+    val workspaces = workspaceState.workspaces
+    val overrides = workspaceState.appOverrides
 
-    val pages = mutableListOf("User", "System", "All")
-    if (workApps.isNotEmpty()) {
-        pages.add(1, "Work")
-    }
+    val selectedWorkspaceId by workspaceViewModel.selectedWorkspaceId.collectAsState()
+    val initialIndex = workspaces.indexOfFirst { it.id == selectedWorkspaceId }
     val pagerState = rememberPagerState(
-        initialPage = initialPage,
-        pageCount = { pages.size }
+        initialPage = initialIndex.coerceIn(0, (workspaces.size - 1).coerceAtLeast(0)),
+        pageCount = { workspaces.size }
     )
-
 
     val icons by appsViewModel.icons.collectAsState()
 
-    val autoLaunchSingleMatch by DrawerSettingsStore.getAutoLaunchSingleMatch(ctx)
+    val autoLaunchSingleMatch by DrawerSettingsStore
+        .getAutoLaunchSingleMatch(ctx)
         .collectAsState(initial = true)
 
-    val clickEmptySpaceToRaiseKeyboard by DrawerSettingsStore.getClickEmptySpaceToRaiseKeyboard(ctx)
+    val clickEmptySpaceToRaiseKeyboard by DrawerSettingsStore
+        .getClickEmptySpaceToRaiseKeyboard(ctx)
         .collectAsState(initial = false)
-
 
     var searchQuery by remember { mutableStateOf("") }
     var dialogApp by remember { mutableStateOf<AppModel?>(null) }
 
-    val filteredUser by remember(searchQuery) {
-        derivedStateOf { userApps.filter { it.name.contains(searchQuery, ignoreCase = true) } }
-    }
-    val filteredAll by remember(searchQuery) {
-        derivedStateOf { allApps.filter { it.name.contains(searchQuery, ignoreCase = true) } }
-    }
-    val filteredSystem by remember(searchQuery) {
-        derivedStateOf { systemApps.filter { it.name.contains(searchQuery, ignoreCase = true) } }
-    }
-    val filteredWork by remember(searchQuery) {
-        derivedStateOf { workApps.filter { it.name.contains(searchQuery, ignoreCase = true) } }
-    }
-
-
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-
     var isSearchFocused by remember { mutableStateOf(false) }
 
-
-    LaunchedEffect(focusRequester) {
+    LaunchedEffect(autoShowKeyboard) {
         if (autoShowKeyboard) {
             yield()
             focusRequester.requestFocus()
         }
     }
 
-    val scrollState = rememberLazyListState()
-
-    LaunchedEffect(scrollState, keyboardController, focusManager, focusRequester, isSearchFocused) {
-        var previousIndex = scrollState.firstVisibleItemIndex
-        var previousOffset = scrollState.firstVisibleItemScrollOffset
-
-        snapshotFlow {
-            Triple(
-                scrollState.firstVisibleItemIndex,
-                scrollState.firstVisibleItemScrollOffset,
-                scrollState.isScrollInProgress
-            )
-        }.collect { (currentIndex, currentOffset, isScrolling) ->
-            if (isScrolling) {
-                val actualScrollHappened = currentIndex != previousIndex || currentOffset != previousOffset
-                if (actualScrollHappened) {
-                    // Determine scroll direction: positive for down, negative for up
-                    val verticalScrollDelta: Int = if (currentIndex > previousIndex) 1 // Major scroll down
-                    else if (currentIndex < previousIndex) -1 // Major scroll up
-                    else currentOffset - previousOffset // Minor scroll in same item
-
-                    if (verticalScrollDelta > 0) { // User scrolled DOWN (content moved UP)
-                        if (isSearchFocused) {
-                            focusManager.clearFocus() // Will trigger onFocusStateChanged(false)
-                        }
-                        keyboardController?.hide()
-                    } else { // User scrolled up
-                        if (currentIndex == 0 && currentOffset == 0) { // Reached the very top of the list
-                            if (!isSearchFocused) {
-                                focusRequester.requestFocus() // Will trigger onFocusStateChanged(true) & show keyboard
-                            }
-                        }
-                    }
-                }
-            }
-            previousIndex = currentIndex
-            previousOffset = currentOffset
-        }
-    }
-
     LaunchedEffect(pagerState.currentPage) {
-        scope.launch {
-            DrawerSettingsStore.setInitialPage(ctx, pagerState.currentPage)
+        val workspaceId = workspaces.getOrNull(pagerState.currentPage)?.id ?: return@LaunchedEffect
+        workspaceViewModel.selectWorkspace(workspaceId)
+    }
+
+
+    fun toggleKeyboard() {
+        if (isSearchFocused) {
+            focusManager.clearFocus()
+            keyboardController?.hide()
+        } else {
+            focusRequester.requestFocus()
+            keyboardController?.show()
         }
     }
 
-    LaunchedEffect(filteredUser, filteredSystem, filteredAll) {
-        if (autoLaunchSingleMatch) {
-            when (pagerState.currentPage) {
-                pages.indexOf("User") -> {
-                    if (filteredUser.size == 1) {
-                        launchSwipeAction(ctx, filteredUser.first().action)
-                        onClose()
-                    }
-                }
-                pages.indexOf("System") -> {
-                    if (filteredSystem.size == 1) {
-                        launchSwipeAction(ctx, filteredSystem.first().action)
-                        onClose()
-                    }
-                }
-                pages.indexOf("All") -> {
-                    if (filteredAll.size == 1) {
-                        launchSwipeAction(ctx, filteredAll.first().action)
-                        onClose()
-                    }
-                }
-                pages.indexOf("Work") -> {
-                    if (filteredWork.size == 1) {
-                        launchSwipeAction(ctx, filteredWork.first().action)
-                        onClose()
-                    }
-                }
-            }
+    fun launchDrawerAction(action: DrawerActions) {
+        when (action) {
+            DrawerActions.CLOSE -> onClose()
+            DrawerActions.TOGGLE_KB -> toggleKeyboard()
+            DrawerActions.NONE -> Unit
         }
     }
-
 
     @Composable
     fun DrawerTextInput() {
         AppDrawerSearch(
             searchQuery = searchQuery,
-            onSearchChanged = { query -> searchQuery = query },
+            onSearchChanged = { searchQuery = it },
             modifier = Modifier.focusRequester(focusRequester),
-            onEnterPressed = {
-                // Clears the search query, cuz why not, its for efficiency first
-                searchQuery = ""
-            },
-            onFocusStateChanged = { focused ->
-                isSearchFocused = focused
-                // Keyboard visibility is handled by onFocusChanged in AppDrawerSearch for focus gain,
-                // and by scroll logic or IME actions for focus loss/hide.
-            }
+            onEnterPressed = { searchQuery = "" },
+            onFocusStateChanged = { isSearchFocused = it }
         )
     }
-
-
-    fun toggleKeyboard() {
-        if (!isSearchFocused) {
-            focusRequester.requestFocus()
-            keyboardController?.show()
-        } else {
-            focusManager.clearFocus()
-            keyboardController?.hide()
-        }
-    }
-
-    fun launchDrawerAction(actions: DrawerActions) {
-        when (actions) {
-            CLOSE -> onClose()
-            TOGGLE_KB -> toggleKeyboard()
-            NONE -> null // Do nothing on NONE action
-        }
-    }
-
-
-
 
     Column(
         modifier = Modifier
@@ -265,11 +156,9 @@ fun AppDrawerScreen(
             DrawerTextInput()
         }
 
+        Row(modifier = Modifier.fillMaxSize()) {
 
-        Row (
-            modifier = Modifier.fillMaxSize()
-        ){
-            if ( leftAction != NONE ) {
+            if (leftAction != DrawerActions.NONE) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -283,19 +172,33 @@ fun AppDrawerScreen(
                     .fillMaxHeight()
                     .weight(1f)
             ) {
-                HorizontalPager(
-                    state = pagerState
-                ) { pageIndex ->
 
-                    val list = when (pageIndex) {
-                        0 -> filteredUser
-                        pages.indexOf("Work").takeIf { it > 0 } -> filteredWork
-                        pages.indexOf("System") -> filteredSystem
-                        else -> filteredAll
+                HorizontalPager(state = pagerState) { pageIndex ->
+
+                    val workspace = workspaces[pageIndex]
+
+                    val apps by appsViewModel
+                        .appsForWorkspace(workspace, overrides)
+                        .collectAsState(initial = emptyList())
+
+                    val filteredApps by remember(searchQuery, apps) {
+                        derivedStateOf {
+                            if (searchQuery.isBlank()) apps
+                            else apps.filter {
+                                it.name.contains(searchQuery, ignoreCase = true)
+                            }
+                        }
+                    }
+
+                    LaunchedEffect(filteredApps) {
+                        if (autoLaunchSingleMatch && filteredApps.size == 1) {
+                            launchSwipeAction(ctx, filteredApps.first().action)
+                            onClose()
+                        }
                     }
 
                     AppGrid(
-                        apps = list,
+                        apps = filteredApps,
                         icons = icons,
                         gridSize = gridSize,
                         txtColor = MaterialTheme.colorScheme.onSurface,
@@ -307,20 +210,9 @@ fun AppDrawerScreen(
                         onClose()
                     }
                 }
-
-//        if (searchBarBottom) {
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .imePadding(),
-//                contentAlignment = Alignment.BottomCenter
-//            ) {
-//                DrawerTextInput()
-//            }
-//        }
             }
 
-            if ( rightAction != NONE ) {
+            if (rightAction != DrawerActions.NONE) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -331,40 +223,29 @@ fun AppDrawerScreen(
         }
     }
 
-//    if (searchBarBottom) {
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .imePadding(),
-//            contentAlignment = Alignment.BottomCenter
-//        ) {
-//            DrawerTextInput()
-//        }
-//    }
-
     if (dialogApp != null) {
         val app = dialogApp!!
         AppLongPressDialog(
             app = app,
-            onDismiss = {
-                dialogApp = null
-            },
+            onDismiss = { dialogApp = null },
             onOpen = {
                 launchSwipeAction(ctx, app.action)
                 onClose()
             },
             onSettings = {
-                val i = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = "package:${app.packageName}".toUri()
-                }
-                ctx.startActivity(i)
+                ctx.startActivity(
+                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = "package:${app.packageName}".toUri()
+                    }
+                )
                 onClose()
             },
             onUninstall = {
-                val intent = Intent(Intent.ACTION_DELETE).apply {
-                    data = "package:${app.packageName}".toUri()
-                }
-                ctx.startActivity(intent)
+                ctx.startActivity(
+                    Intent(Intent.ACTION_DELETE).apply {
+                        data = "package:${app.packageName}".toUri()
+                    }
+                )
                 onClose()
             }
         )

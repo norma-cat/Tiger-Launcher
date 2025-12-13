@@ -15,16 +15,19 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.ui.drawer.AppModel
+import org.elnix.dragonlauncher.ui.drawer.AppOverride
+import org.elnix.dragonlauncher.ui.drawer.Workspace
+import org.elnix.dragonlauncher.ui.drawer.WorkspaceType
+import org.elnix.dragonlauncher.ui.drawer.resolveApp
 import org.elnix.dragonlauncher.utils.actions.loadDrawableAsBitmap
 
 val Context.appDrawerDataStore by preferencesDataStore("app_drawer")
@@ -37,22 +40,21 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
     )
 
     private val _apps = MutableStateFlow<List<AppModel>>(emptyList())
+    val allApps: StateFlow<List<AppModel>> = _apps.asStateFlow()
     private val _icons = MutableStateFlow<Map<String, ImageBitmap>>(emptyMap())
     val icons: StateFlow<Map<String, ImageBitmap>> = _icons
 
-
-    val allApps: StateFlow<List<AppModel>> = _apps.asStateFlow()
-    val userApps: StateFlow<List<AppModel>> = _apps.map { list ->
-        list.filter { !it.isSystem || specialSystemApps.contains(it.packageName) }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-    val workProfileApps: StateFlow<List<AppModel>> = _apps.map { list ->
-        list.filter { it.isWorkProfile && !it.isSystem }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-    val systemApps: StateFlow<List<AppModel>> = _apps.map { list ->
-        list.filter { it.isSystem }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+//    val userApps: StateFlow<List<AppModel>> = _apps.map { list ->
+//        list.filter { !it.isSystem || specialSystemApps.contains(it.packageName) }
+//    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+//
+//    val workProfileApps: StateFlow<List<AppModel>> = _apps.map { list ->
+//        list.filter { it.isWorkProfile && !it.isSystem }
+//    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+//
+//    val systemApps: StateFlow<List<AppModel>> = _apps.map { list ->
+//        list.filter { it.isSystem }
+//    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private val pm: PackageManager = application.packageManager
     @SuppressLint("StaticFieldLeak")
@@ -61,10 +63,28 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
     @Suppress("PrivatePropertyName")
     private val DATASTORE_KEY = stringPreferencesKey("cached_apps_json")
 
-
     init {
         loadApps()
     }
+
+
+    fun appsForWorkspace(
+        workspace: Workspace,
+        overrides: Map<String, AppOverride>
+    ): Flow<List<AppModel>> =
+        allApps.map { list ->
+            list
+                .filter { app ->
+                    when (workspace.type) {
+                        WorkspaceType.ALL, WorkspaceType.CUSTOM -> true
+                        WorkspaceType.USER -> !app.isSystem && !app.isWorkProfile
+                        WorkspaceType.SYSTEM -> app.isSystem
+                        WorkspaceType.WORK -> app.isWorkProfile
+                    }
+                }
+                .map { resolveApp(it, overrides) }
+        }
+
 
     private fun loadApps() {
         viewModelScope.launch(Dispatchers.IO) {

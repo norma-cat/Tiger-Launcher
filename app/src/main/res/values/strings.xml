@@ -105,4 +105,8 @@
     <string name="close_drawer">Close Drawer</string>
     <string name="toggle_kb">Toggle Keyboard</string>
     <string name="behavior">Behavior</string>
+    <string name="workspaces">Workspaces</string>
+    <string name="workspace_help">Here you can customize the differents apps workspaces, you can add / edit / remove them and bind apps to them</string>
+    <string name="create_workspace">Create workspace</string>
+    <string name="rename_workspace">Rename Workspace</string>
 </resources>

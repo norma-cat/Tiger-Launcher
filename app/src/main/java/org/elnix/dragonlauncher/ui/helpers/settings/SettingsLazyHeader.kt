@@ -48,11 +48,17 @@ fun SettingsLazyHeader(
     banner: @Composable (() -> Unit)? = null,
     titleContent: (LazyListScope.() -> Unit)? = null,
     bottomContent: (LazyListScope.() -> Unit)? = null,
-    content: LazyListScope.() -> Unit
+    content: @Composable (() -> Unit)? = null,
+    lazyContent: (LazyListScope.() -> Unit)? = null
 ) {
 
     var showHelpDialog by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
+
+    requireNotNull(
+        content ?: lazyContent
+    ) { "Must provide exactly one of content or lazyContent, not both or neither" }
+
 
     Column(
         modifier = Modifier
@@ -88,18 +94,32 @@ fun SettingsLazyHeader(
                 if (titleContent != null) titleContent()
             }
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(bottom = if (bottomContent != null) 0.dp else 400.dp),
-                modifier = if (reorderState != null) {
-                    modifier
-                        .reorderable(reorderState)
-                        .detectReorderAfterLongPress(reorderState)
-                } else modifier,
-                state = reorderState?.listState ?: rememberLazyListState()
-            ) {
-                content()
+            if (lazyContent != null) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    contentPadding = PaddingValues(bottom = if (bottomContent != null) 0.dp else 400.dp),
+                    modifier = if (reorderState != null) {
+                        modifier
+                            .reorderable(reorderState)
+                            .detectReorderAfterLongPress(reorderState)
+                    } else modifier,
+                    state = reorderState?.listState ?: rememberLazyListState()
+                ) {
+                    lazyContent()
+                }
+            } else {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = if (reorderState != null) {
+                        modifier
+                            .reorderable(reorderState)
+                            .detectReorderAfterLongPress(reorderState)
+                    } else modifier,
+                ) {
+                    content!!()
+                }
             }
 
             bottomContent?.let {

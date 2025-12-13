@@ -30,53 +30,51 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.utils.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.utils.workspace.WorkspaceViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppPickerDialog(
     appsViewModel: AppDrawerViewModel,
+    workspaceViewModel: WorkspaceViewModel,
     gridSize: Int,
-    initialPage: Int,
     onDismiss: () -> Unit,
     onAppSelected: (SwipeActionSerializable.LaunchApp) -> Unit
 ) {
-    val userApps by appsViewModel.userApps.collectAsState()
-    val workApps by appsViewModel.workProfileApps.collectAsState()
-    val systemApps by appsViewModel.systemApps.collectAsState()
-    val allApps by appsViewModel.allApps.collectAsState()
+    val workspaceState by workspaceViewModel.enabledState.collectAsState()
+    val workspaces = workspaceState.workspaces
+    val overrides = workspaceState.appOverrides
 
     val icons by appsViewModel.icons.collectAsState()
 
-    val pages = mutableListOf("User", "System", "All")
-    if (workApps.isNotEmpty()) {
-        pages.add(1, "Work")
-    }
 
+    val selectedWorkspaceId by workspaceViewModel.selectedWorkspaceId.collectAsState()
+    val initialIndex = workspaces.indexOfFirst { it.id == selectedWorkspaceId }
     val pagerState = rememberPagerState(
-        initialPage = initialPage,
-        pageCount = { pages.size }
+        initialPage = initialIndex.coerceIn(0, (workspaces.size - 1).coerceAtLeast(0)),
+        pageCount = { workspaces.size }
     )
 
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(pagerState.currentPage) {
-        scope.launch {
-            DrawerSettingsStore.setInitialPage(ctx, pagerState.currentPage)
-        }
-    }
 
+    LaunchedEffect(pagerState.currentPage) {
+        val workspaceId = workspaces.getOrNull(pagerState.currentPage)?.id ?: return@LaunchedEffect
+        workspaceViewModel.selectWorkspace(workspaceId)
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
                         text = "Select App",
                         color = MaterialTheme.colorScheme.onSurface,
@@ -96,23 +94,27 @@ fun AppPickerDialog(
 
                 Spacer(Modifier.height(6.dp))
 
-                // --- PAGE INDICATOR ---
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    pages.forEachIndexed { index, label ->
+                    workspaces.forEachIndexed { index, workspace ->
                         val selected = pagerState.currentPage == index
 
-
                         TextButton(
-                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                            onClick = {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            },
                             shape = RoundedCornerShape(12.dp),
-                            colors = AppObjectsColors.buttonColors(if (!selected) MaterialTheme.colorScheme.surface else null),
+                            colors = AppObjectsColors.buttonColors(
+                                if (!selected) MaterialTheme.colorScheme.surface else null
+                            ),
                             modifier = Modifier.padding(5.dp)
                         ) {
                             Text(
-                                text = label,
+                                text = workspace.name,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                             )
                         }
@@ -126,14 +128,14 @@ fun AppPickerDialog(
                 modifier = Modifier.height(350.dp)
             ) { pageIndex ->
 
-                val list = when (pageIndex) {
-                    0 -> userApps
-                    1 -> systemApps
-                    else -> allApps
-                }
+                val workspace = workspaces[pageIndex]
+
+                val apps by appsViewModel
+                    .appsForWorkspace(workspace, overrides)
+                    .collectAsState(initial = emptyList())
 
                 AppGrid(
-                    apps = list,
+                    apps = apps,
                     icons = icons,
                     gridSize = gridSize,
                     txtColor = MaterialTheme.colorScheme.onSurface,
