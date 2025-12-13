@@ -12,7 +12,8 @@ enum class DataStoreName(val value: String, val backupKey: String) {
     LANGUAGE("languageDatastore", "language"),
     DRAWER("drawerDatastore", "drawer"),
 
-    DEBUG("debugDatastore", "debug")
+    DEBUG("debugDatastore", "debug"),
+    WORKSPACES("workspacesDataStore", "workspaces")
 }
 
 val Context.uiDatastore by preferencesDataStore(name = DataStoreName.UI.value)
@@ -23,4 +24,4 @@ val Context.swipeDataStore by preferencesDataStore(name = DataStoreName.SWIPE.va
 val Context.languageDatastore by preferencesDataStore(name = DataStoreName.LANGUAGE.value)
 val Context.drawerDataStore by preferencesDataStore(name = DataStoreName.DRAWER.value)
 val Context.debugDatastore by preferencesDataStore(name = DataStoreName.DEBUG.value)
-
+val Context.workspaceDataStore by preferencesDataStore(name = DataStoreName.WORKSPACES.value)

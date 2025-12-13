@@ -2,10 +2,6 @@ package org.elnix.dragonlauncher.utils.workspace
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.content.Context
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -14,15 +10,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.elnix.dragonlauncher.data.stores.WorkspaceSettingsStore
 import org.elnix.dragonlauncher.ui.drawer.AppOverride
 import org.elnix.dragonlauncher.ui.drawer.Workspace
 import org.elnix.dragonlauncher.ui.drawer.WorkspaceState
 import org.elnix.dragonlauncher.ui.drawer.WorkspaceType
 import org.elnix.dragonlauncher.ui.drawer.defaultWorkspaces
+import org.json.JSONObject
 
 
 class WorkspaceViewModel(application: Application) : AndroidViewModel(application) {
@@ -30,10 +27,6 @@ class WorkspaceViewModel(application: Application) : AndroidViewModel(applicatio
     private val gson = Gson()
     @SuppressLint("StaticFieldLeak")
     private val ctx = application.applicationContext
-
-    val Context.workspaceDataStore by preferencesDataStore("workspaces")
-    @Suppress("PropertyName")
-    val WORKSPACE_KEY = stringPreferencesKey("workspace_state")
 
     private val _state = MutableStateFlow(
         WorkspaceState(
@@ -68,19 +61,16 @@ class WorkspaceViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     private fun load() = viewModelScope.launch(Dispatchers.IO) {
-        val json = ctx.workspaceDataStore.data
-            .map { it[WORKSPACE_KEY] }
-            .firstOrNull()
-
-        if (!json.isNullOrEmpty()) {
-            _state.value = gson.fromJson(json, WorkspaceState::class.java)
-        }
+        val json = WorkspaceSettingsStore.getAll(ctx).toString()
+        _state.value = gson.fromJson(json, WorkspaceState::class.java)
     }
 
+
     private fun persist() = viewModelScope.launch(Dispatchers.IO) {
-        ctx.workspaceDataStore.edit {
-            it[WORKSPACE_KEY] = gson.toJson(_state.value)
-        }
+        WorkspaceSettingsStore.setAll(
+            ctx,
+            JSONObject(gson.toJson(_state.value))
+        )
     }
 
     fun selectWorkspace(id: String) {

@@ -7,7 +7,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.data.DataStoreName
 import org.elnix.dragonlauncher.data.SwipeJson
-import org.elnix.dragonlauncher.data.stores.*
+import org.elnix.dragonlauncher.data.stores.ColorModesSettingsStore
+import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
+import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
+import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
+import org.elnix.dragonlauncher.data.stores.LanguageSettingsStore
+import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
+import org.elnix.dragonlauncher.data.stores.UiSettingsStore
+import org.elnix.dragonlauncher.data.stores.WorkspaceSettingsStore
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.OutputStreamWriter
@@ -51,6 +58,12 @@ object SettingsBackupManager {
                         }
                         DataStoreName.DEBUG -> DebugSettingsStore.getAll(ctx).takeIf { it.isNotEmpty() }?.let {
                             put(store.backupKey, JSONObject(it))
+                        }
+                        DataStoreName.WORKSPACES -> {
+                            val obj = WorkspaceSettingsStore.getAll(ctx)
+                            if (obj.length() > 0) {
+                                put(store.backupKey, obj)
+                            }
                         }
                     }
                 }
@@ -118,6 +131,9 @@ object SettingsBackupManager {
                         DataStoreName.DEBUG -> obj.optJSONObject(store.backupKey)?.let {
                             DebugSettingsStore.setAll(ctx, jsonToBooleanMap(it))
                         }
+                        DataStoreName.WORKSPACES -> obj.optJSONObject(store.backupKey)?.let {
+                            WorkspaceSettingsStore.setAll(ctx, it)
+                        }
                     }
                 }
             }
@@ -139,7 +155,7 @@ object SettingsBackupManager {
                 requestedStores.forEach { store ->
                     when (store) {
                         DataStoreName.SWIPE -> jsonObj.optJSONArray(store.backupKey)?.let { jsonArr ->
-                            val pointsString = jsonArr.toString()
+//                            val pointsString = jsonArr.toString()
                             val cleanJsonString = jsonArr.toString(2) // Pretty print = clean JSON
 
                             Log.e("Debug", "Raw array: $jsonArr")
@@ -168,9 +184,11 @@ object SettingsBackupManager {
                         DataStoreName.UI -> jsonObj.optJSONObject(store.backupKey)?.let {
                             UiSettingsStore.setAll(ctx, jsonToStringMap(it))
                         }
-
                         DataStoreName.DEBUG -> jsonObj.optJSONObject(store.backupKey)?.let {
                             DebugSettingsStore.setAll(ctx, jsonToBooleanMap(it))
+                        }
+                        DataStoreName.WORKSPACES -> jsonObj.optJSONObject(store.backupKey)?.let {
+                            WorkspaceSettingsStore.setAll(ctx, it)
                         }
                     }
                 }
