@@ -1,8 +1,22 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
+
+
+val dotenv = Properties().apply {
+    val envFile = rootProject.file(".env")
+    if (envFile.exists()) {
+        envFile.inputStream().use { load(it) }
+    }
+}
+
+fun env(name: String): String? =
+    System.getenv(name) ?: dotenv.getProperty(name)
+
 
 android {
     namespace = "org.elnix.dragonlauncher"
@@ -20,24 +34,30 @@ android {
 
     signingConfigs {
         create("release") {
-            val keystore = System.getenv("KEYSTORE_FILE")
-            val storePass = System.getenv("KEYSTORE_PASSWORD")
-            val alias = System.getenv("KEY_ALIAS")
-            val keyPass = System.getenv("KEY_PASSWORD")
+            val keystore = env("KEYSTORE_FILE")
+            val storePass = env("KEYSTORE_PASSWORD")
+            val alias = env("KEY_ALIAS")
+            val keyPass = env("KEY_PASSWORD")
 
-            if (keystore != null && storePass != null && alias != null && keyPass != null) {
-                storeFile = File(keystore)
+            if (
+                !keystore.isNullOrBlank() &&
+                !storePass.isNullOrBlank() &&
+                !alias.isNullOrBlank() &&
+                !keyPass.isNullOrBlank()
+            ) {
+                storeFile = file(keystore)
                 storePassword = storePass
                 keyAlias = alias
                 keyPassword = keyPass
             } else {
-                println("WARNING: Release signingConfig not fully configured, using debug signing.")
+                println("WARNING: Release signingConfig not fully configured.")
             }
         }
     }
 
     buildTypes {
         release {
+            isDebuggable = true
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("release")

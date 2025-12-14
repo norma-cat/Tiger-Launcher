@@ -195,5 +195,6 @@ fun getVersionCode(ctx: Context): Int =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
         ctx.packageManager.getPackageInfo(ctx.packageName, 0).longVersionCode.toInt()
     } else {
+        @Suppress("DEPRECATION")
         ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionCode
     }

@@ -20,6 +20,11 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+# Do not mignify any Workspace-related stuff dur to boot crashes
+-keep class org.elnix.dragonlauncher.ui.drawer.WorkspaceState { *; }
+-keep class org.elnix.dragonlauncher.ui.drawer.Workspace { *; }
+-keep class org.elnix.dragonlauncher.ui.drawer.AppOverride { *; }
+
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);

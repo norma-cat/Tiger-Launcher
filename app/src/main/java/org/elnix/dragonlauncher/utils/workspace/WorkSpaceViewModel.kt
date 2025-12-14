@@ -7,6 +7,7 @@ import android.util.Base64
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -51,7 +52,7 @@ class WorkspaceViewModel(application: Application) : AndroidViewModel(applicatio
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = WorkspaceState(
-                workspaces = defaultWorkspaces.filter { it.enabled },
+                workspaces = emptyList(),
                 appOverrides = emptyMap()
             )
         )
@@ -64,10 +65,32 @@ class WorkspaceViewModel(application: Application) : AndroidViewModel(applicatio
         load()
     }
 
+
+    /** Load the user's workspaces into the _state var, enforced safety due to some crash at start */
     private fun load() = viewModelScope.launch(Dispatchers.IO) {
-        val json = WorkspaceSettingsStore.getAll(ctx).toString()
-        _state.value = gson.fromJson(json, WorkspaceState::class.java)
+        try {
+            val json = WorkspaceSettingsStore.getAll(ctx).toString()
+
+            // Correct generic type: WorkspaceState with List<Workspace>
+            val type = object : TypeToken<WorkspaceState>() {}.type
+            val loadedState: WorkspaceState? = gson.fromJson(json, type)
+
+            _state.value = loadedState?.copy(
+                workspaces = loadedState.workspaces,
+                appOverrides = loadedState.appOverrides
+            ) ?: WorkspaceState(
+                workspaces = defaultWorkspaces,
+                appOverrides = emptyMap()
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            _state.value = WorkspaceState(
+                workspaces = defaultWorkspaces,
+                appOverrides = emptyMap()
+            )
+        }
     }
+
 
 
     private fun persist() = viewModelScope.launch(Dispatchers.IO) {
