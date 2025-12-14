@@ -80,11 +80,16 @@ fun actionIconBitmap(
 private fun createUntintedBitmap(action: SwipeActionSerializable, context: Context): ImageBitmap {
     return when (action) {
         is SwipeActionSerializable.LaunchApp -> {
-            loadDrawableAsBitmap(
-                context.packageManager.getApplicationIcon(action.packageName),
-                48,
-                48
-            )
+            try {
+                loadDrawableAsBitmap(
+                    context.packageManager.getApplicationIcon(action.packageName),
+                    48,
+                    48
+                )
+
+            } catch (e: Exception) { // If the app was uninstalled, it could not reload it
+                loadDrawableResAsBitmap(context, R.drawable.ic_app_default)
+            }
         }
 
         is SwipeActionSerializable.OpenUrl ->
