@@ -201,7 +201,7 @@ fun AppDrawerScreen(
                     }
 
                     LaunchedEffect(filteredApps) {
-                        if (autoLaunchSingleMatch && filteredApps.size == 1) {
+                        if (autoLaunchSingleMatch && filteredApps.size == 1 && searchQuery.isNotEmpty()) {
                             launchSwipeAction(ctx, filteredApps.first().action)
                             onClose()
                         }
