@@ -25,7 +25,7 @@ import org.elnix.dragonlauncher.ui.helpers.ActionSelectorRow
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 
 @Composable
-fun CreateOrRenameWorkspaceDialog(
+fun CreateOrEditWorkspaceDialog(
     visible: Boolean,
     title: String,
     name: String,
@@ -67,20 +67,24 @@ fun CreateOrRenameWorkspaceDialog(
         text = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(5.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ){
                 TextField(
                     value = name,
                     onValueChange = onNameChange,
                     singleLine = true,
-                    colors = AppObjectsColors.outlinedTextFieldColors(backgroundColor = MaterialTheme.colorScheme.surface)
+                    placeholder = {
+                        Text(stringResource(R.string.workspace_name))
+                    },
+                    colors = AppObjectsColors.outlinedTextFieldColors(backgroundColor = MaterialTheme.colorScheme.surface, removeBorder = true)
                 )
 
                 ActionSelectorRow(
                     options = WorkspaceType.entries,
                     selected = selectedType,
                     switchEnabled = false,
+                    toggled = true,
                     label = stringResource(R.string.workspace_type)
                 ) {
                     selectedType = it

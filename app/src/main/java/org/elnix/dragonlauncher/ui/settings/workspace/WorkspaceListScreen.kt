@@ -119,27 +119,27 @@ fun WorkspaceListScreen(
         }
     }
 
-    CreateOrRenameWorkspaceDialog(
+    CreateOrEditWorkspaceDialog(
         visible = showCreateDialog,
         title = stringResource(R.string.create_workspace),
         name = nameBuffer,
         onNameChange = { nameBuffer = it },
-        onConfirm = {
-            scope.launch { workspaceViewModel.createWorkspace(nameBuffer.trim()) }
+        onConfirm = { selectedType ->
+            scope.launch { workspaceViewModel.createWorkspace(nameBuffer.trim(), selectedType) }
             showCreateDialog = false
         },
         onDismiss = { showCreateDialog = false }
     )
 
-    CreateOrRenameWorkspaceDialog(
+    CreateOrEditWorkspaceDialog(
         visible = renameTarget != null,
         title = stringResource(R.string.rename_workspace),
         name = nameBuffer,
         onNameChange = { nameBuffer = it },
-        onConfirm = {
+        onConfirm = { selectedType ->
             val targetId = renameTarget
             if (targetId != null && nameBuffer.isNotBlank()) {
-                scope.launch { workspaceViewModel.renameWorkspace(targetId, nameBuffer.trim()) }
+                scope.launch { workspaceViewModel.editWorkspace(targetId, nameBuffer.trim(), selectedType) }
             }
             renameTarget = null
         },

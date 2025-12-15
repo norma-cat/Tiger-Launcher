@@ -37,8 +37,6 @@ import org.elnix.dragonlauncher.data.helpers.DrawerActions
 import org.elnix.dragonlauncher.data.helpers.drawerActionIcon
 import org.elnix.dragonlauncher.data.helpers.drawerActionsLabel
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
-import org.elnix.dragonlauncher.ui.drawer.WorkspaceState
-import org.elnix.dragonlauncher.ui.drawer.defaultWorkspaces
 import org.elnix.dragonlauncher.ui.helpers.ActionSelectorRow
 import org.elnix.dragonlauncher.ui.helpers.GridSizeSlider
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
@@ -56,17 +54,8 @@ fun DrawerTab(
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val workspaceState = WorkspaceState(
-        workspaces = defaultWorkspaces,
-        appOverrides = emptyMap()
-    )
-    val apps by appsViewModel
-        .appsForWorkspace(workspaceState.workspaces[1], workspaceState.appOverrides)
-        .collectAsState(initial = emptyList())
-
-
+    val apps by appsViewModel.userApps.collectAsState(initial = emptyList())
     val icons by appsViewModel.icons.collectAsState()
-
 
     val autoLaunchSingleMatch by DrawerSettingsStore.getAutoLaunchSingleMatch(ctx)
         .collectAsState(initial = true)

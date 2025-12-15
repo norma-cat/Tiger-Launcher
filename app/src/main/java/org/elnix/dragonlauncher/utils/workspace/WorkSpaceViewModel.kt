@@ -119,24 +119,25 @@ class WorkspaceViewModel(application: Application) : AndroidViewModel(applicatio
         persist()
     }
 
-    fun createWorkspace(name: String) {
+    fun createWorkspace(name: String, type: WorkspaceType) {
         _state.value = _state.value.copy(
             workspaces = _state.value.workspaces +
                     Workspace(
                         id = System.currentTimeMillis().toString(),
                         name = name,
-                        type = WorkspaceType.CUSTOM,
+                        type = type,
                         enabled = true,
+                        removedAppIds = emptyList(),
                         appIds = emptyList()
                     )
         )
         persist()
     }
 
-    fun renameWorkspace(id: String, name: String) {
+    fun editWorkspace(id: String, name: String, type: WorkspaceType) {
         _state.value = _state.value.copy(
             workspaces = _state.value.workspaces.map {
-                if (it.id == id) it.copy(name = name) else it
+                if (it.id == id) it.copy(name = name, type = type) else it
             }
         )
         persist()
@@ -155,25 +156,57 @@ class WorkspaceViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
 
-    // Apps operations
-    fun addAppToWorkspace(workspaceId: String, packageName: String) {
+    fun resetWorkspace(id: String) {
         _state.value = _state.value.copy(
-            workspaces = _state.value.workspaces.map { ws ->
-                if (ws.id == workspaceId) {
-                    if (packageName in ws.appIds) ws
-                    else ws.copy(appIds = ws.appIds + packageName)
-                } else ws
+            workspaces = _state.value.workspaces.map {
+                if (it.id == id) it.copy(removedAppIds = emptyList(), appIds = emptyList()) else it
             }
         )
         persist()
     }
 
+
+    // Apps operations
+    fun addAppToWorkspace(workspaceId: String, packageName: String) {
+        _state.value = _state.value.copy(
+            workspaces = _state.value.workspaces.map { ws ->
+                if (ws.id != workspaceId) return@map ws
+
+                val inApps = packageName in ws.appIds
+                val inRemoved = ws.removedAppIds?.contains(packageName) == true
+
+                // Checks if the app is in the removed list, and if this is the case, it remove the app from it, while adding the app to the appIds list
+                when {
+                    inApps && inRemoved ->
+                        ws.copy(removedAppIds = ws.removedAppIds - packageName)
+
+                    !inApps && inRemoved ->
+                        ws.copy(
+                            removedAppIds = ws.removedAppIds - packageName,
+                            appIds = ws.appIds + packageName
+                        )
+
+                    !inApps ->
+                        ws.copy(appIds = ws.appIds + packageName)
+
+                    else -> ws
+                }
+            }
+        )
+        persist()
+    }
+
+
     fun removeAppFromWorkspace(workspaceId: String, packageName: String) {
         _state.value = _state.value.copy(
             workspaces = _state.value.workspaces.map { ws ->
-                if (ws.id == workspaceId) {
-                    ws.copy(appIds = ws.appIds - packageName)
-                } else ws
+                if (ws.id != workspaceId) return@map ws
+
+                // remove the app packageName from appsIds, and add it to removedAppIDs
+                ws.copy(
+                    appIds = ws.appIds - packageName,
+                    removedAppIds = ws.removedAppIds?.plus(packageName)
+                )
             }
         )
         persist()

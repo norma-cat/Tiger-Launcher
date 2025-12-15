@@ -17,36 +17,32 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.ui.drawer.AppModel
 import org.elnix.dragonlauncher.ui.drawer.AppOverride
 import org.elnix.dragonlauncher.ui.drawer.Workspace
 import org.elnix.dragonlauncher.ui.drawer.WorkspaceType
-import org.elnix.dragonlauncher.ui.drawer.resolveApp
 import org.elnix.dragonlauncher.utils.actions.loadDrawableAsBitmap
 
 val Context.appDrawerDataStore by preferencesDataStore("app_drawer")
 
 class AppDrawerViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val specialSystemApps = setOf(
-        "com.android.settings",
-        "com.google.android.youtube"
-    )
-
     private val _apps = MutableStateFlow<List<AppModel>>(emptyList())
     val allApps: StateFlow<List<AppModel>> = _apps.asStateFlow()
     private val _icons = MutableStateFlow<Map<String, ImageBitmap>>(emptyMap())
     val icons: StateFlow<Map<String, ImageBitmap>> = _icons
 
-//    val userApps: StateFlow<List<AppModel>> = _apps.map { list ->
-//        list.filter { !it.isSystem || specialSystemApps.contains(it.packageName) }
-//    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val userApps: StateFlow<List<AppModel>> = _apps.map { list ->
+        list.filter { !it.isSystem }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 //
 //    val workProfileApps: StateFlow<List<AppModel>> = _apps.map { list ->
 //        list.filter { it.isWorkProfile && !it.isSystem }
@@ -73,7 +69,7 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
         overrides: Map<String, AppOverride>
     ): Flow<List<AppModel>> =
         allApps.map { list ->
-            val filtered = when (workspace.type) {
+            val base = when (workspace.type) {
                 WorkspaceType.ALL -> list
                 WorkspaceType.USER -> list.filter { !it.isSystem && !it.isWorkProfile }
                 WorkspaceType.SYSTEM -> list.filter { it.isSystem }
@@ -82,7 +78,16 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
                     list.filter { it.packageName in workspace.appIds }
             }
 
-            filtered.map { resolveApp(it, overrides) }
+            // May be null cause I added the removed app ids lately, so some user may still have the old app model without it
+            val removed = workspace.removedAppIds ?: emptyList()
+
+            val added = list.filter { it.packageName in workspace.appIds }
+
+            // Use the base list, and add the new ones (present in added list) and filter them, to remove the removed packages from the workspace
+            (base + added)
+                .distinctBy { it.packageName }
+                .filter { it.packageName !in removed }
+                .sortedBy { it.name.lowercase() }
         }
 
 
@@ -146,7 +151,7 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
                 try {
                     // Method 2: Fallback to adaptive icon with proper flags
                     pm.getApplicationIcon(app.packageName)
-                } catch (e2: Exception) {
+                } catch (_: Exception) {
                     // Method 3: Final fallback to default icon
                     ContextCompat.getDrawable(ctx, R.drawable.ic_app_default)!!
                 }

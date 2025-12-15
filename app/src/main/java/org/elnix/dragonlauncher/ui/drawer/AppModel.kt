@@ -27,6 +27,7 @@ data class Workspace(
     val name: String,
     val type: WorkspaceType,
     val appIds: List<String>,
+    val removedAppIds: List<String>?, // Nullable cause I added it recently in 1.2.2, so if you were on previous versions, it'll cause crash
     val enabled: Boolean
 )
 
@@ -38,10 +39,6 @@ data class AppOverride(
 
 
 
-//data class WorkspaceState(
-//    val workspaces: List<Workspace>,
-//    val appOverrides: Map<String, AppOverride>
-//)
 data class WorkspaceState(
     val workspaces: List<Workspace> = defaultWorkspaces,
     val appOverrides: Map<String, AppOverride> = emptyMap()
@@ -57,9 +54,12 @@ fun resolveApp(
 
 
 val defaultWorkspaces = listOf(
-    Workspace("user", "User", WorkspaceType.USER, emptyList(), true),
-    Workspace("system", "System", WorkspaceType.SYSTEM, emptyList(), true),
-    Workspace("all", "All", WorkspaceType.ALL, emptyList(), true),
+    Workspace("user", "User", WorkspaceType.USER, listOf(
+        "com.android.settings",
+        "com.google.android.youtube"
+    ), emptyList(), true),
+    Workspace("system", "System", WorkspaceType.SYSTEM, emptyList(), emptyList(), true),
+    Workspace("all", "All", WorkspaceType.ALL, emptyList(), emptyList(),  true),
     // I set work profile disabled by default, enable it if you need it
-    Workspace("work", "Work", WorkspaceType.WORK, emptyList(), false)
+    Workspace("work", "Work", WorkspaceType.WORK, emptyList(), emptyList(),  false)
 )

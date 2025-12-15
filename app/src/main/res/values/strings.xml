@@ -122,4 +122,10 @@
     <string name="icon_updated">Icon Updated</string>
     <string name="icon_update_failed">Icon Update failed</string>
     <string name="none">None</string>
+    <string name="workspace_type">Workspace Type</string>
+    <string name="workspace_name">Workspace name</string>
+    <string name="reset_this_workspace_to_default_apps">Reset this workspace to default apps? It depends on the type it has, a SYSTEM workspace will get all the system app, and USER will get all the user ones.</string>
+    <string name="workspace_detail_help">You can customize what apps shows on this workspace, add or remove, rename them and change their icons</string>
+    <string name="reset_workspace">Reset Workspace</string>
+    <string name="workspace">Workspace</string>
 </resources>

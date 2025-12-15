@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
@@ -111,10 +112,12 @@ fun WorkspaceDetailScreen(
 
     Box(Modifier.fillMaxSize()) {
         SettingsLazyHeader(
-            title = workspace.name,
+            title = "${stringResource(R.string.workspace)}: ${workspace.name}",
             onBack = onBack,
-            helpText = "",
-            onReset = {},
+            helpText = stringResource(R.string.workspace_detail_help),
+            onReset = { workspaceViewModel.resetWorkspace(workspaceId) },
+            resetTitle = stringResource(R.string.reset_workspace),
+            resetText = stringResource(R.string.reset_this_workspace_to_default_apps),
             content = {
                 AppGrid(
                     apps = apps,
