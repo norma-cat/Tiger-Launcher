@@ -1,5 +1,8 @@
 package org.elnix.dragonlauncher.ui.settings.workspace
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -8,8 +11,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.ui.drawer.WorkspaceType
+import org.elnix.dragonlauncher.ui.helpers.ActionSelectorRow
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 
 @Composable
@@ -18,16 +30,18 @@ fun CreateOrRenameWorkspaceDialog(
     title: String,
     name: String,
     onNameChange: (String) -> Unit,
-    onConfirm: () -> Unit,
+    onConfirm: (WorkspaceType) -> Unit,
     onDismiss: () -> Unit
 ) {
     if (!visible) return
+
+    var selectedType by remember { mutableStateOf(WorkspaceType.CUSTOM) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             Button(
-                onClick = { onConfirm() },
+                onClick = { onConfirm(selectedType) },
                 colors = AppObjectsColors.buttonColors()
             ) {
                 Text(
@@ -51,12 +65,27 @@ fun CreateOrRenameWorkspaceDialog(
         },
         title = { Text(title) },
         text = {
-            TextField(
-                value = name,
-                onValueChange = onNameChange,
-                singleLine = true,
-                colors = AppObjectsColors.outlinedTextFieldColors(backgroundColor = MaterialTheme.colorScheme.surface)
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(5.dp),
+                modifier = Modifier.fillMaxWidth()
+            ){
+                TextField(
+                    value = name,
+                    onValueChange = onNameChange,
+                    singleLine = true,
+                    colors = AppObjectsColors.outlinedTextFieldColors(backgroundColor = MaterialTheme.colorScheme.surface)
+                )
+
+                ActionSelectorRow(
+                    options = WorkspaceType.entries,
+                    selected = selectedType,
+                    switchEnabled = false,
+                    label = stringResource(R.string.workspace_type)
+                ) {
+                    selectedType = it
+                }
+            }
         },
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 6.dp,

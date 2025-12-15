@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
@@ -56,9 +57,9 @@ fun <T> ActionSelectorRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = if (label != null) Arrangement.SpaceBetween else Arrangement.Center,
         modifier = baseModifier
+            .clip(RoundedCornerShape(12.dp))
             .background(
                 color = backgroundColor.copy(if (enabled) 1f else 0.5f),
-                shape = RoundedCornerShape(14.dp)
             )
             .clickable(enabled) { showDialog = true }
             .padding(horizontal = 16.dp, vertical = 14.dp)
