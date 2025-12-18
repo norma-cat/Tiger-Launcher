@@ -8,6 +8,7 @@ on:
       - fastlane/**
       - README.md
       - TODO.md
+      - metadata/**
 
 jobs:
   build:
