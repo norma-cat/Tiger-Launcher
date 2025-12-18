@@ -69,6 +69,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -88,7 +89,6 @@ import org.elnix.dragonlauncher.ui.helpers.RepeatingPressButton
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionIcon
 import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
@@ -98,6 +98,7 @@ import org.elnix.dragonlauncher.utils.circles.normalizeAngle
 import org.elnix.dragonlauncher.utils.circles.randomFreeAngle
 import org.elnix.dragonlauncher.utils.circles.updatePointPosition
 import org.elnix.dragonlauncher.utils.colors.adjustBrightness
+import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 import java.math.RoundingMode
 import java.util.UUID
@@ -609,6 +610,8 @@ fun SettingsScreen(
                     text = angleText,
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 18.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Visible,
                     modifier = Modifier.width(50.dp)
                 )
 

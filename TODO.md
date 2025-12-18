@@ -1,4 +1,4 @@
-- [ ] Correct angle text overlapping on settings screen
+- [x] Correct angle text overlapping on settings screen
 - [x] Toolbar in drawer (auto-close)
 - [ ] Drag & drop items in settings
 - [ ] Disable circle/line switch
