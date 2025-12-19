@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.data.DataStoreName
 import org.elnix.dragonlauncher.data.SwipeJson
+import org.elnix.dragonlauncher.data.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.data.stores.ColorModesSettingsStore
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
@@ -67,6 +68,9 @@ object SettingsBackupManager {
                         }
 
                         DataStoreName.APPS -> null
+                        DataStoreName.BEHAVIOR -> BehaviorSettingsStore.getAll(ctx).takeIf { it.isNotEmpty() }?.let {
+                            put(store.backupKey, JSONObject(it))
+                        }
                     }
                 }
             }
@@ -151,6 +155,9 @@ object SettingsBackupManager {
                         }
 
                         DataStoreName.APPS -> null
+                        DataStoreName.BEHAVIOR -> obj.optJSONObject(store.backupKey)?.let {
+                            BehaviorSettingsStore.setAll(ctx, jsonToStringMap(it))
+                        }
                     }
                 }
             }
@@ -172,7 +179,6 @@ object SettingsBackupManager {
                 requestedStores.forEach { store ->
                     when (store) {
                         DataStoreName.SWIPE -> jsonObj.optJSONArray(store.backupKey)?.let { jsonArr ->
-//                            val pointsString = jsonArr.toString()
                             val cleanJsonString = jsonArr.toString(2) // Pretty print = clean JSON
 
                             Log.e("Debug", "Raw array: $jsonArr")
@@ -209,6 +215,9 @@ object SettingsBackupManager {
                         }
 
                         DataStoreName.APPS -> null
+                        DataStoreName.BEHAVIOR -> jsonObj.optJSONObject(store.backupKey)?.let {
+                            WorkspaceSettingsStore.setAll(ctx, it)
+                        }
                     }
                 }
             }

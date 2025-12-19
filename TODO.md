@@ -8,7 +8,7 @@
 - [ ] Add double-click action
 - [ ] Open alarm/calendar apps
 - [ ] Show status bar (battery %, time)
-- [ ] Require pressing Exit twice to leave fullscreen
+~~- [ ] Require pressing Exit twice to leave fullscreen~~
 - [x] Remove changelog header text divider
 - [ ] Allow editing points (like "pick")
 - [ ] Fix random free-angle issue and set it to the last used circle
@@ -34,3 +34,5 @@
 - [ ] Show beta tag in version number
 - [x] Open Obtainium when checking updates (if installed)
 - [ ] Auto Backup Feature
+- [ ] Add 'Special actions' for back, double, maybe triple click
+- [ ] Add 'keep screen on' option (in future behavior tab)

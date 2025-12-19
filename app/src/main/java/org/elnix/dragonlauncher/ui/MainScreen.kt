@@ -1,6 +1,5 @@
 package org.elnix.dragonlauncher.ui
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -36,8 +35,8 @@ import org.elnix.dragonlauncher.ui.helpers.FilePickerDialog
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
 import org.elnix.dragonlauncher.ui.helpers.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.rememberHoldToOpenSettings
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
+import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable
@@ -87,8 +86,6 @@ fun MainScreen(
 
     val points by SwipeSettingsStore.getPointsFlow(ctx).collectAsState(emptyList())
 
-    // To prevent the user from exiting the app on back, since it's a launcher
-    BackHandler { }
 
     Box(
         modifier = Modifier

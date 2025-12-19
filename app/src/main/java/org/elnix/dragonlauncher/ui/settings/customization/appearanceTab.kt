@@ -1,4 +1,4 @@
-package org.elnix.dragonlauncher.ui.settings.appearance
+package org.elnix.dragonlauncher.ui.settings.customization
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ColorLens

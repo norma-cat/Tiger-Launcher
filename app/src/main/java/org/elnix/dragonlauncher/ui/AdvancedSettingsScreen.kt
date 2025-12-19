@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.SettingsSuggest
@@ -65,11 +66,11 @@ import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.ContributorItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.elnix.dragonlauncher.utils.copyToClipboard
 import org.elnix.dragonlauncher.utils.getVersionCode
+import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.obtainiumPackageName
 import org.elnix.dragonlauncher.utils.openUrl
 import org.elnix.dragonlauncher.utils.showToast
@@ -132,6 +133,16 @@ fun AdvancedSettingsScreen(
                 icon = Icons.Default.ColorLens
             ) {
                 navController.navigate(SETTINGS.APPEARANCE)
+            }
+        }
+
+        item {
+            SettingsItem(
+                title = stringResource(R.string.behavior),
+                icon = Icons.Default.QuestionMark,
+                enabled = false
+            ) {
+                navController.navigate(SETTINGS.BEHAVIOR)
             }
         }
 

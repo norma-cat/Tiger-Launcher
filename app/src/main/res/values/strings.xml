@@ -128,4 +128,7 @@
     <string name="workspace_detail_help">You can customize what apps shows on this workspace, add or remove, rename them and change their icons</string>
     <string name="reset_workspace">Reset Workspace</string>
     <string name="workspace">Workspace</string>
+    <string name="behavior_help">Here you can edit the behavior related settings of the app.</string>
+    <string name="require_pressing_back_twice_to_exit">Require pressing Back twice to exit</string>
+    <string name="double_back_press_feedback">Double back press feedback (Toast)</string>
 </resources>

@@ -1,7 +1,6 @@
 package org.elnix.dragonlauncher.ui
 
 import android.R.attr.versionCode
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -31,10 +30,11 @@ import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.drawer.AppDrawerScreen
 import org.elnix.dragonlauncher.ui.helpers.SetDefaultLauncherBanner
-import org.elnix.dragonlauncher.ui.settings.appearance.AppearanceTab
-import org.elnix.dragonlauncher.ui.settings.appearance.ColorSelectorTab
-import org.elnix.dragonlauncher.ui.settings.appearance.DrawerTab
 import org.elnix.dragonlauncher.ui.settings.backup.BackupTab
+import org.elnix.dragonlauncher.ui.settings.customization.AppearanceTab
+import org.elnix.dragonlauncher.ui.settings.customization.BehaviorTab
+import org.elnix.dragonlauncher.ui.settings.customization.ColorSelectorTab
+import org.elnix.dragonlauncher.ui.settings.customization.DrawerTab
 import org.elnix.dragonlauncher.ui.settings.debug.DebugTab
 import org.elnix.dragonlauncher.ui.settings.language.LanguageTab
 import org.elnix.dragonlauncher.ui.settings.workspace.WorkspaceDetailScreen
@@ -55,6 +55,7 @@ object SETTINGS {
     const val ROOT = "settings"
     const val ADVANCED_ROOT = "settings/advanced"
     const val APPEARANCE = "settings/advanced/appearance"
+    const val BEHAVIOR = "settings/advanced/behavior"
     const val COLORS = "settings/advanced/appearance/colors"
     const val DRAWER = "settings/advanced/drawer"
     const val WORKSPACE = "settings/advanced/workspace"
@@ -178,7 +179,6 @@ fun MainAppUi(
             currentRoute != ROUTES.WELCOME
 
 
-    BackHandler { }
 
     Scaffold(
         topBar = {
@@ -190,7 +190,7 @@ fun MainAppUi(
             startDestination = ROUTES.MAIN,
             modifier = Modifier.padding(paddingValues)
         ) {
-            // Main App (LauncherScreen + Drawer)
+            // Main App (LauncherScreen)
             composable(ROUTES.MAIN) {
                 MainScreen(
                     appsViewModel = appViewModel,
@@ -238,6 +238,7 @@ fun MainAppUi(
             composable(SETTINGS.ADVANCED_ROOT) { AdvancedSettingsScreen(appViewModel, navController, onReset = { goMainScreen() } ) { goSettingsRoot() } }
 
             composable(SETTINGS.APPEARANCE) { AppearanceTab(navController) { goAdvSettingsRoot() } }
+            composable(SETTINGS.BEHAVIOR)   { BehaviorTab { goAdvSettingsRoot() } }
             composable(SETTINGS.DRAWER)     { DrawerTab(appViewModel) { goAdvSettingsRoot() } }
             composable(SETTINGS.COLORS)     { ColorSelectorTab { goAdvSettingsRoot() } }
             composable(SETTINGS.DEBUG)      { DebugTab(navController, onShowWelcome = { goWelcome() } ) { goAdvSettingsRoot() } }
