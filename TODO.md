@@ -37,3 +37,4 @@
 - [x] Add 'Special actions' for back, double, maybe triple click
 - [x] Add 'keep screen on' option (in future behavior tab)
 - [ ] Add toggle bluetooth, wifi, data, etc actions
+- [ ] Make check for updates show Obtainium icon if installed
