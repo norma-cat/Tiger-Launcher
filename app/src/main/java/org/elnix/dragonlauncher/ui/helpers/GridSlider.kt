@@ -95,7 +95,7 @@ fun GridSizeSlider(
                 .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
         ) {
             AppGrid(
-                apps = apps.take(gridSize),
+                apps = apps.take(if (gridSize == 1) 3 else gridSize),
                 icons = icons,
                 txtColor = MaterialTheme.colorScheme.onBackground,
                 gridSize = gridSize,
