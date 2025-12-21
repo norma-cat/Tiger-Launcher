@@ -11,15 +11,10 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Launch
 import androidx.compose.material.icons.automirrored.filled.Notes
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ColorLens
@@ -31,8 +26,6 @@ import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.Workspaces
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,9 +36,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -58,10 +51,10 @@ import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.ContributorItem
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.elnix.dragonlauncher.utils.copyToClipboard
 import org.elnix.dragonlauncher.utils.getVersionCode
 import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
@@ -80,6 +73,8 @@ fun AdvancedSettingsScreen(
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    val icons by appViewModel.icons.collectAsState()
 
     val versionCode = getVersionCode(ctx)
 
@@ -206,32 +201,38 @@ fun AdvancedSettingsScreen(
         item { TextDivider(stringResource(R.string.about)) }
 
         item {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                SettingsItem(
-                    title = stringResource(R.string.changelogs),
-                    modifier = Modifier.weight(1f),
-                    icon = Icons.AutoMirrored.Filled.Notes
-                ) { navController.navigate(SETTINGS.CHANGELOGS) }
 
-                IconButton(
-                    onClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/changelogs/${versionCode}.txt") },
-                    colors = AppObjectsColors.iconButtonColors(
-                        backgroundColor = MaterialTheme.colorScheme.surface
-                    ),
-                    modifier = Modifier
-                        .size(52.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                        contentDescription = "Open link in github",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
+            SettingItemWithExternalOpen(
+                title = stringResource(R.string.changelogs),
+                icon = Icons.AutoMirrored.Filled.Notes,
+                onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/changelogs/${versionCode}.txt") }
+            ) { navController.navigate(SETTINGS.CHANGELOGS) }
+//            Row(
+//                horizontalArrangement = Arrangement.spacedBy(5.dp),
+//                verticalAlignment = Alignment.CenterVertically
+//            ){
+//                SettingsItem(
+//                    title = stringResource(R.string.changelogs),
+//                    modifier = Modifier.weight(1f),
+//                    icon = Icons.AutoMirrored.Filled.Notes
+//                ) { navController.navigate(SETTINGS.CHANGELOGS) }
+//
+//                IconButton(
+//                    onClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/changelogs/${versionCode}.txt") },
+//                    colors = AppObjectsColors.iconButtonColors(
+//                        backgroundColor = MaterialTheme.colorScheme.surface
+//                    ),
+//                    modifier = Modifier
+//                        .size(52.dp),
+//                    shape = RoundedCornerShape(12.dp)
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+//                        contentDescription = "Open link in web",
+//                        tint = MaterialTheme.colorScheme.primary
+//                    )
+//                }
+//            }
         }
 
         item {
@@ -244,15 +245,31 @@ fun AdvancedSettingsScreen(
         }
 
         item {
-            SettingsItem(
-                title = stringResource(R.string.check_for_update),
-                description = stringResource(R.string.check_for_updates_text),
-                icon = Icons.Default.Update,
-                leadIcon = Icons.AutoMirrored.Filled.Launch,
-                onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher/releases/latest")}
-            ) {
-                if (isObtainiumInstalled) launchSwipeAction(ctx, SwipeActionSerializable.LaunchApp(obtainiumPackageName))
-                else ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/releases/latest")
+
+            if (isObtainiumInstalled){
+                SettingItemWithExternalOpen(
+                    title = stringResource(R.string.check_for_update),
+                    description = stringResource(R.string.check_for_updates_obtainium),
+                    icon = Icons.Default.Update,
+                    leadIcon = painterResource(R.drawable.obtainium),
+                    onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher/releases/latest") },
+                    onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/releases/latest") }
+                ) {
+                    launchSwipeAction(
+                        ctx,
+                        SwipeActionSerializable.LaunchApp(obtainiumPackageName)
+                    )
+                }
+            } else {
+                SettingsItem(
+                    title = stringResource(R.string.check_for_update),
+                    description = stringResource(R.string.check_for_updates_github),
+                    icon = Icons.Default.Update,
+                    leadIcon = Icons.AutoMirrored.Filled.Launch,
+                    onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher/releases/latest") }
+                ) {
+                     ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/releases/latest")
+                }
             }
         }
 
