@@ -143,4 +143,5 @@
     <string name="theme_selector">Theme selector</string>
     <string name="everything_ready">Everything Ready!</string>
     <string name="reset_app_icon">Reset App Icon</string>
+    <string name="home">Home</string>
 </resources>

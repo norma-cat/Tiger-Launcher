@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Add
@@ -31,6 +30,7 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Grid3x3
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.ChangeCircle
@@ -345,7 +345,11 @@ fun SettingsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Default.Home, null, tint = MaterialTheme.colorScheme.onBackground)
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = stringResource(R.string.home),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
             }
 
             Text(
@@ -356,7 +360,11 @@ fun SettingsScreen(
             )
 
             IconButton(onClick = onAdvSettings) {
-                Icon(Icons.Default.Settings, null, tint = MaterialTheme.colorScheme.onBackground)
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
             }
         }
 
@@ -630,11 +638,17 @@ fun SettingsScreen(
 
             if (!isCircleDistanceMode) {
                 IconButton(onClick = { undo() }, enabled = undoStack.isNotEmpty()) {
-                    Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = "Undo")
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Undo,
+                        contentDescription = "Undo"
+                    )
                 }
 
                 IconButton(onClick = { redo() }, enabled = redoStack.isNotEmpty()) {
-                    Icon(Icons.AutoMirrored.Filled.Redo, contentDescription = "Redo")
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Redo,
+                        contentDescription = "Redo"
+                    )
                 }
             }
 
