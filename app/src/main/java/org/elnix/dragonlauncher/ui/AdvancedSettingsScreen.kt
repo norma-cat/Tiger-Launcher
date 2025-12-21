@@ -74,8 +74,6 @@ fun AdvancedSettingsScreen(
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val icons by appViewModel.icons.collectAsState()
-
     val versionCode = getVersionCode(ctx)
 
     val isDebugModeEnabled by DebugSettingsStore.getDebugEnabled(ctx)

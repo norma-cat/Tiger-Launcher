@@ -14,13 +14,13 @@
 - [ ] Fix random free-angle issue and set it to the last used circle
 - [x] Close settings like the drawer after some time
 - [x] Add drawer setting: tapping empty space closes, opens keyboard, or does nothing
-- [ ] Move apps between workspaces from the drawer
+- [x] Move apps between workspaces from the drawer
 - [ ] Make long-click action use variable arguments (more powerful)
 - [ ] Enable automatic backups
-- [ ] Ignore case in app picker search
+- [x] Ignore case in app picker search
 - [ ] Fix quick action width
-- [ ] Add reset options for renaming/app icons
-- [ ] Add "snap circles" (not to drag distance)
+- [x] Add reset options for renaming/app icons
+- [x] Add "snap circles" (not to drag distance)
 - [ ] Add undo/redo in settings
 - [ ] Fix extra padding in fullscreen when swiping down
 - [ ] Show user apps in drawer preview
@@ -33,7 +33,6 @@
 - [ ] Fix lag during reload; show loading indicator in app picker
 - [x] Show beta tag in version number
 - [x] Open Obtainium when checking updates (if installed)
-- [ ] Auto Backup Feature
 - [x] Add 'Special actions' for back, double, maybe triple click
 - [x] Add 'keep screen on' option (in future behavior tab)
 - [ ] Add toggle bluetooth, wifi, data, etc actions
