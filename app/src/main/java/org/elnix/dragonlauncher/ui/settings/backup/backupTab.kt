@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -253,12 +256,26 @@ fun BackupButtons(
         GradientBigButton(
             text = stringResource(R.string.export_settings),
             onClick = onExport,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Upload,
+                    contentDescription = stringResource(R.string.export_settings),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
             modifier = Modifier
         )
 
         GradientBigButton(
             text = stringResource(R.string.import_settings),
             onClick = onImport,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Download,
+                    contentDescription = stringResource(R.string.import_settings),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
             modifier = Modifier
         )
     }

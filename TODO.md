@@ -24,7 +24,7 @@
 - [ ] Add undo/redo in settings
 - [x] Fix extra padding in fullscreen when swiping down
 - [x] Show user apps in drawer preview
-- [ ] Improve backup/restore buttons: add icons and auto-backup option
+- [x] Improve backup/restore buttons: add icons
 - [x] Make each "What's New" sheet clickable (open release link; long-click to copy)
 - [x] Remove click indication from drawer panels
 - [ ] Correct incorrect width behavior

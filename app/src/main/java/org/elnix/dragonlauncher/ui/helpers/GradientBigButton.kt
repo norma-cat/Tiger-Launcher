@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,8 @@ fun GradientBigButton(
     text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
     onClick: () -> Unit
 ) {
 
@@ -61,11 +64,37 @@ fun GradientBigButton(
             .clickable(enabled) { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = text,
-            color = if (enabled) Color.White else Color.White.copy(alpha = 0.6f),
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (leadingIcon != null) {
+                Box(
+                    modifier = Modifier.padding(end = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    leadingIcon()
+                }
+            }
+
+            Text(
+                text = text,
+                modifier = Modifier.weight(1f),
+                color = if (enabled) Color.White else Color.White.copy(alpha = 0.6f),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center
+            )
+
+            if (trailingIcon != null) {
+                Box(
+                    modifier = Modifier.padding(start = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    trailingIcon()
+                }
+            }
+        }
     }
 }
