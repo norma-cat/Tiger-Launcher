@@ -8,7 +8,7 @@
 - [x] Add double-click action
 - [ ] Open alarm/calendar apps
 - [ ] Show status bar (battery %, time)
-~~- [ ] Require pressing Exit twice to leave fullscreen~~
+- [ ] ~~Require pressing Exit twice to leave fullscreen~~
 - [x] Remove changelog header text divider
 - [ ] Allow editing points (like "pick")
 - [ ] Fix random free-angle issue and set it to the last used circle
