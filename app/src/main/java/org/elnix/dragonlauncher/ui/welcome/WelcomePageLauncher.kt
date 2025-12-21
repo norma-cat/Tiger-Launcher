@@ -4,17 +4,24 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 import org.elnix.dragonlauncher.utils.isDefaultLauncher
 
@@ -29,11 +36,24 @@ fun WelcomePageLauncher() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            "Set as Default Launcher",
-            color = Color.White,
-            fontSize = 24.sp
-        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ){
+            Icon(
+                imageVector = Icons.Default.RocketLaunch,
+                contentDescription = stringResource(R.string.set_default_launcher),
+                modifier = Modifier.size(80.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                text = stringResource(R.string.set_default_launcher),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 26.sp
+            )
+        }
+
 
         Spacer(Modifier.height(32.dp))
 
@@ -45,13 +65,6 @@ fun WelcomePageLauncher() {
             enabled = !isDefaultLauncher,
             onClick = {
                 ctx.startActivity(Intent(Settings.ACTION_HOME_SETTINGS))
-
-//                // Re-check when user comes back
-//                // Using a slight delay avoids checking too early
-//                android.os.Handler(android.os.Looper.getMainLooper())
-//                    .postDelayed({
-//                        isDefaultLauncher.value = ctx.isDefaultLauncher
-//                    }, 500)
             }
         )
     }

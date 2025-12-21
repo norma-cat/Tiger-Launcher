@@ -135,4 +135,9 @@
     <string name="keep_screen_on">Keep Screen On</string>
     <string name="back_action">Back Action</string>
     <string name="double_click_action">Double Click Action</string>
+    <string name="privacy_first">Privacy First</string>
+    <string name="quick_tutorial">Quick Tutorial</string>
+    <string name="long_click_to_access_settings">Long click 3s to access settings</string>
+    <string name="swipe_to_open_app">Swipe to open your configured apps / shortcuts</string>
+    <string name="configure_your_apps">Configure your apps and shortcuts in settings</string>
 </resources>

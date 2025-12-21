@@ -46,10 +46,10 @@ import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.DataStoreName
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.helpers.UserValidation
-import org.elnix.dragonlauncher.utils.models.BackupResult
-import org.elnix.dragonlauncher.utils.models.BackupViewModel
 import org.elnix.dragonlauncher.ui.settings.backup.ImportSettingsDialog
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
+import org.elnix.dragonlauncher.utils.models.BackupResult
+import org.elnix.dragonlauncher.utils.models.BackupViewModel
 import org.json.JSONObject
 
 @Composable
@@ -58,7 +58,7 @@ fun WelcomeScreen(
     onEnterSettings: () -> Unit,
     onEnterApp: () -> Unit
 ) {
-    val pagerState = rememberPagerState(pageCount = { 3 })
+    val pagerState = rememberPagerState(pageCount = { 5 })
     val scope = rememberCoroutineScope()
     val ctx = LocalContext.current
 
@@ -148,8 +148,10 @@ fun WelcomeScreen(
             ) { page ->
                 when (page) {
                     0 -> WelcomePageIntro { settingsImportLauncher.launch(arrayOf("application/json")) }
-                    1 -> WelcomePageLauncher()
-                    2 -> WelcomePageFinish(
+                    1 -> WelcomePagePrivacy()
+                    2 -> WelcomePageTutorial()
+                    3 -> WelcomePageLauncher()
+                    4 -> WelcomePageFinish(
                         onEnterSettings = {
                             setHasSeen()
                             onEnterSettings()
@@ -166,18 +168,18 @@ fun WelcomeScreen(
 
             AnimatedPagerIndicator(
                 currentPage = pagerState.currentPage,
-                total = 3
+                total = 5
             )
         }
 
-        if (pagerState.currentPage < 2) {
+        if (pagerState.currentPage < 4) {
             FloatingActionButton(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(16.dp),
                 onClick = {
                     val next = pagerState.currentPage + 1
-                    if (next < 3) {
+                    if (next < 5) {
                         scope.launch { pagerState.animateScrollToPage(next) }
                     }
                 },
