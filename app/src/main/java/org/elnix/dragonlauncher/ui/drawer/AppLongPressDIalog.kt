@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -48,6 +50,7 @@ fun AppLongPressDialog(
     onRemoveFromWorkspace: (() -> Unit)? = null,
     onRenameApp: (() -> Unit)? = null,
     onChangeAppIcon: (() -> Unit)? = null,
+    onResetAppIcon: (() -> Unit)? = null,
     onDismiss: () -> Unit
 ) {
 
@@ -112,11 +115,23 @@ fun AppLongPressDialog(
             )
         }
 
+        onResetAppIcon?.let {
+            add(
+                DialogEntry(
+                    label = stringResource(R.string.reset_app_icon),
+                    icon = Icons.Default.Restore,
+                    backgroundColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.1f),
+                    iconTint = MaterialTheme.colorScheme.primary,
+                    onClick = { onDismiss(); it() }
+                )
+            )
+        }
+
         onRemoveFromWorkspace?.let {
             add(
                 DialogEntry(
                     label = stringResource(R.string.remove_from_workspace),
-                    icon = Icons.Default.Delete,
+                    icon = Icons.Default.Close,
                     backgroundColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f),
                     iconTint = MaterialTheme.colorScheme.error,
                     onClick = { onDismiss(); it() }

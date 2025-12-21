@@ -5,14 +5,14 @@
 - [x] Prevent duplicate drops on the same circle; new items go on the last circle
 - [x] Rename apps
 - [x] Change app icons/colors
-- [ ] Add double-click action
+- [x] Add double-click action
 - [ ] Open alarm/calendar apps
 - [ ] Show status bar (battery %, time)
 ~~- [ ] Require pressing Exit twice to leave fullscreen~~
 - [x] Remove changelog header text divider
 - [ ] Allow editing points (like "pick")
 - [ ] Fix random free-angle issue and set it to the last used circle
-- [ ] Close settings like the drawer after some time
+- [x] Close settings like the drawer after some time
 - [x] Add drawer setting: tapping empty space closes, opens keyboard, or does nothing
 - [ ] Move apps between workspaces from the drawer
 - [ ] Make long-click action use variable arguments (more powerful)

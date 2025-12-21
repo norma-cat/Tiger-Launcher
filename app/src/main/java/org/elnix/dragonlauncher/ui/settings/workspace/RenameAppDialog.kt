@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.ui.settings.workspace
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -10,6 +11,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 
 @Composable
@@ -19,6 +21,7 @@ fun RenameAppDialog(
     name: String,
     onNameChange: (String) -> Unit,
     onConfirm: () -> Unit,
+    onReset: () -> Unit,
     onDismiss: () -> Unit
 ) {
     if (!visible) return
@@ -51,14 +54,23 @@ fun RenameAppDialog(
         },
         title = { Text(title) },
         text = {
-            TextField(
-                value = name,
-                onValueChange = onNameChange,
-                singleLine = true,
-                colors = AppObjectsColors.outlinedTextFieldColors(
-                    backgroundColor = MaterialTheme.colorScheme.surface
+            Column{
+                TextField(
+                    value = name,
+                    onValueChange = onNameChange,
+                    singleLine = true,
+                    colors = AppObjectsColors.outlinedTextFieldColors(
+                        backgroundColor = MaterialTheme.colorScheme.surface
+                    )
                 )
-            )
+
+                Button(
+                    onClick = onReset,
+                    colors = AppObjectsColors.buttonColors()
+                ) {
+                    Text(stringResource(R.string.reset))
+                }
+            }
         },
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 6.dp,

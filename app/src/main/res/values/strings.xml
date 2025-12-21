@@ -142,4 +142,5 @@
     <string name="configure_your_apps">Configure your apps and shortcuts in settings</string>
     <string name="theme_selector">Theme selector</string>
     <string name="everything_ready">Everything Ready!</string>
+    <string name="reset_app_icon">Reset App Icon</string>
 </resources>

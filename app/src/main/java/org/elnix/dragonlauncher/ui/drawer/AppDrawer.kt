@@ -2,6 +2,8 @@ package org.elnix.dragonlauncher.ui.drawer
 
 import android.content.Intent
 import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -29,6 +31,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -42,14 +45,18 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.helpers.DrawerActions
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.ui.settings.workspace.RenameAppDialog
 import org.elnix.dragonlauncher.utils.ImageUtils
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
+import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
+import org.elnix.dragonlauncher.utils.showToast
 
 @Suppress("AssignedValueIsNeverRead")
 @OptIn(ExperimentalComposeUiApi::class)
@@ -69,6 +76,7 @@ fun AppDrawerScreen(
     onClose: () -> Unit
 ) {
     val ctx = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     val workspaceState by workspaceViewModel.enabledState.collectAsState()
     val workspaces = workspaceState.workspaces
@@ -99,6 +107,41 @@ fun AppDrawerScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     var isSearchFocused by remember { mutableStateOf(false) }
 
+    var showRenameAppDialog by remember { mutableStateOf(false) }
+    var renameTargetPackage by remember { mutableStateOf<String?>(null) }
+    var renameText by remember { mutableStateOf("") }
+
+    var workspaceId by remember { mutableStateOf<String?>(null) }
+
+
+    var iconTargetPackage by remember { mutableStateOf<String?>(null) }
+
+    val pickImageLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        val pkg = iconTargetPackage ?: return@rememberLauncherForActivityResult
+        if (uri != null) {
+            scope.launch {
+                try {
+                    val bitmap = ImageUtils.loadBitmap(ctx, uri)
+                    val cropped = ImageUtils.cropCenterSquare(bitmap)
+                    val resized = ImageUtils.resize(cropped, 192)
+
+                    // Save as Base64 now
+                    workspaceViewModel.setAppIcon(
+                        pkg,
+                        resized
+                    )
+                    // Optionally show toast
+                    ctx.showToast(R.string.icon_updated)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    ctx.showToast(R.string.icon_update_failed)
+                }
+            }
+        }
+    }
+
     LaunchedEffect(autoShowKeyboard) {
         if (autoShowKeyboard) {
             yield()
@@ -107,8 +150,8 @@ fun AppDrawerScreen(
     }
 
     LaunchedEffect(pagerState.currentPage) {
-        val workspaceId = workspaces.getOrNull(pagerState.currentPage)?.id ?: return@LaunchedEffect
-        workspaceViewModel.selectWorkspace(workspaceId)
+        workspaceId = workspaces.getOrNull(pagerState.currentPage)?.id ?: return@LaunchedEffect
+        workspaceViewModel.selectWorkspace(workspaceId!!)
     }
 
 
@@ -236,6 +279,9 @@ fun AppDrawerScreen(
 
     if (dialogApp != null) {
         val app = dialogApp!!
+        val hasCustomIcon =
+            overrides[app.packageName]?.customIconBase64 != null
+
         AppLongPressDialog(
             app = app,
             onDismiss = { dialogApp = null },
@@ -258,9 +304,66 @@ fun AppDrawerScreen(
                     }
                 )
                 onClose()
-            }
+            },
+            onRemoveFromWorkspace = {
+                workspaceId?.let{
+                    scope.launch {
+                        workspaceViewModel.removeAppFromWorkspace(
+                            it,
+                            app.packageName
+                        )
+                    }
+                }
+            },
+            onRenameApp = {
+                renameText = app.name
+                renameTargetPackage = app.packageName
+                showRenameAppDialog = true
+            },
+            onChangeAppIcon = {
+                val pkg = app.packageName
+                iconTargetPackage = pkg
+                pickImageLauncher.launch(arrayOf("image/*"))
+            },
+            onResetAppIcon = if (hasCustomIcon) {
+                {
+                    scope.launch {
+                        workspaceViewModel.resetAppIcon(app.packageName)
+                    }
+                }
+            } else null
         )
     }
+
+    RenameAppDialog(
+        visible = showRenameAppDialog,
+        title = ctx.getString(R.string.rename_app),
+        name = renameText,
+        onNameChange = { renameText = it },
+        onConfirm = {
+            val pkg = renameTargetPackage ?: return@RenameAppDialog
+
+            scope.launch {
+                workspaceViewModel.renameApp(
+                    packageName = pkg,
+                    name = renameText
+                )
+            }
+
+            showRenameAppDialog = false
+            renameTargetPackage = null
+        },
+        onReset = {
+            val pkg = renameTargetPackage ?: return@RenameAppDialog
+
+            scope.launch {
+                workspaceViewModel.resetAppName(pkg)
+            }
+            showRenameAppDialog = false
+            renameTargetPackage = null
+        },
+        onDismiss = { showRenameAppDialog = false }
+    )
 }
 
 

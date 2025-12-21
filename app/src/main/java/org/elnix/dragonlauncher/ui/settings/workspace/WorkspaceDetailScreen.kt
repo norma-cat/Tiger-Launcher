@@ -35,11 +35,11 @@ import org.elnix.dragonlauncher.ui.drawer.AppModel
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
 import org.elnix.dragonlauncher.ui.helpers.AppPickerDialog
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.ImageUtils
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
-import org.elnix.dragonlauncher.utils.showToast
+import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
+import org.elnix.dragonlauncher.utils.showToast
 
 @Composable
 fun WorkspaceDetailScreen(
@@ -160,6 +160,9 @@ fun WorkspaceDetailScreen(
 
     if (showDetailScreen != null) {
         val app = showDetailScreen!!
+        val hasCustomIcon =
+            workspaceState.appOverrides[app.packageName]?.customIconBase64 != null
+
         AppLongPressDialog(
             app = app,
             onOpen = {
@@ -197,6 +200,14 @@ fun WorkspaceDetailScreen(
                 iconTargetPackage = pkg
                 pickImageLauncher.launch(arrayOf("image/*"))
             },
+            onResetAppIcon = if (hasCustomIcon) {
+                {
+                    val pkg = app.packageName
+                    scope.launch {
+                        workspaceViewModel.resetAppIcon(pkg)
+                    }
+                }
+            } else null,
             onDismiss = { showDetailScreen = null }
         )
     }
@@ -218,6 +229,15 @@ fun WorkspaceDetailScreen(
 
             showRenameAppDialog = false
             showDetailScreen = null
+            renameTargetPackage = null
+        },
+        onReset = {
+            val pkg = renameTargetPackage ?: return@RenameAppDialog
+
+            scope.launch {
+                workspaceViewModel.resetAppName(pkg)
+            }
+            showRenameAppDialog = false
             renameTargetPackage = null
         },
         onDismiss = { showRenameAppDialog = false }

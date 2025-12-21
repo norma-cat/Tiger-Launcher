@@ -234,6 +234,36 @@ class WorkspaceViewModel(application: Application) : AndroidViewModel(applicatio
         persist()
     }
 
+    fun resetAppName(packageName: String) {
+        val prev = _state.value.appOverrides[packageName] ?: return
+
+        val updated = prev.copy(customLabel = null)
+
+        _state.value = _state.value.copy(
+            appOverrides =
+                if (updated.customIconBase64 == null)
+                    _state.value.appOverrides - packageName
+                else
+                    _state.value.appOverrides + (packageName to updated)
+        )
+        persist()
+    }
+
+    fun resetAppIcon(packageName: String) {
+        val prev = _state.value.appOverrides[packageName] ?: return
+
+        val updated = prev.copy(customIconBase64 = null)
+
+        _state.value = _state.value.copy(
+            appOverrides =
+                if (updated.customLabel == null)
+                    _state.value.appOverrides - packageName
+                else
+                    _state.value.appOverrides + (packageName to updated)
+        )
+        persist()
+    }
+
 
     fun resetWorkspacesAndOverrides() {
         _state.value = WorkspaceState(
