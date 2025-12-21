@@ -25,7 +25,7 @@
 - [x] Fix extra padding in fullscreen when swiping down
 - [x] Show user apps in drawer preview
 - [ ] Improve backup/restore buttons: add icons and auto-backup option
-- [ ] Make each "What's New" sheet clickable (open release link; long-click to copy)
+- [x] Make each "What's New" sheet clickable (open release link; long-click to copy)
 - [ ] Remove click indication from drawer panels
 - [ ] Correct incorrect width behavior
 - [x] Change toggle behavior: unchecked hides panel, add DISABLED action

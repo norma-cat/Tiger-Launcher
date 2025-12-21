@@ -19,11 +19,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.utils.copyToClipboard
+import org.elnix.dragonlauncher.utils.getVersionCode
+import org.elnix.dragonlauncher.utils.openUrl
 import java.util.Date
 
 data class Update(
@@ -44,8 +48,11 @@ fun WhatsNewBottomSheet(
     updates: List<Update>,
     onDismiss: () -> Unit
 ) {
+    val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+
+    val versionCode = getVersionCode(ctx)
 
     ModalBottomSheet(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -83,7 +90,17 @@ fun WhatsNewBottomSheet(
             Spacer(Modifier.height(12.dp))
 
             updates.forEach { update ->
-                UpdateCard(update)
+                UpdateCard(
+                    update,
+                    onLongCLick = {
+                        ctx.copyToClipboard(update.toString())
+                    },
+                    onCLick = {
+                        ctx.openUrl(
+                            "https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/changelogs/${versionCode}.txt"
+                        )
+                    }
+                )
             }
         }
     }

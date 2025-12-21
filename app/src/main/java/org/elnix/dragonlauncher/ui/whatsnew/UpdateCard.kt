@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.ui.whatsnew
 
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,13 +19,21 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun UpdateCard(update: Update) {
+fun UpdateCard(
+    update: Update,
+    onLongCLick: (() -> Unit)? = null,
+    onCLick: () -> Unit
+) {
     val dateFormatter = rememberDateFormatter()
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .combinedClickable(
+                onClick = onCLick,
+                onLongClick = onLongCLick
+            ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(3.dp),
         colors = CardDefaults.cardColors(

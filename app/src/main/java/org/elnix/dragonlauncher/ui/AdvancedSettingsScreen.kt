@@ -205,32 +205,7 @@ fun AdvancedSettingsScreen(
                 icon = Icons.AutoMirrored.Filled.Notes,
                 onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/changelogs/${versionCode}.txt") }
             ) { navController.navigate(SETTINGS.CHANGELOGS) }
-//            Row(
-//                horizontalArrangement = Arrangement.spacedBy(5.dp),
-//                verticalAlignment = Alignment.CenterVertically
-//            ){
-//                SettingsItem(
-//                    title = stringResource(R.string.changelogs),
-//                    modifier = Modifier.weight(1f),
-//                    icon = Icons.AutoMirrored.Filled.Notes
-//                ) { navController.navigate(SETTINGS.CHANGELOGS) }
-//
-//                IconButton(
-//                    onClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/changelogs/${versionCode}.txt") },
-//                    colors = AppObjectsColors.iconButtonColors(
-//                        backgroundColor = MaterialTheme.colorScheme.surface
-//                    ),
-//                    modifier = Modifier
-//                        .size(52.dp),
-//                    shape = RoundedCornerShape(12.dp)
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-//                        contentDescription = "Open link in web",
-//                        tint = MaterialTheme.colorScheme.primary
-//                    )
-//                }
-//            }
+
         }
 
         item {

@@ -8,8 +8,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.utils.copyToClipboard
 import org.elnix.dragonlauncher.utils.getVersionCode
 import org.elnix.dragonlauncher.utils.loadChangelogs
+import org.elnix.dragonlauncher.utils.openUrl
 
 @Composable
 fun ChangelogsScreen(
@@ -32,7 +34,17 @@ fun ChangelogsScreen(
         onReset = null
     ) {
         items(updates) { update ->
-            UpdateCard(update)
+            UpdateCard(
+                update,
+                onLongCLick = {
+                    ctx.copyToClipboard(update.toString())
+                },
+                onCLick = {
+                    ctx.openUrl(
+                        "https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/changelogs/${versionCode}.txt"
+                    )
+                }
+            )
         }
     }
 }
