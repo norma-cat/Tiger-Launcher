@@ -55,22 +55,21 @@ jobs:
         with:
           timeout_minutes: 10
           max_attempts: 3
-          command: ./gradlew assembleRelease assembleUnminifiedRelease assembleDebuggableRelease
+          command: ./gradlew assembleBetaRelease assembleBetaUnminifiedRelease assembleBetaDebuggableRelease
 
       - name: Rename APKs with version
         run: |
-          MIN="DragonLauncher-v${{ env.versionName }}-beta-${{ github.run_number }}.apk"
-          UNMIN="DragonLauncher-v${{ env.versionName }}-beta-${{ github.run_number }}-unminified.apk"
-          DEBUG="DragonLauncher-v${{ env.versionName }}-beta-${{ github.run_number }}-debuggable.apk"
+          MIN="DragonLauncher-v${{ env.versionName }}-${{ github.run_number }}.apk"
+          UNMIN="DragonLauncher-v${{ env.versionName }}-${{ github.run_number }}-unminified.apk"
+          DEBUG="DragonLauncher-v${{ env.versionName }}-${{ github.run_number }}-debuggable.apk"
 
-          mv app/build/outputs/apk/release/app-release.apk "$MIN"
-          mv app/build/outputs/apk/unminifiedRelease/app-unminifiedRelease.apk "$UNMIN"
-          mv app/build/outputs/apk/debuggableRelease/app-debuggableRelease.apk "$DEBUG"
-
+          mv app/build/outputs/apk/beta/release/app-beta-release.apk "$MIN"
+          mv app/build/outputs/apk/beta/unminifiedRelease/app-beta-unminifiedRelease.apk "$UNMIN"
+          mv app/build/outputs/apk/beta/debuggableRelease/app-beta-debuggableRelease.apk "$DEBUG"
+          
           echo "APK_MIN=$MIN" >> $GITHUB_ENV
           echo "APK_UNMIN=$UNMIN" >> $GITHUB_ENV
           echo "APK_DEBUG=$DEBUG" >> $GITHUB_ENV
-
 
       # Create tag before release
       - name: Create tag

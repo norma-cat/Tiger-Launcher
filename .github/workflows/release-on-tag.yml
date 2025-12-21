@@ -49,12 +49,12 @@ jobs:
           echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleStableRelease
 
       - name: Rename APK
         run: |
           NAME="DragonLauncher-${{ env.VERSION }}.apk"
-          mv app/build/outputs/apk/release/app-release.apk "$NAME"
+          mv app/build/outputs/apk/release/app-stable-release.apk "$NAME"
           echo "APK=$NAME" >> $GITHUB_ENV
 
       - name: Create GitHub Release

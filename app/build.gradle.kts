@@ -32,6 +32,19 @@ android {
         versionName = "1.2.3"
     }
 
+
+    flavorDimensions += "channel"
+    productFlavors {
+        create("stable") {
+            dimension = "channel"
+            versionNameSuffix = ""
+        }
+        create("beta") {
+            dimension = "channel"
+            versionNameSuffix = "-beta"
+        }
+    }
+
     signingConfigs {
         create("release") {
             val keystore = env("KEYSTORE_FILE")

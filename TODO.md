@@ -31,7 +31,7 @@
 - [ ] Correct incorrect width behavior
 - [x] Change toggle behavior: unchecked hides panel, add DISABLED action
 - [ ] Fix lag during reload; show loading indicator in app picker
-- [ ] Show beta tag in version number
+- [x] Show beta tag in version number
 - [x] Open Obtainium when checking updates (if installed)
 - [ ] Auto Backup Feature
 - [x] Add 'Special actions' for back, double, maybe triple click
