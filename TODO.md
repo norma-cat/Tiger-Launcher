@@ -11,11 +11,11 @@
 - [ ] ~~Require pressing Exit twice to leave fullscreen~~
 - [x] Remove changelog header text divider
 - [ ] Allow editing points (like "pick")
-- [ ] Fix random free-angle issue and set it to the last used circle
+- [x] Fix random free-angle issue and set it to the last used circle
 - [x] Close settings like the drawer after some time
 - [x] Add drawer setting: tapping empty space closes, opens keyboard, or does nothing
 - [x] Move apps between workspaces from the drawer
-- [ ] Make long-click action use variable arguments (more powerful)
+- [ ] ~~Make long-click action use variable arguments (more powerful)~~
 - [ ] Enable automatic backups
 - [x] Ignore case in app picker search
 - [ ] Fix quick action width
