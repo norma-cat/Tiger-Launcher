@@ -61,4 +61,4 @@ Contributions are welcome! Feel free to submit pull requests or open issues.
 ---
 ## License
 
-This project is open-source under the **MIT License**.
+This project is open-source under the **GPL 3 Licence**.
