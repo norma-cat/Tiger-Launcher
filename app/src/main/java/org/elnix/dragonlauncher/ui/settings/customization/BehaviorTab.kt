@@ -111,12 +111,12 @@ fun BehaviorTab(
             SliderWithLabel(
                 label = stringResource(R.string.left_padding),
                 value = leftPadding,
-                valueRange = 0f..50f,
+                valueRange = 0f..100f,
                 color = MaterialTheme.colorScheme.primary,
                 showValue = true,
                 onReset = {
                     scope.launch {
-                        BehaviorSettingsStore.setLeftPadding(ctx, 0)
+                        BehaviorSettingsStore.setLeftPadding(ctx, 20)
                     }
                 },
                 onChange = {
@@ -134,12 +134,12 @@ fun BehaviorTab(
             SliderWithLabel(
                 label = stringResource(R.string.right_padding),
                 value = rightPadding,
-                valueRange = 0f..50f,
+                valueRange = 0f..100f,
                 color = MaterialTheme.colorScheme.primary,
                 showValue = true,
                 onReset = {
                     scope.launch {
-                        BehaviorSettingsStore.setRightPadding(ctx, 0)
+                        BehaviorSettingsStore.setRightPadding(ctx, 20)
                     }
                 },
                 onChange = {
@@ -157,12 +157,12 @@ fun BehaviorTab(
             SliderWithLabel(
                 label = stringResource(R.string.up_padding),
                 value = upPadding,
-                valueRange = 0f..50f,
+                valueRange = 0f..100f,
                 color = MaterialTheme.colorScheme.primary,
                 showValue = true,
                 onReset = {
                     scope.launch {
-                        BehaviorSettingsStore.setUpPadding(ctx, 0)
+                        BehaviorSettingsStore.setUpPadding(ctx, 50)
                     }
                 },
                 onChange = {
@@ -180,12 +180,12 @@ fun BehaviorTab(
             SliderWithLabel(
                 label = stringResource(R.string.down_padding),
                 value = downPadding,
-                valueRange = 0f..50f,
+                valueRange = 0f..100f,
                 color = MaterialTheme.colorScheme.primary,
                 showValue = true,
                 onReset = {
                     scope.launch {
-                        BehaviorSettingsStore.setDownPadding(ctx, 0)
+                        BehaviorSettingsStore.setDownPadding(ctx, 50)
                     }
                 },
                 onChange = {

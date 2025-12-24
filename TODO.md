@@ -25,7 +25,6 @@
 - [x] Improve backup/restore buttons: add icons
 - [x] Make each "What's New" sheet clickable (open release link; long-click to copy)
 - [x] Remove click indication from drawer panels
-- [ ] Correct incorrect width behavior
 - [x] Change toggle behavior: unchecked hides panel, add DISABLED action
 - [ ] Fix lag during reload; show loading indicator in app picker
 - [x] Show beta tag in version number
@@ -35,7 +34,7 @@
 - [ ] Add toggle bluetooth, wifi, data, etc actions
 - [x] Make check for updates show Obtainium icon if installed
 - [x] Add "Recent apps" action
-- [ ] Allow user set wallpaper / set plain wallpaper system wide
+- [x] Allow user set wallpaper / set plain wallpaper system wide
 - [x] DO not show what's new on welcome screen
 - [X] Add privacy welcome screen
 - [ ] Allow preview theme, add multiple images  for the theme

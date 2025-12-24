@@ -21,10 +21,10 @@ object BehaviorSettingsStore : BaseSettingsStore() {
         val backAction: SwipeActionSerializable? = null,
         val doubleClickAction: SwipeActionSerializable? = null,
         val keepScreenOn: Boolean = false,
-        val leftPadding: Int = 0,
-        val rightPadding: Int = 0,
-        val upPadding: Int = 0,
-        val downPadding: Int = 0
+        val leftPadding: Int = 20,
+        val rightPadding: Int = 20,
+        val upPadding: Int = 50,
+        val downPadding: Int = 50
     )
 
     private val defaults = UiSettingsBackup()
