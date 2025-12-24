@@ -32,15 +32,17 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,7 +57,6 @@ import org.elnix.dragonlauncher.ui.theme.ExtraColors
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionIcon
-import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -312,7 +313,13 @@ fun MainScreenOverlay(
 
 
         // Main drawing canva (the lines, circles and selected actions
-        Canvas(modifier = Modifier.fillMaxSize()) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer { // I use that to let the action in circle remove the background, otherwise it doesn't work
+                    compositingStrategy = CompositingStrategy.Offscreen
+                }
+        ) {
 
             // Draw only if the user is dragging (has a start pos and a end (current) Offsets
             if (start != null && current != null) {
@@ -333,8 +340,7 @@ fun MainScreenOverlay(
                             start = start,
                             end = current,
                             radius = circleRadius,
-                            color = lineColor,
-                            backgroundColor = backgroundColor
+                            color = lineColor
                         )
                     }
                 }
@@ -365,6 +371,8 @@ fun MainScreenOverlay(
                 if (showAppCirclePreview || showAppLinePreview || showAppLaunchPreview) {
                     hoveredAction?.let { point ->
                         val action = point.action!!
+
+                        // Main circle (the selected) drawn before any apps to be behind
                         if (showAppCirclePreview) {
                             drawCircle(
                                 color = circleColor ?: AmoledDefault.CircleColor,
@@ -391,8 +399,7 @@ fun MainScreenOverlay(
                                 start = start,
                                 end = Offset(px,py),
                                 radius = circleRadius,
-                                color = lineColor,
-                                backgroundColor = backgroundColor
+                                color = lineColor
                             )
                         }
 
@@ -409,7 +416,7 @@ fun MainScreenOverlay(
                                     drawScope = this,
                                     action = p.action!!,
                                     circleColor = circleColor ?: AmoledDefault.CircleColor,
-                                    backgroundColor = backgroundColor,
+                                    backgroundColor = null, // Null for now to erase bg (maybe settings later)
                                     colorAction = actionColor(p.action, extraColors),
                                     px = px, py = py,
                                     ctx = ctx
@@ -422,11 +429,11 @@ fun MainScreenOverlay(
                             actionsInCircle(
                                 drawScope = this,
                                 action = action,
-                                circleColor = circleColor ?: AmoledDefault.CircleColor,
-                                backgroundColor = backgroundColor,
-                                colorAction = colorAction,
                                 px = px, py = py,
-                                ctx = ctx
+                                ctx = ctx,
+                                backgroundColor = null, // Null for now to erase bg (maybe settings later)
+                                colorAction = colorAction,
+                                circleColor = circleColor ?: AmoledDefault.CircleColor
                             )
                         }
                     }
@@ -436,14 +443,16 @@ fun MainScreenOverlay(
                 // Show the current selected app in the center of the circle
                 if (showAppPreviewIconCenterStartPosition && hoveredAction != null) {
                     val currentAction = hoveredAction!!.action!!
-                    drawImage(
-                        image = actionIconBitmap(
-                            action = currentAction,
-                            context = ctx,
-                            tintColor = colorAction
-                        ),
-                        dstOffset = IntOffset(start.x.toInt() - 28, start.y.toInt() - 28),
-                        dstSize = IntSize(56, 56)
+
+                    actionsInCircle(
+                        drawScope = this,
+                        action = currentAction,
+                        px = start.x, py = start.y,
+                        ctx = ctx,
+                        drawBorder = false,
+                        backgroundColor = null, // Null for now to erase bg (maybe settings later)
+                        colorAction = colorAction,
+                        circleColor = circleColor ?: AmoledDefault.CircleColor
                     )
                 }
             }
@@ -515,7 +524,6 @@ private fun actionLine(
     end: Offset,
     radius: Float,
     color: Color,
-    backgroundColor: Color
 ) {
     // Draw the main line from start to end
     drawScope.drawLine(
@@ -526,11 +534,12 @@ private fun actionLine(
         cap = StrokeCap.Round
     )
 
-    // Fill the full circle in the center spot to empty it
+    // Erases the color, instead of putting it, that lets the wallpaper pass trough
     drawScope.drawCircle(
-        color = backgroundColor,
+        color = Color.Transparent,
         radius = radius - 2,
-        center = start
+        center = start,
+        blendMode = BlendMode.Clear
     )
 
     // Small circle at the end of the trail
