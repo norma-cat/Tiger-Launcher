@@ -19,7 +19,7 @@ class AppLaunchException(message: String, cause: Throwable? = null) : Exception(
 fun launchSwipeAction(
     ctx: Context,
     action: SwipeActionSerializable?,
-    useAccessibilityInsteadOfContextToExpandActionPanel: Boolean = false,
+    useAccessibilityInsteadOfContextToExpandActionPanel: Boolean = true,
     onAskWhatMethodToUseToOpenQuickActions: (() -> Unit)? = null,
     onReloadApps: (() -> Unit)? = null,
     onReselectFile: (() -> Unit)? = null,
