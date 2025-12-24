@@ -107,9 +107,36 @@ fun <T> ActionSelectorRow(
     }
 
     // Options dialog
-    if (showDialog) {
+    ActionSelector(
+        visible = showDialog,
+        label = label,
+        textColor = textColor,
+        surfaceColor = surfaceColor,
+        options = options,
+        optionLabel = optionLabel,
+        selected = selected,
+        onSelected = onSelected,
+        onDismiss = { showDialog = false }
+    )
+}
+
+
+@Composable
+fun <T> ActionSelector(
+    visible: Boolean,
+    label: String?,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
+    surfaceColor: Color = MaterialTheme.colorScheme.surface,
+    options: List<T>,
+    optionLabel: (T) -> String = { it.toString() },
+    selected: T?,
+    onSelected: (T) -> Unit,
+    onDismiss: () -> Unit,
+) {
+
+    if (visible) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = { onDismiss() },
             confirmButton = {},
             dismissButton = {},
             title = {
@@ -131,15 +158,12 @@ fun <T> ActionSelectorRow(
                                 .padding(horizontal = 4.dp)
                                 .clickable {
                                     onSelected(option)
-                                    showDialog = false
+                                    onDismiss()
                                 }
                         ) {
                             RadioButton(
                                 selected = (selected == option),
-                                onClick = {
-                                    onSelected(option)
-                                    showDialog = false
-                                },
+                                onClick = { onSelected(option) },
                                 colors = AppObjectsColors.radioButtonColors()
                             )
                             Text(
