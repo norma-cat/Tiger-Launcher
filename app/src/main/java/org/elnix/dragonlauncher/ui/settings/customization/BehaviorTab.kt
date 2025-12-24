@@ -1,9 +1,7 @@
 package org.elnix.dragonlauncher.ui.settings.customization
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -12,11 +10,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.stores.BehaviorSettingsStore
@@ -111,12 +109,12 @@ fun BehaviorTab(
             SliderWithLabel(
                 label = stringResource(R.string.left_padding),
                 value = leftPadding,
-                valueRange = 0f..100f,
+                valueRange = 0f..300f,
                 color = MaterialTheme.colorScheme.primary,
                 showValue = true,
                 onReset = {
                     scope.launch {
-                        BehaviorSettingsStore.setLeftPadding(ctx, 20)
+                        BehaviorSettingsStore.setLeftPadding(ctx, 60)
                     }
                 },
                 onChange = {
@@ -134,12 +132,12 @@ fun BehaviorTab(
             SliderWithLabel(
                 label = stringResource(R.string.right_padding),
                 value = rightPadding,
-                valueRange = 0f..100f,
+                valueRange = 0f..300f,
                 color = MaterialTheme.colorScheme.primary,
                 showValue = true,
                 onReset = {
                     scope.launch {
-                        BehaviorSettingsStore.setRightPadding(ctx, 20)
+                        BehaviorSettingsStore.setRightPadding(ctx, 60)
                     }
                 },
                 onChange = {
@@ -157,12 +155,12 @@ fun BehaviorTab(
             SliderWithLabel(
                 label = stringResource(R.string.up_padding),
                 value = upPadding,
-                valueRange = 0f..100f,
+                valueRange = 0f..300f,
                 color = MaterialTheme.colorScheme.primary,
                 showValue = true,
                 onReset = {
                     scope.launch {
-                        BehaviorSettingsStore.setUpPadding(ctx, 50)
+                        BehaviorSettingsStore.setUpPadding(ctx, 80)
                     }
                 },
                 onChange = {
@@ -180,12 +178,12 @@ fun BehaviorTab(
             SliderWithLabel(
                 label = stringResource(R.string.down_padding),
                 value = downPadding,
-                valueRange = 0f..100f,
+                valueRange = 0f..300f,
                 color = MaterialTheme.colorScheme.primary,
                 showValue = true,
                 onReset = {
                     scope.launch {
-                        BehaviorSettingsStore.setDownPadding(ctx, 50)
+                        BehaviorSettingsStore.setDownPadding(ctx, 100)
                     }
                 },
                 onChange = {
@@ -200,46 +198,20 @@ fun BehaviorTab(
         }
     }
 
-    DragPreviewOverlay(
-        isVisible = isDragging.value,
-        leftPadding = leftPadding.dp,
-        rightPadding = rightPadding.dp,
-        upPadding = upPadding.dp,
-        downPadding = downPadding.dp
-    )
-}
 
-
-
-
-
-@Composable
-fun DragPreviewOverlay(
-    isVisible: Boolean,
-    leftPadding: androidx.compose.ui.unit.Dp,
-    rightPadding: androidx.compose.ui.unit.Dp,
-    upPadding: androidx.compose.ui.unit.Dp,
-    downPadding: androidx.compose.ui.unit.Dp
-) {
-    if (!isVisible) return
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                while (true) {
-                    awaitPointerEventScope {
-                        awaitPointerEvent()
-                    }
-                }
-            }
-            .padding(
-                start = leftPadding,
-                top = upPadding,
-                end = rightPadding,
-                bottom = downPadding
+    if (isDragging.value){
+        Canvas(Modifier.fillMaxSize()) {
+            drawRect(
+                color = Color(0x55FF0000),
+                topLeft = Offset(
+                    leftPadding.toFloat(),
+                    upPadding.toFloat()
+                ),
+                size = Size(
+                    size.width - leftPadding - rightPadding.toFloat(),
+                    size.height - upPadding - downPadding.toFloat()
+                )
             )
-            .background(Color(0x55FF0000))
-
-    ) { }
+        }
+    }
 }
