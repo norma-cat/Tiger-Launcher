@@ -39,3 +39,8 @@
 - [x] DO not show what's new on welcome screen
 - [X] Add privacy welcome screen
 - [ ] Allow preview theme, add multiple images  for the theme
+- [ ] Add / rewove circles
+- [ ] Add issue template -> check todolist before feature request
+- [ ] Improve this shitty todo list
+- [ ] Improve auto backup : When uri file expired, show a banner like set as default launcher, and display a big resalect button instead of the 3 actual (or at least remove the trigger backup button
+- [ ] Add app specific quick actions on long click drawer like "Missed calls" for phone, etc...
