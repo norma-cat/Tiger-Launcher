@@ -40,6 +40,9 @@ You can customize your list of fast access apps easily in the settings, and also
   <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/8.jpg" width="22%" alt="App ScreenShot 8"/>
   <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/9.jpg" width="22%" alt="App ScreenShot 9"/>
   <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/10.jpg" width="22%" alt="App ScreenShot 10"/>
+  <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/11.jpg" width="22%" alt="App ScreenShot 11"/>
+  <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/12.jpg" width="22%" alt="App ScreenShot 12"/>
+  <img src="https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/13.jpg" width="22%" alt="App ScreenShot 13"/>
 </p>
 
 ## Usage
@@ -47,6 +50,7 @@ You can customize your list of fast access apps easily in the settings, and also
 * **Long click 3 seconds to access settings**
 * Tap or long-press apps to quickly launch, view options, or uninstall on drawer
 * Customize gestures and visual settings via the Settings menu.
+* Change background for main screen / drawer, add blur to it
 
 
 ## Credits
