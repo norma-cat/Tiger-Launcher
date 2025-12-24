@@ -20,7 +20,15 @@ import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import kotlin.math.roundToInt
 
-
+/**
+ * Basic float slider for simple value adjustment (0f..1f range).
+ *
+ * @param label Optional label displayed above the slider
+ * @param showValue Whether to display current value next to label
+ * @param value Current slider value (0f..1f)
+ * @param color Primary color for slider and text
+ * @param onChange Callback invoked when slider value changes
+ */
 @Composable
 fun SliderWithLabel(
     label: String? =null,
@@ -66,6 +74,65 @@ fun SliderWithLabel(
     }
 }
 
+/**
+ * Percentage-based float slider (0%..100%) with drag state tracking.
+ *
+ * @param label Label displayed above the slider
+ * @param value Current slider value (0f..1f, displays as 0%..100%)
+ * @param color Primary color for slider and text
+ * @param showValue Whether to display percentage value next to label
+ * @param onChange Callback invoked during drag (new value 0f..1f)
+ * @param onDragStateChange Callback for drag start (true) / end (false)
+ */
+@Composable
+fun SliderWithLabel(
+    label: String,
+    value: Float,
+    color: Color,
+    showValue: Boolean = true,
+    onChange: (Float) -> Unit,
+    onDragStateChange: (Boolean) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(5.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier.wrapContentWidth(),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = label, color = color)
+            if (showValue) Text(text = "${(value * 100).toInt()}%", color = color)
+        }
+
+        Slider(
+            value = value,
+            onValueChange = { newValue ->
+                onChange(newValue)
+                onDragStateChange(true)
+            },
+            onValueChangeFinished = { onDragStateChange(false) },
+            valueRange = 0f..1f,
+            steps = 99,
+            colors = AppObjectsColors.sliderColors(color)
+        )
+    }
+}
+
+
+/**
+ * Integer slider for discrete values without drag state tracking.
+ *
+ * @param label Optional label displayed above the slider
+ * @param value Current slider value (integer)
+ * @param valueRange Range of allowed values (converted to float for slider)
+ * @param color Primary color for slider and text
+ * @param showValue Whether to display current value next to label
+ * @param onReset Optional reset button callback
+ * @param onChange Callback invoked when slider value changes (integer)
+ */
 @Composable
 fun SliderWithLabel(
     label: String? = null,
@@ -127,7 +194,18 @@ fun SliderWithLabel(
     }
 }
 
-
+/**
+ * Integer slider with drag state tracking and optional reset.
+ *
+ * @param label Optional label displayed above the slider
+ * @param value Current slider value (integer)
+ * @param valueRange Range of allowed values (converted to float for slider)
+ * @param color Primary color for slider and text
+ * @param showValue Whether to display current value next to label
+ * @param onReset Optional reset button callback
+ * @param onChange Callback invoked during drag (integer value)
+ * @param onDragStateChange Optional callback for drag start/end states
+ */
 @Composable
 fun SliderWithLabel(
     label: String? = null,
