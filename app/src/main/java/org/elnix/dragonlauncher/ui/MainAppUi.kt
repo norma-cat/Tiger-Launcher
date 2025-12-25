@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -252,7 +253,8 @@ fun MainAppUi(
                     }
                 }
             }
-        }
+        },
+        contentWindowInsets = WindowInsets(0)
     ) { paddingValues ->
         NavHost(
             navController = navController,

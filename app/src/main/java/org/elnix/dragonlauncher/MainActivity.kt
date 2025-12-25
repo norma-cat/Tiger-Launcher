@@ -108,9 +108,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-//            LaunchedEffect(debugToast) {
-//                SettingsBackupManager.triggerBackup(ctx, debugToast)
-//            }
 
             LaunchedEffect(hasInitialized) {
                 if (!hasInitialized) {
@@ -141,7 +138,6 @@ class MainActivity : ComponentActivity() {
             }
 
             // Colors
-
             val primary by ColorSettingsStore.getPrimary(ctx).collectAsState(initial = null)
             val onPrimary by ColorSettingsStore.getOnPrimary(ctx).collectAsState(initial = null)
 
@@ -175,6 +171,7 @@ class MainActivity : ComponentActivity() {
             val openFileColor by ColorSettingsStore.getOpenFileColor(ctx).collectAsState(initial = null)
             val reloadColor by ColorSettingsStore.getReloadColor(ctx).collectAsState(initial = null)
             val openRecentAppsColor by ColorSettingsStore.getOpenRecentApps(ctx).collectAsState(initial = null)
+
 
 
             DragonLauncherTheme(

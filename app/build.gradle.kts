@@ -147,6 +147,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.reorderable)
     implementation(libs.android.image.cropper)
+    implementation(libs.material)
+    implementation(libs.material3)
 }
 
 

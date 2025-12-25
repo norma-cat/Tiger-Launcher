@@ -4,11 +4,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -59,7 +62,7 @@ fun SettingsLazyHeader(
     Column(
         modifier = Modifier
             .fillMaxSize()
-//            .background(MaterialTheme.colorScheme.background)
+            .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
 
         if (banner != null) { banner() }
@@ -73,7 +76,6 @@ fun SettingsLazyHeader(
             LazyColumn (
                 modifier = Modifier
                     .fillMaxWidth(),
-//                    .background(MaterialTheme.colorScheme.background),
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 item {
