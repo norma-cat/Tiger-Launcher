@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
@@ -29,7 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.elnix.dragonlauncher.ui.components.CustomAlertDialog
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.elnix.dragonlauncher.utils.colors.adjustBrightness
 
@@ -135,7 +137,7 @@ fun <T> ActionSelector(
 ) {
 
     if (visible) {
-        AlertDialog(
+        CustomAlertDialog(
             onDismissRequest = { onDismiss() },
             confirmButton = {},
             dismissButton = {},
@@ -144,36 +146,40 @@ fun <T> ActionSelector(
                     Text(
                         text = label,
                         style = MaterialTheme.typography.titleMedium,
-                        color = textColor
+                        color = textColor,
+                        textAlign = TextAlign.Center
                     )
                 }
             },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column {
                     options.forEach { option ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
-                                .padding(horizontal = 4.dp)
                                 .clickable {
                                     onSelected(option)
                                     onDismiss()
                                 }
+                                .padding(15.dp)
                         ) {
+                            Text(
+                                text = optionLabel(option),
+                                color = textColor,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f)
+                            )
+
                             RadioButton(
                                 selected = (selected == option),
                                 onClick = {
                                     onSelected(option)
                                     onDismiss()
                                 },
-                                colors = AppObjectsColors.radioButtonColors()
-                            )
-                            Text(
-                                text = optionLabel(option),
-                                color = textColor,
-                                style = MaterialTheme.typography.bodyMedium
+                                colors = AppObjectsColors.radioButtonColors(),
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                     }

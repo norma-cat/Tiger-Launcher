@@ -5,16 +5,14 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -34,15 +32,12 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColorInt
-import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import android.graphics.Color as AndroidColor
 
 
 @Composable
 fun GradientColorPicker(
     initialColor: Color,
-//    defaultColor: Color,
     onColorSelected: (Color) -> Unit
 ) {
     val hsvArray = remember {
@@ -57,20 +52,17 @@ fun GradientColorPicker(
 
     var selectedColor by remember { mutableStateOf(initialColor) }
     var alpha by remember { mutableFloatStateOf(initialColor.alpha) }
-    var hexText by remember { mutableStateOf(toHexWithAlpha(initialColor)) }
 
     val hueColor = remember(hue) { Color.hsv(hue, 1f, 1f) }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.padding(5.dp)
     ) {
-
         // --- Gradient + Hue selectors ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(240.dp),
+                .height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -80,6 +72,7 @@ fun GradientColorPicker(
             Box(
                 modifier = Modifier
                     .weight(1f)
+                    .aspectRatio(1f)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(8.dp))
                     .background(Brush.horizontalGradient(listOf(Color.White, hueColor)))
@@ -108,7 +101,6 @@ fun GradientColorPicker(
                                 sat = (pos.x / pickerSize).coerceIn(0f, 1f)
                                 value = 1f - (pos.y / pickerSize).coerceIn(0f, 1f)
                                 selectedColor = Color.hsv(hue, sat, value)
-                                hexText = toHexWithAlpha(selectedColor.copy(alpha = alpha))
                                 onColorSelected(selectedColor)
                             },
                             onDrag = { change, _ ->
@@ -116,7 +108,6 @@ fun GradientColorPicker(
                                 sat = (change.position.x / pickerSize).coerceIn(0f, 1f)
                                 value = 1f - (change.position.y / pickerSize).coerceIn(0f, 1f)
                                 selectedColor = Color.hsv(hue, sat, value)
-                                hexText = toHexWithAlpha(selectedColor.copy(alpha = alpha))
                                 onColorSelected(selectedColor)
                             }
                         )
@@ -149,63 +140,16 @@ fun GradientColorPicker(
                             onDragStart = { pos ->
                                 hue = (1 - pos.y / size.height).coerceIn(0f, 1f) * 360f
                                 selectedColor = Color.hsv(hue, sat, value)
-                                hexText = toHexWithAlpha(selectedColor.copy(alpha = alpha))
                                 onColorSelected(selectedColor)
                             },
                             onDrag = { change, _ ->
                                 hue = (1 - change.position.y / size.height).coerceIn(0f, 1f) * 360f
                                 selectedColor = Color.hsv(hue, sat, value)
-                                hexText = toHexWithAlpha(selectedColor.copy(alpha = alpha))
                                 onColorSelected(selectedColor)
                             }
                         )
                     }
             )
         }
-
-
-        SliderWithLabel(
-            label = "Transparency",
-            showValue = false,
-            value = alpha,
-            color = MaterialTheme.colorScheme.primary
-        ) {
-            alpha = it
-            selectedColor = selectedColor.copy(alpha = alpha)
-            hexText = toHexWithAlpha(selectedColor)
-            onColorSelected(selectedColor)
-        }
-
-        // --- HEX entry ---
-        OutlinedTextField(
-            value = hexText,
-            onValueChange = {
-                hexText = it
-                runCatching {
-                    if (it.startsWith("#")) {
-                        selectedColor = Color(it.toColorInt())
-                        alpha = parseAlpha(it)
-                    }
-                }
-                onColorSelected(selectedColor)
-            },
-            label = { Text("HEX") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
-
-
-// --- Utility: extract alpha from hex like #RRGGBBAA ---
-private fun parseAlpha(hex: String): Float {
-    return try {
-        if (hex.length == 9) {
-            val alphaHex = hex.takeLast(2)
-            alphaHex.toInt(16) / 255f
-        } else 1f
-    } catch (_: Exception) {
-        1f
     }
 }

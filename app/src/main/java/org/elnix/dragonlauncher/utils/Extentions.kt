@@ -59,6 +59,12 @@ fun Context.copyToClipboard(text: String) {
     showToast("")
 }
 
+fun Context.pasteClipboard(): String? {
+    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = clipboard.primaryClip ?: return null
+    if (clip.itemCount == 0) return null
+    return clip.getItemAt(0).coerceToText(this)?.toString()
+}
 
 
 fun Context.openUrl(url: String) {

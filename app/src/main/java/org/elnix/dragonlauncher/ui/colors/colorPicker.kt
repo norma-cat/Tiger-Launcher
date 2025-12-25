@@ -21,14 +21,15 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Shuffle
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,15 +45,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import kotlinx.coroutines.launch
+import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.helpers.ColorPickerMode
 import org.elnix.dragonlauncher.data.helpers.colorPickerText
 import org.elnix.dragonlauncher.data.stores.ColorModesSettingsStore.getColorPickerMode
 import org.elnix.dragonlauncher.data.stores.ColorModesSettingsStore.setColorPickerMode
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.ui.components.CustomAlertDialog
+import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
+import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.utils.colors.adjustBrightness
 import org.elnix.dragonlauncher.utils.colors.randomColor
+import org.elnix.dragonlauncher.utils.copyToClipboard
+import org.elnix.dragonlauncher.utils.pasteClipboard
 
 @Composable
 fun ColorPickerRow(
@@ -141,30 +150,25 @@ fun ColorPickerRow(
     }
 
     if (showPicker) {
-        AlertDialog(
+        CustomAlertDialog(
+            modifier = modifier.padding(15.dp),
             onDismissRequest = { showPicker = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Restore,
+                    contentDescription = "Reset Color",
+                    tint = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .padding(8.dp)
+                        .clickable { actualColor = defaultColor }
+                )
+            },
             title = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-
-                    Icon(
-                        imageVector = Icons.Default.Restore,
-                        contentDescription = "Reset Color",
-                        tint = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .padding(8.dp)
-                            .clickable { actualColor = defaultColor }
-                    )
-
-                    Spacer(Modifier.width(15.dp))
-
-                    Text(
-                        text = label,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                Text(
+                    text = label,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             },
             text = {
                 ColorPicker(
@@ -173,26 +177,15 @@ fun ColorPickerRow(
                 )
             },
             confirmButton = {
-                Button(
-                    onClick = {
-                        onColorPicked(actualColor)
-                        showPicker = false
-                    },
-                    colors = AppObjectsColors.buttonColors(),
-                    shape = RoundedCornerShape(12.dp)
+                ValidateCancelButtons(
+                    onCancel = { showPicker = false}
                 ) {
-                    Text("Save")
+                    onColorPicked(actualColor)
+                    showPicker = false
                 }
             },
-            dismissButton = {
-                TextButton(
-                    onClick = { showPicker = false },
-                    colors = AppObjectsColors.cancelButtonColors()
-                ) {
-                    Text("Close")
-                }
-            },
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surface,
+            alignment = Alignment.Center
         )
     }
 }
@@ -213,17 +206,19 @@ private fun ColorPicker(
     val initialPage = remember(savedMode) { pickerModes.indexOf(savedMode) }
     val pagerState = rememberPagerState(initialPage = initialPage) { pickerModes.size }
 
+    var hexText by remember { mutableStateOf(toHexWithAlpha(color)) }
+
+    LaunchedEffect(color) {
+        hexText = toHexWithAlpha(color)
+    }
+
     // Save the current page as mode whenever changed
     LaunchedEffect(pagerState.currentPage) {
         val currentMode = pickerModes[pagerState.currentPage]
         setColorPickerMode(ctx, currentMode)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(520.dp)
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         // Tabs to indicate and jump
         Row(
             Modifier.fillMaxWidth(),
@@ -233,6 +228,7 @@ private fun ColorPicker(
                 Text(
                     text = colorPickerText(mode),
                     modifier = Modifier
+                        .weight(1f)
                         .clip(RoundedCornerShape(10.dp))
                         .clickable { scope.launch { pagerState.scrollToPage(idx) } }
                         .background(
@@ -243,6 +239,7 @@ private fun ColorPicker(
                     color = if (pagerState.currentPage == idx) MaterialTheme.colorScheme.onSecondary
                     else MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -264,7 +261,7 @@ private fun ColorPicker(
             )
         }
 
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.height(15.dp))
 
         HorizontalPager(state = pagerState) { page ->
             when (pickerModes[page]) {
@@ -283,17 +280,79 @@ private fun ColorPicker(
             }
         }
 
-        Spacer(Modifier.weight(1f))
+
+        Spacer(Modifier.height(12.dp))
+
+
+        SliderWithLabel(
+            label = stringResource(R.string.transparency),
+            showValue = false,
+            value = color.alpha,
+            color = MaterialTheme.colorScheme.primary,
+        ) { alpha -> onColorSelected(color.copy(alpha = alpha)) }
+
+        Spacer(Modifier.height(15.dp))
+
+        // --- HEX entry ---
+        val context = LocalContext.current
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = hexText,
+                onValueChange = {
+                    hexText = it
+                    runCatching {
+                        if (it.startsWith("#")) {
+                            onColorSelected(Color(it.toColorInt()))
+                        }
+                    }
+                },
+                label = { Text("HEX") },
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+
+            IconButton(
+                onClick = {
+                    context.copyToClipboard(hexText)
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ContentCopy,
+                    contentDescription = "Copy HEX"
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    context.pasteClipboard()?.let { pasted ->
+                        hexText = pasted
+                        runCatching {
+                            if (pasted.startsWith("#")) {
+                                onColorSelected(Color(pasted.toColorInt()))
+                            }
+                        }
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ContentPaste,
+                    contentDescription = "Paste HEX"
+                )
+            }
+        }
+
     }
 }
 
 
 
 
-// --- Utility: convert color → #RRGGBBAA ---
+// --- Utility: convert color → #AARRGGBB ---
 fun toHexWithAlpha(color: Color): String {
-    val argb = color.toArgb()
-    val rgb = argb and 0xFFFFFF
-    val alpha = (color.alpha * 255).toInt().coerceIn(0, 255)
-    return "#${"%06X".format(rgb)}${"%02X".format(alpha)}"
+    val argb = color.toArgb() // already AARRGGBB
+    return "#%08X".format(argb)
 }

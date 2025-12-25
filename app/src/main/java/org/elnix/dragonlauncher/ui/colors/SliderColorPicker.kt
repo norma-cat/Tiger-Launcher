@@ -51,7 +51,6 @@ fun SliderColorPicker(
             red = last.red
             green = last.green
             blue = last.blue
-            alpha = last.alpha
             onColorSelected(color)
         }
     }
@@ -59,7 +58,6 @@ fun SliderColorPicker(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.padding(5.dp)
     ) {
-
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -125,17 +123,5 @@ fun SliderColorPicker(
             pushCurrentColor()
             onColorSelected(color)
         }
-
-        SliderWithLabel(
-            label = "Transparency",
-            showValue = false,
-            value = alpha,
-            color = MaterialTheme.colorScheme.primary
-        ) {
-            alpha = it
-            pushCurrentColor()
-            onColorSelected(color)
-        }
-
     }
 }

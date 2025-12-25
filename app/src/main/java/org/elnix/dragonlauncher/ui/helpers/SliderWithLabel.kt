@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Restore
@@ -23,23 +24,24 @@ import kotlin.math.roundToInt
 /**
  * Basic float slider for simple value adjustment (0f..1f range).
  *
- * @param label Optional label displayed above the slider
- * @param showValue Whether to display current value next to label
  * @param value Current slider value (0f..1f)
  * @param color Primary color for slider and text
+ * @param label Optional label displayed above the slider
+ * @param showValue Whether to display current value next to label
  * @param onChange Callback invoked when slider value changes
  */
 @Composable
 fun SliderWithLabel(
-    label: String? =null,
-    showValue: Boolean = true,
     value: Float,
     color: Color,
+    label: String? = null,
+    showValue: Boolean = true,
     onChange: (Float) -> Unit
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .height(50.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
