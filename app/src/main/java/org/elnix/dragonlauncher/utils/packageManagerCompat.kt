@@ -3,13 +3,18 @@ package org.elnix.dragonlauncher.utils
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.LauncherApps
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.ShortcutInfo
 import android.graphics.drawable.Drawable
 import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.core.content.ContextCompat
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.ui.drawer.AppModel
+import org.elnix.dragonlauncher.utils.actions.loadDrawableAsBitmap
 
 class PackageManagerCompat(private val pm: PackageManager) {
 
@@ -85,4 +90,63 @@ class PackageManagerCompat(private val pm: PackageManager) {
     fun getResourcesForApplication(pkgName: String): android.content.res.Resources {
         return pm.getResourcesForApplication(pkgName)
     }
+}
+
+
+
+@RequiresApi(Build.VERSION_CODES.R)
+fun queryAppShortcuts(context: Context, packageName: String): List<ShortcutInfo> {
+    val launcherApps = context.getSystemService(LauncherApps::class.java) ?: return emptyList()
+    val query = LauncherApps.ShortcutQuery()
+        .setPackage(packageName)
+        .setQueryFlags(
+            LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC or
+                    LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST or
+                    LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED
+        )
+
+    val userHandle = android.os.Process.myUserHandle()
+    val shortcuts = launcherApps.getShortcuts(query, userHandle)
+    return shortcuts ?: emptyList()
+}
+
+
+fun launchShortcut(ctx: Context, pkg: String, id: String) {
+    val launcherApps = ctx.getSystemService(LauncherApps::class.java) ?: return
+    try {
+        launcherApps.startShortcut(pkg, id, null, null, android.os.Process.myUserHandle())
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+
+fun loadShortcutIcon(
+    context: Context,
+    packageName: String,
+    shortcutId: String
+): ImageBitmap? {
+    try {
+        val launcherApps = context.getSystemService(LauncherApps::class.java) ?: return null
+        val user = android.os.Process.myUserHandle()
+
+        val query = LauncherApps.ShortcutQuery()
+            .setPackage(packageName)
+            .setQueryFlags(
+                LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC or
+                        LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST or
+                        LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED
+            )
+
+        val shortcuts = launcherApps.getShortcuts(query, user) ?: return null
+        val shortcut = shortcuts.firstOrNull { it.id == shortcutId } ?: return null
+
+        val drawable = launcherApps.getShortcutIconDrawable(shortcut, 0) ?: return null
+
+        // Convert Drawable → ImageBitmap
+        return loadDrawableAsBitmap(drawable, 48, 48)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return null
 }

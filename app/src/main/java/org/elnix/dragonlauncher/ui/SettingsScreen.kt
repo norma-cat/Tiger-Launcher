@@ -18,9 +18,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -61,7 +59,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -73,8 +70,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -87,6 +82,7 @@ import org.elnix.dragonlauncher.data.UiSwipePoint
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
+import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
 import org.elnix.dragonlauncher.ui.components.dialogs.AddPointDialog
 import org.elnix.dragonlauncher.ui.helpers.RepeatingPressButton
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
@@ -94,8 +90,6 @@ import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionIcon
-import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import org.elnix.dragonlauncher.utils.circles.autoSeparate
 import org.elnix.dragonlauncher.utils.circles.normalizeAngle
@@ -459,20 +453,15 @@ fun SettingsScreen(
                                 center = Offset(px, py)
                             )
 
-                            drawCircle(
-                                color = backgroundColor,
-                                radius = POINT_RADIUS_PX,
-                                center = Offset(px, py)
-                            )
-                            drawImage(
-                                image = actionIconBitmap(
-                                    icons = icons,
-                                    action = p.action,
-                                    context = ctx,
-                                    tintColor = actionColor(p.action, extraColors)
-                                ),
-                                dstOffset = IntOffset(px.toInt() - 28, py.toInt() - 28),
-                                dstSize = IntSize(56, 56)
+                            actionsInCircle(
+                                drawScope = this,
+                                action = p.action,
+                                circleColor = circleColor ?: AmoledDefault.CircleColor,
+                                backgroundColor = backgroundColor,
+                                colorAction = actionColor(p.action, extraColors),
+                                px = px, py = py,
+                                ctx = ctx,
+                                icons = icons
                             )
                         }
                     }
@@ -961,31 +950,14 @@ fun SettingsScreen(
     if (selectedPoint != null) {
         val currentPoint = selectedPoint!!
         val currentAction = currentPoint.action
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .offset(y = offsetY)
-                .padding(top = 60.dp)
-                .alpha(alpha),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = actionIcon(currentAction, icons),
-                    contentDescription = actionLabel(currentAction),
-                    tint = actionTint(currentAction, extraColors),
-                    modifier = Modifier.size(22.dp)
-                )
-                Text(
-                    text = actionLabel(currentAction),
-                    color = actionColor(currentAction, extraColors),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
+        val label = actionLabel(currentAction)
+        AppPreviewTitle(
+            offsetY = offsetY,
+            alpha = alpha,
+            icons = icons,
+            currentAction = currentAction,
+            extraColors = extraColors,
+            label = label
+        )
     }
 }

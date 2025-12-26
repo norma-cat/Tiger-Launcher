@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.utils.actions
 
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -7,6 +8,7 @@ import androidx.core.net.toUri
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.utils.getFilePathFromUri
+import org.elnix.dragonlauncher.utils.queryAppShortcuts
 
 @Composable
 fun actionLabel(action: SwipeActionSerializable): String {
@@ -24,6 +26,33 @@ fun actionLabel(action: SwipeActionSerializable): String {
                 action.packageName
             }
         }
+
+        is SwipeActionSerializable.LaunchShortcut -> {
+            val appLabel = try {
+                pm.getApplicationLabel(
+                    pm.getApplicationInfo(action.packageName, 0)
+                ).toString()
+            } catch (_: Exception) {
+                action.packageName
+            }
+
+            val shortcutLabel = try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    queryAppShortcuts(ctx, action.packageName)
+                        .firstOrNull { it.id == action.shortcutId }
+                        ?.shortLabel
+                        ?.toString()
+                } else null
+            } catch (_: Exception) {
+                null
+            }
+
+            when {
+                !shortcutLabel.isNullOrBlank() -> "$appLabel: $shortcutLabel"
+                else -> appLabel
+            }
+        }
+
 
         is SwipeActionSerializable.OpenUrl ->
             action.url

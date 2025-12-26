@@ -9,13 +9,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -50,12 +44,12 @@ import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
+import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
 import org.elnix.dragonlauncher.ui.theme.ExtraColors
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionIcon
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -466,37 +460,19 @@ fun MainScreenOverlay(
     // Label on top of the screen to indicate the launching app
     if (hoveredAction != null && (showLaunchingAppLabel || showLaunchingAppIcon)) {
         val currentAction = hoveredAction!!.action!!
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .offset(y = offsetY)
-                .padding(top = 20.dp)
-                .alpha(alpha),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                if (showLaunchingAppIcon) {
-                    Icon(
-                        painter = actionIcon(currentAction, icons),
-                        contentDescription = actionLabel(currentAction),
-                        tint = actionTint(currentAction, extraColors),
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-                if (showLaunchingAppLabel) {
-                    Text(
-                        text = actionLabel(currentAction),
-                        color = actionColor(currentAction, extraColors),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
+        val label = actionLabel(currentAction)
+        AppPreviewTitle(
+            offsetY = offsetY,
+            alpha = alpha,
+            icons = icons,
+            currentAction = currentAction,
+            extraColors = extraColors,
+            label = label,
+            topPadding = 20.dp
+        )
     }
+
+
     // Debug to test calendar and alarms opening
 //    Row(
 //        modifier = Modifier.fillMaxWidth()

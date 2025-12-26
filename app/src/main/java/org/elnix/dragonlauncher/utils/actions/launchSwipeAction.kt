@@ -7,6 +7,7 @@ import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.services.SystemControl
 import org.elnix.dragonlauncher.utils.expandQuickActionsDrawer
 import org.elnix.dragonlauncher.utils.hasUriReadPermission
+import org.elnix.dragonlauncher.utils.launchShortcut
 import org.elnix.dragonlauncher.utils.showToast
 
 
@@ -44,6 +45,11 @@ fun launchSwipeAction(
                 }
             }
         }
+
+        is SwipeActionSerializable.LaunchShortcut -> {
+            launchShortcut(ctx, action.packageName, action.shortcutId)
+        }
+
 
         is SwipeActionSerializable.OpenUrl -> {
             val i = Intent(Intent.ACTION_VIEW, action.url.toUri())

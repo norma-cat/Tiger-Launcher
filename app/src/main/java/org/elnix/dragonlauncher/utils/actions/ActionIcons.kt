@@ -16,6 +16,8 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.data.targetPackage
+import org.elnix.dragonlauncher.utils.loadShortcutIcon
 
 @Composable
 fun appIcon(
@@ -30,40 +32,6 @@ fun appIcon(
     }
 }
 
-@Composable
-fun actionIcon(
-    action: SwipeActionSerializable,
-    icons: Map<String, ImageBitmap>? = null
-): Painter = when (action) {
-
-    is SwipeActionSerializable.LaunchApp ->
-        appIcon(
-            packageName = action.packageName,
-            icons = icons
-        )
-
-    is SwipeActionSerializable.OpenUrl ->
-        painterResource(R.drawable.ic_action_web)
-
-    SwipeActionSerializable.NotificationShade ->
-        painterResource(R.drawable.ic_action_notification)
-
-    SwipeActionSerializable.ControlPanel ->
-        painterResource(R.drawable.ic_action_grid)
-
-    SwipeActionSerializable.OpenAppDrawer ->
-        painterResource(R.drawable.ic_action_drawer)
-
-    SwipeActionSerializable.OpenDragonLauncherSettings ->
-        painterResource(R.drawable.dragon_launcher_foreground)
-
-    SwipeActionSerializable.Lock -> painterResource(R.drawable.ic_action_lock)
-    is SwipeActionSerializable.OpenFile -> painterResource(R.drawable.ic_action_open_file)
-    SwipeActionSerializable.ReloadApps -> painterResource(R.drawable.ic_action_reload)
-    SwipeActionSerializable.OpenRecentApps -> painterResource(R.drawable.ic_action_recent)
-}
-
-
 
 fun actionIconBitmap(
     icons: Map<String, ImageBitmap>,
@@ -72,7 +40,11 @@ fun actionIconBitmap(
     tintColor: Color
 ): ImageBitmap {
     val bitmap = createUntintedBitmap(action, context, icons)
-    return if (action is SwipeActionSerializable.LaunchApp || action is SwipeActionSerializable.OpenDragonLauncherSettings) {
+    return if (
+        action is SwipeActionSerializable.LaunchApp ||
+        action is SwipeActionSerializable.LaunchShortcut ||
+        action is SwipeActionSerializable.OpenDragonLauncherSettings
+    ) {
         bitmap
     } else {
         tintBitmap(bitmap, tintColor)
@@ -81,10 +53,18 @@ fun actionIconBitmap(
 
 private fun createUntintedBitmap(action: SwipeActionSerializable, context: Context, icons: Map<String, ImageBitmap>): ImageBitmap {
     return when (action) {
-        is SwipeActionSerializable.LaunchApp -> {
+        is SwipeActionSerializable.LaunchApp,
+        is SwipeActionSerializable.LaunchShortcut -> {
+            val pkg = action.targetPackage()!!
+
+            if (action is SwipeActionSerializable.LaunchShortcut) {
+                val shortcutIcon = loadShortcutIcon(context, pkg, action.shortcutId)
+                if (shortcutIcon != null) return shortcutIcon
+            }
+
             try {
-                icons[action.packageName] ?: loadDrawableAsBitmap(
-                    context.packageManager.getApplicationIcon(action.packageName),
+                icons[pkg] ?: loadDrawableAsBitmap(
+                    context.packageManager.getApplicationIcon(pkg),
                     48,
                     48
                 )
@@ -140,7 +120,7 @@ private fun createDefaultBitmap(): ImageBitmap {
 }
 
 
-private fun loadDrawableResAsBitmap(context: Context, resId: Int): ImageBitmap {
+fun loadDrawableResAsBitmap(context: Context, resId: Int): ImageBitmap {
     val drawable = ContextCompat.getDrawable(context, resId)
         ?: return createDefaultBitmap()
 

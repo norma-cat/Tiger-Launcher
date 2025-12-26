@@ -1,5 +1,8 @@
 package org.elnix.dragonlauncher.ui.components.dialogs
 
+import android.content.pm.ShortcutInfo
+import android.os.Build
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,8 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -36,12 +39,15 @@ import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.actionTint
+import org.elnix.dragonlauncher.ui.drawer.AppModel
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionIcon
+import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.actionLabel
+import org.elnix.dragonlauncher.utils.actions.loadDrawableResAsBitmap
 import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
+import org.elnix.dragonlauncher.utils.queryAppShortcuts
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable
@@ -71,12 +77,20 @@ fun AddPointDialog(
         SwipeActionSerializable.OpenDragonLauncherSettings
     )
 
+    val icons by appsViewModel.icons.collectAsState()
+
     val gridSize by DrawerSettingsStore.getGridSize(ctx)
         .collectAsState(initial = 1)
     val showIcons by DrawerSettingsStore.getShowAppIconsInDrawer(ctx)
         .collectAsState(initial = true)
     val showLabels by DrawerSettingsStore.getShowAppLabelsInDrawer(ctx)
         .collectAsState(initial = true)
+
+
+    var selectedApp by remember { mutableStateOf<AppModel?>(null) }
+    var shortcutDialogVisible by remember { mutableStateOf(false) }
+    var shortcuts by remember { mutableStateOf<List<ShortcutInfo>>(emptyList()) }
+
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -99,6 +113,7 @@ fun AddPointDialog(
                         is SwipeActionSerializable.LaunchApp -> {
                             AddPointColumn(
                                 action = action,
+                                icons = icons,
                                 onSelected = { showAppPicker = true }
                             )
                             Spacer(Modifier.height(8.dp))
@@ -108,6 +123,7 @@ fun AddPointDialog(
                         is SwipeActionSerializable.OpenUrl -> {
                             AddPointColumn(
                                 action = action,
+                                icons = icons,
                                 onSelected = { showUrlInput = true }
                             )
                             Spacer(Modifier.height(8.dp))
@@ -117,6 +133,7 @@ fun AddPointDialog(
                         is SwipeActionSerializable.OpenFile -> {
                             AddPointColumn(
                                 action = action,
+                                icons = icons,
                                 onSelected = { showFilePicker = true }
                             )
                             Spacer(Modifier.height(8.dp))
@@ -126,6 +143,7 @@ fun AddPointDialog(
                         else -> {
                             AddPointColumn(
                                 action = action,
+                                icons = icons,
                                 onSelected = { onActionSelected(action) }
                             )
                             Spacer(Modifier.height(8.dp))
@@ -145,9 +163,24 @@ fun AddPointDialog(
             showIcons = showIcons,
             showLabels = showLabels,
             onDismiss = { showAppPicker = false },
-            onAppSelected = {
-                onActionSelected(it)
-                showAppPicker = false
+            onAppSelected = { app ->
+
+
+                val list = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    queryAppShortcuts(ctx, app.packageName)
+                } else {
+                    emptyList()
+                }
+
+                Log.e("Shortcuts", list.toString())
+
+                if (list.isNotEmpty()) {
+                    selectedApp = app
+                    shortcuts = list
+                    shortcutDialogVisible = true
+                } else {
+                    onActionSelected(SwipeActionSerializable.LaunchApp(app.packageName))
+                }
             }
         )
     }
@@ -171,20 +204,44 @@ fun AddPointDialog(
             }
         )
     }
+
+    if (shortcutDialogVisible && selectedApp != null) {
+        AppShortcutPickerDialog(
+            app = selectedApp!!,
+            icons = icons,
+            shortcuts = shortcuts,
+            onDismiss = { shortcutDialogVisible = false },
+            onShortcutSelected = {pkg, id ->
+                onActionSelected(SwipeActionSerializable.LaunchShortcut(pkg, id))
+                shortcutDialogVisible = false
+            },
+            onOpenApp = {
+                onActionSelected(SwipeActionSerializable.LaunchApp(selectedApp!!.packageName))
+                onDismiss()
+            }
+        )
+    }
 }
 
 
 @Composable
 fun AddPointColumn(
     action: SwipeActionSerializable,
+    icons: Map<String, ImageBitmap>,
     onSelected: () -> Unit
 ) {
+    val ctx = LocalContext.current
     val extraColors = LocalExtraColors.current
 
 
     val icon = when(action) {
-        is SwipeActionSerializable.LaunchApp -> painterResource(R.drawable.ic_app_grid)
-        else -> actionIcon(action)
+        is SwipeActionSerializable.LaunchApp -> loadDrawableResAsBitmap(ctx, R.drawable.ic_app_grid)
+        else -> actionIconBitmap(
+            icons,
+            action,
+            ctx,
+            tintColor = actionColor(action, extraColors)
+        )
     }
 
     val name = when(action) {
@@ -210,7 +267,7 @@ fun AddPointColumn(
             textAlign = TextAlign.Center
         )
         Icon(
-            painter = icon,
+            bitmap = icon,
             contentDescription = action.toString(),
             tint = actionTint(action, extraColors),
             modifier = Modifier.size(30.dp)

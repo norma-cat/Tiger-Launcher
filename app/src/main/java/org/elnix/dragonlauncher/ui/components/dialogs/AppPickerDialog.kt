@@ -42,7 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.ui.drawer.AppModel
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.elnix.dragonlauncher.utils.colors.adjustBrightness
@@ -58,7 +58,7 @@ fun AppPickerDialog(
     showIcons: Boolean,
     showLabels: Boolean,
     onDismiss: () -> Unit,
-    onAppSelected: (SwipeActionSerializable.LaunchApp) -> Unit
+    onAppSelected: (AppModel) -> Unit
 ) {
     val workspaceState by workspaceViewModel.enabledState.collectAsState()
     val workspaces = workspaceState.workspaces
@@ -206,7 +206,7 @@ fun AppPickerDialog(
                     showIcons = showIcons,
                     showLabels = showLabels
                 ) {
-                    onAppSelected(SwipeActionSerializable.LaunchApp(it.packageName))
+                    onAppSelected(it)
                     onDismiss()
                 }
             }

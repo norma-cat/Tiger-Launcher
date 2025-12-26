@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +38,7 @@ import org.elnix.dragonlauncher.ui.actionTint
 import org.elnix.dragonlauncher.ui.components.dialogs.AddPointDialog
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionIcon
+import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
@@ -58,13 +59,14 @@ fun CustomActionSelector(
     onToggle: (Boolean) -> Unit,
     onSelected: (SwipeActionSerializable) -> Unit
 ) {
+    val extraColors = LocalExtraColors.current
+    val ctx = LocalContext.current
+
     var showDialog by remember { mutableStateOf(false) }
 
     val baseModifier = if (label != null) Modifier.fillMaxWidth() else Modifier.wrapContentWidth()
 
     val toggled = currentAction != null
-
-    val extraColors = LocalExtraColors.current
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -95,7 +97,12 @@ fun CustomActionSelector(
                     .padding(start = 12.dp)
             ) {
                 Icon(
-                    painter = actionIcon(currentAction, icons),
+                    bitmap = actionIconBitmap(
+                        icons = icons,
+                        action = currentAction,
+                        context = ctx,
+                        tintColor = actionColor(currentAction, extraColors)
+                    ),
                     contentDescription = actionLabel(currentAction),
                     tint = actionTint(currentAction, extraColors),
                     modifier = Modifier.size(22.dp)

@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.data
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
@@ -26,6 +27,12 @@ data class SwipePointSerializable(
 @Serializable
 sealed class SwipeActionSerializable {
     @Serializable data class LaunchApp(val packageName: String) : SwipeActionSerializable()
+    @Serializable
+    data class LaunchShortcut(
+        val packageName: String,
+        val shortcutId: String
+    ) : SwipeActionSerializable()
+
     @Serializable data class OpenUrl(val url: String) : SwipeActionSerializable()
     @Serializable data class OpenFile(
         val uri: String,
@@ -71,6 +78,11 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
             is SwipeActionSerializable.Lock -> { obj.addProperty("type", "Lock") }
             is SwipeActionSerializable.ReloadApps -> { obj.addProperty("type", "ReloadApps") }
             is SwipeActionSerializable.OpenRecentApps -> { obj.addProperty("type", "OpenRecentApps") }
+            is SwipeActionSerializable.LaunchShortcut -> {
+                obj.addProperty("type", "LaunchShortcut")
+                obj.addProperty("packageName", src.packageName)
+                obj.addProperty("shortcutId", src.shortcutId)
+            }
         }
         return obj
     }
@@ -96,6 +108,10 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
             "Lock" -> SwipeActionSerializable.Lock
             "ReloadApps" -> SwipeActionSerializable.ReloadApps
             "OpenRecentApps" -> SwipeActionSerializable.OpenRecentApps
+            "LaunchShortcut" -> SwipeActionSerializable.LaunchShortcut(
+                obj.get("packageName").asString,
+                obj.get("shortcutId").asString
+            )
             else -> null
         }
     }
@@ -121,7 +137,8 @@ object SwipeJson {
         if (jsonString.isBlank()) return emptyList()
         return try {
             gson.fromJson(jsonString, listType)
-        } catch (_: Throwable) {
+        } catch (e: Throwable) {
+            Log.e("SwipeJson", "Decode failed: ${e.message}", e)
             emptyList()
         }
     }
@@ -131,6 +148,8 @@ object SwipeJson {
     fun encodeAction(action: SwipeActionSerializable): String = when (action) {
         is SwipeActionSerializable.LaunchApp ->
             """{"type":"LaunchApp","packageName":"${action.packageName}"}"""
+        is SwipeActionSerializable.LaunchShortcut ->
+            """{"type":"LaunchShortcut","packageName":"${action.packageName}","shortcutId":"${action.shortcutId}"}"""
         is SwipeActionSerializable.OpenUrl ->
             """{"type":"OpenUrl","url":"${action.url}"}"""
         is SwipeActionSerializable.OpenFile ->
@@ -158,4 +177,11 @@ object SwipeJson {
             null
         }
     }
+}
+
+
+fun SwipeActionSerializable.targetPackage(): String? = when (this) {
+    is SwipeActionSerializable.LaunchApp -> packageName
+    is SwipeActionSerializable.LaunchShortcut -> packageName
+    else -> null
 }
