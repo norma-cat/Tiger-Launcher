@@ -144,6 +144,9 @@ fun MainScreen(
 
     val showConnectivity by StatusBarSettingsStore.getShowConnectivity(ctx)
         .collectAsState(initial = true)
+    val showNextAlarm by StatusBarSettingsStore.getShowNextAlarm(ctx)
+        .collectAsState(true)
+
 
 
     val systemInsets = WindowInsets.systemBars.asPaddingValues()
@@ -294,7 +297,8 @@ fun MainScreen(
                 dateFormatter = dateFormatter,
                 showNotifications = showNotifications,
                 showBattery = showBattery,
-                showConnectivity = showConnectivity
+                showConnectivity = showConnectivity,
+                showNextAlarm = showNextAlarm
             )
         }
 

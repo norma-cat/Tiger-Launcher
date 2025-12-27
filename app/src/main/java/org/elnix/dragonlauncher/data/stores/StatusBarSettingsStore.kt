@@ -16,6 +16,17 @@ import org.elnix.dragonlauncher.data.getIntStrict
 import org.elnix.dragonlauncher.data.getStringStrict
 import org.elnix.dragonlauncher.data.putIfNonDefault
 import org.elnix.dragonlauncher.data.statusBarDatastore
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore.Keys.BAR_BACKGROUND_COLOR
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore.Keys.BAR_TEXT_COLOR
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore.Keys.DATE_FORMATTER
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore.Keys.SHOW_BATTERY
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore.Keys.SHOW_CONNECTIVITY
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore.Keys.SHOW_DATE
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore.Keys.SHOW_NEXT_ALARM
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore.Keys.SHOW_NOTIFICATIONS
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore.Keys.SHOW_STATUS_BAR
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore.Keys.SHOW_TIME
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore.Keys.TIME_FORMATTER
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
 
 object StatusBarSettingsStore : BaseSettingsStore() {
@@ -32,7 +43,8 @@ object StatusBarSettingsStore : BaseSettingsStore() {
         val dateFormatter: String = "MMM dd",
         val showNotifications: Boolean = false,
         val showBattery: Boolean = true,
-        val showConnectivity: Boolean = false
+        val showConnectivity: Boolean = false,
+        val showNextAlarm: Boolean = true
     )
 
     private val defaults = SettingsBackup()
@@ -48,6 +60,7 @@ object StatusBarSettingsStore : BaseSettingsStore() {
         val SHOW_NOTIFICATIONS = booleanPreferencesKey(SettingsBackup::showNotifications.name)
         val SHOW_BATTERY = booleanPreferencesKey(SettingsBackup::showBattery.name)
         val SHOW_CONNECTIVITY = booleanPreferencesKey(SettingsBackup::showConnectivity.name)
+        val SHOW_NEXT_ALARM = booleanPreferencesKey("showNextAlarm")
 
         val ALL = listOf(
             SHOW_STATUS_BAR,
@@ -66,90 +79,97 @@ object StatusBarSettingsStore : BaseSettingsStore() {
     /* ───────────── visibility ───────────── */
 
     fun getShowStatusBar(ctx: Context): Flow<Boolean> =
-        ctx.statusBarDatastore.data.map { it[Keys.SHOW_STATUS_BAR] ?: defaults.showStatusBar }
+        ctx.statusBarDatastore.data.map { it[SHOW_STATUS_BAR] ?: defaults.showStatusBar }
 
     suspend fun setShowStatusBar(ctx: Context, value: Boolean) {
-        ctx.statusBarDatastore.edit { it[Keys.SHOW_STATUS_BAR] = value }
+        ctx.statusBarDatastore.edit { it[SHOW_STATUS_BAR] = value }
     }
 
     /* ───────────── colors ───────────── */
 
     fun getBarBackgroundColor(ctx: Context): Flow<Color> =
         ctx.statusBarDatastore.data.map {
-            Color(it[Keys.BAR_BACKGROUND_COLOR] ?: defaults.barBackgroundColor)
+            Color(it[BAR_BACKGROUND_COLOR] ?: defaults.barBackgroundColor)
         }
 
     suspend fun setBarBackgroundColor(ctx: Context, color: Color) {
         ctx.statusBarDatastore.edit {
-            it[Keys.BAR_BACKGROUND_COLOR] = color.toArgb()
+            it[BAR_BACKGROUND_COLOR] = color.toArgb()
         }
     }
 
     fun getBarTextColor(ctx: Context): Flow<Color> =
         ctx.statusBarDatastore.data.map {
-            Color(it[Keys.BAR_TEXT_COLOR] ?: defaults.barTextColor)
+            Color(it[BAR_TEXT_COLOR] ?: defaults.barTextColor)
         }
 
     suspend fun setBarTextColor(ctx: Context, color: Color) {
         ctx.statusBarDatastore.edit {
-            it[Keys.BAR_TEXT_COLOR] = color.toArgb()
+            it[BAR_TEXT_COLOR] = color.toArgb()
         }
     }
 
     /* ───────────── existing flags ───────────── */
 
     fun getShowTime(ctx: Context): Flow<Boolean> =
-        ctx.statusBarDatastore.data.map { it[Keys.SHOW_TIME] ?: defaults.showTime }
+        ctx.statusBarDatastore.data.map { it[SHOW_TIME] ?: defaults.showTime }
 
     suspend fun setShowTime(ctx: Context, value: Boolean) {
-        ctx.statusBarDatastore.edit { it[Keys.SHOW_TIME] = value }
+        ctx.statusBarDatastore.edit { it[SHOW_TIME] = value }
     }
 
     fun getShowDate(ctx: Context): Flow<Boolean> =
-        ctx.statusBarDatastore.data.map { it[Keys.SHOW_DATE] ?: defaults.showDate }
+        ctx.statusBarDatastore.data.map { it[SHOW_DATE] ?: defaults.showDate }
 
     suspend fun setShowDate(ctx: Context, value: Boolean) {
-        ctx.statusBarDatastore.edit { it[Keys.SHOW_DATE] = value }
+        ctx.statusBarDatastore.edit { it[SHOW_DATE] = value }
     }
 
 
     fun getTimeFormatter(ctx: Context): Flow<String> =
         ctx.statusBarDatastore.data.map {
-            it[Keys.TIME_FORMATTER] ?: defaults.timeFormatter
+            it[TIME_FORMATTER] ?: defaults.timeFormatter
         }
 
     suspend fun setTimeFormatter(ctx: Context, formatter: String) {
-        ctx.statusBarDatastore.edit { it[Keys.TIME_FORMATTER] = formatter }
+        ctx.statusBarDatastore.edit { it[TIME_FORMATTER] = formatter }
     }
 
     fun getDateFormatter(ctx: Context): Flow<String> =
         ctx.statusBarDatastore.data.map {
-            it[Keys.DATE_FORMATTER] ?: defaults.dateFormatter
+            it[DATE_FORMATTER] ?: defaults.dateFormatter
         }
 
     suspend fun setDateFormatter(ctx: Context, formatter: String) {
-        ctx.statusBarDatastore.edit { it[Keys.DATE_FORMATTER] = formatter }
+        ctx.statusBarDatastore.edit { it[DATE_FORMATTER] = formatter }
     }
 
     fun getShowNotifications(ctx: Context): Flow<Boolean> =
-        ctx.statusBarDatastore.data.map { it[Keys.SHOW_NOTIFICATIONS] ?: defaults.showNotifications }
+        ctx.statusBarDatastore.data.map { it[SHOW_NOTIFICATIONS] ?: defaults.showNotifications }
 
     suspend fun setShowNotifications(ctx: Context, value: Boolean) {
-        ctx.statusBarDatastore.edit { it[Keys.SHOW_NOTIFICATIONS] = value }
+        ctx.statusBarDatastore.edit { it[SHOW_NOTIFICATIONS] = value }
     }
 
     fun getShowBattery(ctx: Context): Flow<Boolean> =
-        ctx.statusBarDatastore.data.map { it[Keys.SHOW_BATTERY] ?: defaults.showBattery }
+        ctx.statusBarDatastore.data.map { it[SHOW_BATTERY] ?: defaults.showBattery }
 
     suspend fun setShowBattery(ctx: Context, value: Boolean) {
-        ctx.statusBarDatastore.edit { it[Keys.SHOW_BATTERY] = value }
+        ctx.statusBarDatastore.edit { it[SHOW_BATTERY] = value }
     }
 
     fun getShowConnectivity(ctx: Context): Flow<Boolean> =
-        ctx.statusBarDatastore.data.map { it[Keys.SHOW_CONNECTIVITY] ?: defaults.showConnectivity }
+        ctx.statusBarDatastore.data.map { it[SHOW_CONNECTIVITY] ?: defaults.showConnectivity }
 
     suspend fun setShowConnectivity(ctx: Context, value: Boolean) {
-        ctx.statusBarDatastore.edit { it[Keys.SHOW_CONNECTIVITY] = value }
+        ctx.statusBarDatastore.edit { it[SHOW_CONNECTIVITY] = value }
+    }
+
+    fun getShowNextAlarm(ctx: Context): Flow<Boolean> =
+        ctx.statusBarDatastore.data.map { it[SHOW_NEXT_ALARM] ?: defaults.showNextAlarm }
+
+    suspend fun setShowNextAlarm(ctx: Context, value: Boolean) {
+        ctx.statusBarDatastore.edit { it[SHOW_NEXT_ALARM] = value }
     }
 
     /* ───────────── reset / backup ───────────── */
@@ -164,50 +184,54 @@ object StatusBarSettingsStore : BaseSettingsStore() {
         val prefs = ctx.statusBarDatastore.data.first()
 
         return buildMap {
-            putIfNonDefault(Keys.SHOW_STATUS_BAR, prefs[Keys.SHOW_STATUS_BAR], defaults.showStatusBar)
-            putIfNonDefault(Keys.BAR_BACKGROUND_COLOR, prefs[Keys.BAR_BACKGROUND_COLOR], defaults.barBackgroundColor)
-            putIfNonDefault(Keys.BAR_TEXT_COLOR, prefs[Keys.BAR_TEXT_COLOR], defaults.barTextColor)
-            putIfNonDefault(Keys.SHOW_TIME, prefs[Keys.SHOW_TIME], defaults.showTime)
-            putIfNonDefault(Keys.SHOW_DATE, prefs[Keys.SHOW_DATE], defaults.showDate)
-            putIfNonDefault(Keys.TIME_FORMATTER, prefs[Keys.TIME_FORMATTER], defaults.timeFormatter)
-            putIfNonDefault(Keys.DATE_FORMATTER, prefs[Keys.DATE_FORMATTER], defaults.dateFormatter)
-            putIfNonDefault(Keys.SHOW_NOTIFICATIONS, prefs[Keys.SHOW_NOTIFICATIONS], defaults.showNotifications)
-            putIfNonDefault(Keys.SHOW_BATTERY, prefs[Keys.SHOW_BATTERY], defaults.showBattery)
-            putIfNonDefault(Keys.SHOW_CONNECTIVITY, prefs[Keys.SHOW_CONNECTIVITY], defaults.showConnectivity)
+            putIfNonDefault(SHOW_STATUS_BAR, prefs[SHOW_STATUS_BAR], defaults.showStatusBar)
+            putIfNonDefault(BAR_BACKGROUND_COLOR, prefs[BAR_BACKGROUND_COLOR], defaults.barBackgroundColor)
+            putIfNonDefault(BAR_TEXT_COLOR, prefs[BAR_TEXT_COLOR], defaults.barTextColor)
+            putIfNonDefault(SHOW_TIME, prefs[SHOW_TIME], defaults.showTime)
+            putIfNonDefault(SHOW_DATE, prefs[SHOW_DATE], defaults.showDate)
+            putIfNonDefault(TIME_FORMATTER, prefs[TIME_FORMATTER], defaults.timeFormatter)
+            putIfNonDefault(DATE_FORMATTER, prefs[DATE_FORMATTER], defaults.dateFormatter)
+            putIfNonDefault(SHOW_NOTIFICATIONS, prefs[SHOW_NOTIFICATIONS], defaults.showNotifications)
+            putIfNonDefault(SHOW_BATTERY, prefs[SHOW_BATTERY], defaults.showBattery)
+            putIfNonDefault(SHOW_CONNECTIVITY, prefs[SHOW_CONNECTIVITY], defaults.showConnectivity)
+            putIfNonDefault(SHOW_NEXT_ALARM, prefs[SHOW_NEXT_ALARM], defaults.showNextAlarm)
         }
     }
 
     suspend fun setAll(ctx: Context, backup: Map<String, Any?>) {
         ctx.statusBarDatastore.edit { prefs ->
-            prefs[Keys.SHOW_STATUS_BAR] =
-                getBooleanStrict(backup, Keys.SHOW_STATUS_BAR, defaults.showStatusBar)
+            prefs[SHOW_STATUS_BAR] =
+                getBooleanStrict(backup, SHOW_STATUS_BAR, defaults.showStatusBar)
 
-            prefs[Keys.BAR_BACKGROUND_COLOR] =
-                getIntStrict(backup, Keys.BAR_BACKGROUND_COLOR, defaults.barBackgroundColor)
+            prefs[BAR_BACKGROUND_COLOR] =
+                getIntStrict(backup, BAR_BACKGROUND_COLOR, defaults.barBackgroundColor)
 
-            prefs[Keys.BAR_TEXT_COLOR] =
-                getIntStrict(backup, Keys.BAR_TEXT_COLOR, defaults.barTextColor)
+            prefs[BAR_TEXT_COLOR] =
+                getIntStrict(backup, BAR_TEXT_COLOR, defaults.barTextColor)
 
-            prefs[Keys.SHOW_TIME] =
-                getBooleanStrict(backup, Keys.SHOW_TIME, defaults.showTime)
+            prefs[SHOW_TIME] =
+                getBooleanStrict(backup, SHOW_TIME, defaults.showTime)
 
-            prefs[Keys.SHOW_DATE] =
-                getBooleanStrict(backup, Keys.SHOW_DATE, defaults.showDate)
+            prefs[SHOW_DATE] =
+                getBooleanStrict(backup, SHOW_DATE, defaults.showDate)
 
-            prefs[Keys.TIME_FORMATTER] =
-                getStringStrict(backup, Keys.TIME_FORMATTER, defaults.timeFormatter)
+            prefs[TIME_FORMATTER] =
+                getStringStrict(backup, TIME_FORMATTER, defaults.timeFormatter)
 
-            prefs[Keys.DATE_FORMATTER] =
-                getStringStrict(backup, Keys.DATE_FORMATTER, defaults.dateFormatter)
+            prefs[DATE_FORMATTER] =
+                getStringStrict(backup, DATE_FORMATTER, defaults.dateFormatter)
 
-            prefs[Keys.SHOW_NOTIFICATIONS] =
-                getBooleanStrict(backup, Keys.SHOW_NOTIFICATIONS, defaults.showNotifications)
+            prefs[SHOW_NOTIFICATIONS] =
+                getBooleanStrict(backup, SHOW_NOTIFICATIONS, defaults.showNotifications)
 
-            prefs[Keys.SHOW_BATTERY] =
-                getBooleanStrict(backup, Keys.SHOW_BATTERY, defaults.showBattery)
+            prefs[SHOW_BATTERY] =
+                getBooleanStrict(backup, SHOW_BATTERY, defaults.showBattery)
 
-            prefs[Keys.SHOW_CONNECTIVITY] =
-                getBooleanStrict(backup, Keys.SHOW_CONNECTIVITY, defaults.showConnectivity)
+            prefs[SHOW_CONNECTIVITY] =
+                getBooleanStrict(backup, SHOW_CONNECTIVITY, defaults.showConnectivity)
+
+            prefs[SHOW_NEXT_ALARM] =
+                getBooleanStrict(backup, SHOW_NEXT_ALARM, defaults.showNextAlarm)
         }
     }
 }

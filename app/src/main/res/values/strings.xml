@@ -210,4 +210,9 @@
     <string name="date_format_title">Date Format</string>
     <string name="date_format_examples">Examples: MMM dd, E dd, dd/MM, MMMM d</string>
     <string name="invalid_format">Invalid format. Check examples above.</string>
+    <string name="next_alarm_at">Alarm %1$s</string>
+    <string name="no_alarm_permission">Alarm access denied</string>
+    <string name="no_alarms_set">No alarms</string>
+    <string name="show_next_alarm">Show Next Alarm</string>
+
 </resources>

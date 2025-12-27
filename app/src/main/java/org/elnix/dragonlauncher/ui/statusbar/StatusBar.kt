@@ -22,7 +22,8 @@ fun StatusBar(
     dateFormatter: String,
     showNotifications: Boolean,
     showBattery: Boolean,
-    showConnectivity: Boolean
+    showConnectivity: Boolean,
+    showNextAlarm: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -41,6 +42,11 @@ fun StatusBar(
         )
 
         Spacer(modifier = Modifier.weight(1f))
+
+        if (showNextAlarm) {
+            StatusBarNextAlarm(textColor = textColor)
+            Spacer(modifier = Modifier.width(6.dp))
+        }
 
         if (showNotifications) {
             StatusBarNotifications()

@@ -68,6 +68,8 @@ fun StatusBarTab(
     val showConnectivity by StatusBarSettingsStore.getShowConnectivity(ctx)
         .collectAsState(initial = false)
 
+    val showNextAlarm by StatusBarSettingsStore.getShowNextAlarm(ctx)
+        .collectAsState(true)
 
 
 
@@ -82,7 +84,8 @@ fun StatusBarTab(
             dateFormatter = dateFormatter,
             showNotifications = showNotifications,
             showBattery = showBattery,
-            showConnectivity = showConnectivity
+            showConnectivity = showConnectivity,
+            showNextAlarm = showNextAlarm
         )
 
         SettingsLazyHeader(
@@ -262,6 +265,16 @@ fun StatusBarTab(
                         modifier = Modifier.fillMaxWidth(),
                         colors = AppObjectsColors.outlinedTextFieldColors()
                     )
+                }
+            }
+
+            item {
+                SwitchRow(
+                    state = showNextAlarm,
+                    text = stringResource(R.string.show_next_alarm),
+                    subText = "Requires exact alarm permission"
+                ) {
+                    scope.launch { StatusBarSettingsStore.setShowNextAlarm(ctx, it) }
                 }
             }
 
