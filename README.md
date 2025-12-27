@@ -66,6 +66,8 @@ Dragon Launcher was inspired by [CCLauncher](https://github.com/mlm-games/CCLaun
 Contributions are welcome! Feel free to submit pull requests or open issues.
 
 
+You may join the [discord serve](https://discord.gg/XXKXQeXpvF)r to discuss more easily about changes in the project:
+
 ---
 ## License
 
