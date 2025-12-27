@@ -31,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -88,6 +89,8 @@ fun AppDrawerScreen(
     val workspaceState by workspaceViewModel.enabledState.collectAsState()
     val workspaces = workspaceState.workspaces
     val overrides = workspaceState.appOverrides
+
+    val reloadTrigger by appsViewModel.reloadTrigger.collectAsState()
 
     val selectedWorkspaceId by workspaceViewModel.selectedWorkspaceId.collectAsState()
     val initialIndex = workspaces.indexOfFirst { it.id == selectedWorkspaceId }
@@ -259,57 +262,58 @@ fun AppDrawerScreen(
             ) {
 
                 HorizontalPager(state = pagerState) { pageIndex ->
+                    key(reloadTrigger, workspaces[pageIndex].id) {
+                        val workspace = workspaces[pageIndex]
 
-                    val workspace = workspaces[pageIndex]
+                        val apps by appsViewModel
+                            .appsForWorkspace(workspace, overrides)
+                            .collectAsState(initial = emptyList())
 
-                    val apps by appsViewModel
-                        .appsForWorkspace(workspace, overrides)
-                        .collectAsState(initial = emptyList())
-
-                    val filteredApps by remember(searchQuery, apps) {
-                        derivedStateOf {
-                            if (searchQuery.isBlank()) apps
-                            else apps.filter {
-                                it.name.contains(searchQuery, ignoreCase = true)
+                        val filteredApps by remember(searchQuery, apps) {
+                            derivedStateOf {
+                                if (searchQuery.isBlank()) apps
+                                else apps.filter {
+                                    it.name.contains(searchQuery, ignoreCase = true)
+                                }
                             }
                         }
-                    }
 
-                    val iconsMerged = icons.toMutableMap()
-                    apps.forEach { app ->
-                        val base64 = overrides[app.packageName]?.customIconBase64
-                        if (base64 != null) {
-                            val bmp = ImageUtils.base64ToImageBitmap(base64)
-                            if (bmp != null) iconsMerged[app.packageName] = bmp
+                        val iconsMerged = icons.toMutableMap()
+                        apps.forEach { app ->
+                            val base64 = overrides[app.packageName]?.customIconBase64
+                            if (base64 != null) {
+                                val bmp = ImageUtils.base64ToImageBitmap(base64)
+                                if (bmp != null) iconsMerged[app.packageName] = bmp
+                            }
                         }
-                    }
 
-                    LaunchedEffect(filteredApps) {
-                        if (autoLaunchSingleMatch && filteredApps.size == 1 && searchQuery.isNotEmpty()) {
-                            launchSwipeAction(ctx, filteredApps.first().action)
+                        LaunchedEffect(filteredApps) {
+                            if (autoLaunchSingleMatch && filteredApps.size == 1 && searchQuery.isNotEmpty()) {
+                                launchSwipeAction(ctx, filteredApps.first().action)
+                                onClose()
+                            }
+                        }
+
+                        LaunchedEffect(haveToLaunchFirstApp) {
+                            if (haveToLaunchFirstApp) {
+                                launchSwipeAction(ctx, filteredApps.first().action)
+                                onClose()
+                            }
+                        }
+
+                        AppGrid(
+                            apps = filteredApps,
+                            icons = iconsMerged,
+                            gridSize = gridSize,
+                            txtColor = MaterialTheme.colorScheme.onSurface,
+                            showIcons = showIcons,
+                            showLabels = showLabels,
+                            onLongClick = { dialogApp = it },
+                            onClose = if (scrollDownToCloseDrawerOnTop) onClose else null
+                        ) {
+                            launchSwipeAction(ctx, it.action)
                             onClose()
                         }
-                    }
-
-                    LaunchedEffect(haveToLaunchFirstApp) {
-                        if (haveToLaunchFirstApp) {
-                            launchSwipeAction(ctx, filteredApps.first().action)
-                            onClose()
-                        }
-                    }
-
-                    AppGrid(
-                        apps = filteredApps,
-                        icons = iconsMerged,
-                        gridSize = gridSize,
-                        txtColor = MaterialTheme.colorScheme.onSurface,
-                        showIcons = showIcons,
-                        showLabels = showLabels,
-                        onLongClick = { dialogApp = it },
-                        onClose = if (scrollDownToCloseDrawerOnTop) onClose else null
-                    ) {
-                        launchSwipeAction(ctx, it.action)
-                        onClose()
                     }
                 }
             }

@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.data.stores.AppsSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.drawer.AppModel
@@ -36,6 +38,11 @@ import org.xmlpull.v1.XmlPullParser
 
 
 class AppDrawerViewModel(application: Application) : AndroidViewModel(application) {
+
+
+    private val _reloadTrigger = MutableStateFlow(0)
+    val reloadTrigger = _reloadTrigger.asStateFlow()
+
 
     private val _apps = MutableStateFlow<List<AppModel>>(emptyList())
     val allApps: StateFlow<List<AppModel>> = _apps.asStateFlow()
@@ -79,16 +86,14 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun appsForWorkspace(
         workspace: Workspace,
-        overrides: Map<String, AppOverride>
+        overrides: Map<String, AppOverride>,
     ): Flow<List<AppModel>> =
         allApps.map { list ->
             val base = when (workspace.type) {
-                WorkspaceType.ALL -> list
+                WorkspaceType.ALL, WorkspaceType.CUSTOM -> list
                 WorkspaceType.USER -> list.filter { !it.isSystem && !it.isWorkProfile && it.isLaunchable == true }
                 WorkspaceType.SYSTEM -> list.filter { it.isSystem }
                 WorkspaceType.WORK -> list.filter { it.isWorkProfile }
-                WorkspaceType.CUSTOM ->
-                    list.filter { it.packageName in workspace.appIds }
             }
 
             // May be null cause I added the removed app ids lately, so some user may still have the old app model without it
@@ -129,22 +134,30 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
      * This is used by the BroadcastReceiver.
      */
     suspend fun reloadApps(ctx: Context) {
-        val apps = pmCompat.getAllApps()
+        val apps = withContext(Dispatchers.IO) {
+            pmCompat.getAllApps()
+        }
 
         _apps.value = apps
         _icons.value = loadIcons(apps)
-        AppsSettingsStore.saveCachedApps(ctx, gson.toJson(apps))
-    }
+        _reloadTrigger.value += 1
 
-    private fun loadIcons(apps: List<AppModel>): Map<String, ImageBitmap> {
-        return apps.associate { app ->
-            val packIconName = getCachedIconMapping(app.packageName)
-            val drawable = packIconName?.let { loadIconFromPack(selectedIconPack.value?.packageName, it) }
-
-            val finalDrawable = drawable ?: pmCompat.getAppIcon(app.packageName, ctx)
-            app.packageName to loadDrawableAsBitmap(finalDrawable, 128, 128)
+        withContext(Dispatchers.IO) {
+            AppsSettingsStore.saveCachedApps(ctx, gson.toJson(apps))
         }
+        Log.e("AppsVm", "Reloaded packages.")
     }
+
+
+    private fun loadIcons(apps: List<AppModel>): Map<String, ImageBitmap> =
+        runBlocking(Dispatchers.IO) {  // Off main thread
+            apps.associate { app ->
+                val packIconName = getCachedIconMapping(app.packageName)
+                val drawable = packIconName?.let { loadIconFromPack(selectedIconPack.value?.packageName, it) }
+                val finalDrawable = drawable ?: pmCompat.getAppIcon(app.packageName, ctx)
+                app.packageName to loadDrawableAsBitmap(finalDrawable, 128, 128)
+            }
+        }
 
     @SuppressLint("DiscouragedApi")
     private fun loadIconFromPack(packPkg: String?, iconName: String): android.graphics.drawable.Drawable? {

@@ -180,7 +180,7 @@ fun MainScreen(
     }
 
     BackHandler {
-        if (backAction != null){
+        if (backAction != null) {
             launchAction(
                 SwipePointSerializable(
                     circleNumber = 0,
