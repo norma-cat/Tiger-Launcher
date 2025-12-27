@@ -20,11 +20,6 @@ object WorkspaceSettingsStore : BaseSettingsStore() {
 
     private val WORKSPACE_KEY = stringPreferencesKey(Keys.WORKSPACE_STATE)
 
-    private val defaultState = WorkspaceState(
-        workspaces = defaultWorkspaces,
-        appOverrides = emptyMap()
-    )
-
     // -------------------------------------------------------------------------
     // Backup export
     // -------------------------------------------------------------------------
