@@ -150,7 +150,16 @@ fun WelcomeScreen(
                     .weight(1f)
             ) { page ->
                 when (page) {
-                    0 -> WelcomePageIntro { settingsImportLauncher.launch(arrayOf("application/json")) }
+                    0 -> WelcomePageIntro {
+                        settingsImportLauncher.launch(
+                            arrayOf(
+                                "application/json",
+                                "text/plain",
+                                "application/octet-stream",
+                                "*/*"
+                            )
+                        )
+                    }
                     1 -> WelcomePagePrivacy()
                     2 -> WelcomePageTutorial()
                     3 -> WelcomePageTheme()

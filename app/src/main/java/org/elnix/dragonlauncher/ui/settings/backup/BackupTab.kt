@@ -51,10 +51,10 @@ import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.DataStoreName
 import org.elnix.dragonlauncher.data.stores.BackupSettingsStore
+import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
-import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
 import org.elnix.dragonlauncher.utils.formatDateTime
@@ -227,7 +227,16 @@ fun BackupTab(
         item {
             BackupButtons(
                 onExport = { showExportDialog = true },
-                onImport = { settingsImportLauncher.launch(arrayOf("application/json")) }
+                onImport = {
+                    settingsImportLauncher.launch(
+                        arrayOf(
+                            "application/json",
+                            "text/plain",
+                            "application/octet-stream",
+                            "*/*"
+                        )
+                    )
+                }
             )
         }
 
