@@ -1,0 +1,177 @@
+package org.elnix.dragonlauncher.ui.settings.customization
+
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
+import kotlinx.coroutines.launch
+import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore
+import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
+import org.elnix.dragonlauncher.ui.helpers.SwitchRow
+import org.elnix.dragonlauncher.ui.helpers.TextDivider
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.utils.openUrl
+
+@Composable
+fun StatusBarTab(
+    onBack: () -> Unit
+) {
+    val ctx = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val showStatusBar by StatusBarSettingsStore.getShowStatusBar(ctx)
+        .collectAsState(initial = true)
+
+    val statusBarBackground by StatusBarSettingsStore.getBarBackgroundColor(ctx)
+        .collectAsState(initial = Color.Transparent)
+
+    val statusBarText by StatusBarSettingsStore.getBarTextColor(ctx)
+        .collectAsState(initial = MaterialTheme.colorScheme.onBackground)
+
+    val showTime by StatusBarSettingsStore.getShowTime(ctx)
+        .collectAsState(initial = true)
+
+    val showSeconds by StatusBarSettingsStore.getShowSeconds(ctx)
+        .collectAsState(initial = true)
+
+    val showNotifications by StatusBarSettingsStore.getShowNotifications(ctx)
+        .collectAsState(initial = false)
+
+    val showBattery by StatusBarSettingsStore.getShowBattery(ctx)
+        .collectAsState(initial = true)
+
+    val showConnectivity by StatusBarSettingsStore.getShowConnectivity(ctx)
+        .collectAsState(initial = false)
+
+    SettingsLazyHeader(
+        title = stringResource(R.string.status_bar),
+        onBack = onBack,
+        helpText = stringResource(R.string.status_bar_tab_text),
+        onReset = {
+            scope.launch {
+                StatusBarSettingsStore.resetAll(ctx)
+            }
+        }
+    ) {
+
+        item {
+            Text(
+                text = "For the little nerds that uses my app, I would like a lot of feedback on this status bar, the rule I fixed to me is that Dragon will never have any network access (btw to show the connectivity icons it's annoying). You can feedback me on github issues or tell me on discord",
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+
+        item {
+            Text(
+                text = "Github Issues",
+                modifier = Modifier.clickable { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/issues/new") },
+                color = MaterialTheme.colorScheme.onBackground,
+                textDecoration = TextDecoration.Underline
+
+            )
+        }
+
+        item {
+            Text(
+                text = "Discord",
+                modifier = Modifier.clickable { ctx.openUrl("https://discord.gg/XXKXQeXpvF") },
+                color = MaterialTheme.colorScheme.onBackground,
+                textDecoration = TextDecoration.Underline
+            )
+        }
+
+        item {
+            SwitchRow(
+                state = showStatusBar,
+                text = stringResource(R.string.show_status_bar)
+            ) {
+                scope.launch {
+                    StatusBarSettingsStore.setShowStatusBar(ctx, it)
+                }
+            }
+        }
+
+        item { TextDivider(stringResource(R.string.display)) }
+
+        item {
+            ColorPickerRow(
+                label = stringResource(R.string.status_bar_background),
+                defaultColor = Color.Transparent,
+                currentColor = statusBarBackground,
+            ) {
+                scope.launch {
+                    StatusBarSettingsStore.setBarBackgroundColor(ctx, it)
+                }
+            }
+        }
+
+        item {
+            ColorPickerRow(
+                label = stringResource(R.string.status_bar_text_color),
+                defaultColor = MaterialTheme.colorScheme.onBackground,
+                currentColor = statusBarText,
+            ) {
+                scope.launch {
+                    StatusBarSettingsStore.setBarTextColor(ctx, it)
+                }
+            }
+        }
+
+        item {
+            SwitchRow(
+                state = showTime,
+                text = stringResource(R.string.show_time)
+            ) {
+                scope.launch { StatusBarSettingsStore.setShowTime(ctx, it) }
+            }
+        }
+
+        item {
+            SwitchRow(
+                state = showSeconds,
+                text = stringResource(R.string.show_seconds)
+            ) {
+                scope.launch { StatusBarSettingsStore.setShowSeconds(ctx, it) }
+            }
+        }
+
+        item {
+            SwitchRow(
+                state = showNotifications,
+                enabled = false,
+                text = stringResource(R.string.show_notifications),
+                subText = "Not implemented"
+            ) {
+                scope.launch { StatusBarSettingsStore.setShowNotifications(ctx, it) }
+            }
+        }
+
+        item {
+            SwitchRow(
+                state = showBattery,
+                text = stringResource(R.string.show_battery)
+            ) {
+                scope.launch { StatusBarSettingsStore.setShowBattery(ctx, it) }
+            }
+        }
+
+        item {
+            SwitchRow(
+                state = showConnectivity,
+                text = stringResource(R.string.show_connectivity),
+                subText = "Kinda buggy RN, so working so well, but you can try"
+            ) {
+                scope.launch { StatusBarSettingsStore.setShowConnectivity(ctx, it) }
+            }
+        }
+    }
+}

@@ -206,7 +206,8 @@ fun DebugTab(
             OutlinedButton(
                 onClick = { scope.launch { store.resetAll(ctx) } },
                 colors = AppObjectsColors.cancelButtonColors(),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = buildAnnotatedString {

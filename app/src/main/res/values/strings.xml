@@ -193,4 +193,15 @@
     <string name="use_original_app_icon">Use original app icons</string>
     <string name="scroll_down_drawer">Scroll down to close drawer</string>
     <string name="show_actions_icon_border">Show Action Icon Border</string>
+    <string name="status_bar">Status bar</string>
+    <string name="status_bar_tab_text">Customize what is displayed in the status bar.</string>
+    <string name="display">Display</string>
+    <string name="show_time">Show time</string>
+    <string name="show_seconds">Show seconds</string>
+    <string name="show_notifications">Show notifications</string>
+    <string name="show_battery">Show battery</string>
+    <string name="show_connectivity">Show Wi-Fi, data and airplane mode</string>
+    <string name="show_status_bar">Show Status bar</string>
+    <string name="status_bar_background">Status Bar Background</string>
+    <string name="status_bar_text_color">Status Bar Text Color</string>
 </resources>

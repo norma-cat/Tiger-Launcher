@@ -7,7 +7,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,17 +31,20 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore
 import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.dialogs.FilePickerDialog
-import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
 import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
+import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
 import org.elnix.dragonlauncher.ui.helpers.rememberHoldToOpenSettings
+import org.elnix.dragonlauncher.ui.statusbar.StatusBar
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
 import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
 
@@ -106,6 +112,37 @@ fun MainScreen(
         .getUseAccessibilityInsteadOfContextToExpandActionPanel(ctx)
         .collectAsState(initial = true)
 
+
+    /* ───────────── status bar things ───────────── */
+
+    val showStatusBar by StatusBarSettingsStore.getShowStatusBar(ctx)
+        .collectAsState(initial = true)
+
+    val statusBarBackground by StatusBarSettingsStore.getBarBackgroundColor(ctx)
+        .collectAsState(initial = Color.Transparent)
+
+    val statusBarText by StatusBarSettingsStore.getBarTextColor(ctx)
+        .collectAsState(initial = MaterialTheme.colorScheme.onBackground)
+
+    val showTime by StatusBarSettingsStore.getShowTime(ctx)
+        .collectAsState(initial = true)
+
+    val showSeconds by StatusBarSettingsStore.getShowSeconds(ctx)
+        .collectAsState(initial = true)
+
+    val showNotifications by StatusBarSettingsStore.getShowNotifications(ctx)
+        .collectAsState(initial = true)
+
+    val showBattery by StatusBarSettingsStore.getShowBattery(ctx)
+        .collectAsState(initial = true)
+
+    val showConnectivity by StatusBarSettingsStore.getShowConnectivity(ctx)
+        .collectAsState(initial = true)
+
+
+    val systemInsets = WindowInsets.systemBars.asPaddingValues()
+
+    val isRealFullscreen = systemInsets.calculateTopPadding() == 0.dp
 
     LaunchedEffect(hasSeenWelcome) {
         if (!hasSeenWelcome) onGoWelcome()
@@ -240,6 +277,18 @@ fun MainScreen(
             .onSizeChanged { size = it }
             .then(hold.pointerModifier)
     ) {
+
+        if (showStatusBar && isRealFullscreen) {
+            StatusBar(
+                backgroundColor = statusBarBackground,
+                textColor = statusBarText,
+                showTime = showTime,
+                showSeconds = showSeconds,
+                showNotifications = showNotifications,
+                showBattery = showBattery,
+                showConnectivity = showConnectivity
+            )
+        }
 
         MainScreenOverlay(
             icons = icons,

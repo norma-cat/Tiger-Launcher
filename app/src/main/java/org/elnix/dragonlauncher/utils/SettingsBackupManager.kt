@@ -16,6 +16,7 @@ import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.data.stores.LanguageSettingsStore
+import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore
 import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.data.stores.WallpaperSettingsStore
@@ -113,15 +114,15 @@ object SettingsBackupManager {
                         DataStoreName.BEHAVIOR -> BehaviorSettingsStore.getAll(ctx).takeIf { it.isNotEmpty() }?.let {
                             put(store.backupKey!!, JSONObject(it))
                         }
-
                         DataStoreName.BACKUP -> BackupSettingsStore.getAll(ctx).takeIf { it.isNotEmpty() }?.let {
                             put(store.backupKey!!, JSONObject(it))
                         }
-
                         DataStoreName.WALLPAPER -> WallpaperSettingsStore.getAll(ctx).takeIf { it.isNotEmpty() }?.let {
                             put(store.backupKey!!, JSONObject(it))
                         }
-
+                        DataStoreName.STATUS_BAR -> StatusBarSettingsStore.getAll(ctx).takeIf { it.isNotEmpty() }?.let {
+                            put(store.backupKey!!, JSONObject(it))
+                        }
 
                         // Those 2 aren't meant to be backupable
                         DataStoreName.APPS -> {}
@@ -203,6 +204,9 @@ object SettingsBackupManager {
                         }
                         DataStoreName.WALLPAPER -> jsonObj.optJSONObject(store.backupKey)?.let {
                             WallpaperSettingsStore.setAll(ctx, jsonToStringMap(it))
+                        }
+                        DataStoreName.STATUS_BAR -> jsonObj.optJSONObject(store.backupKey)?.let {
+                            StatusBarSettingsStore.setAll(ctx, jsonToStringMap(it))
                         }
 
                         DataStoreName.APPS -> {}
