@@ -15,27 +15,69 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun StatusBarClock(
-    showSeconds: Boolean,
-    textColor: Color
+    showTime: Boolean,
+    showDate: Boolean,
+    textColor: Color,
+    timeFormatter: String,
+    dateFormatter: String
 ) {
-    val formatter = remember(showSeconds) {
-        DateTimeFormatter.ofPattern(
-            if (showSeconds) "HH:mm:ss" else "HH:mm"
-        )
-    }
-
-    var time by remember { mutableStateOf(LocalTime.now()) }
-
-    LaunchedEffect(showSeconds) {
-        while (true) {
-            time = LocalTime.now()
-            delay(if (showSeconds) 1_000 else 60_000)
+    val timeFormat = remember(timeFormatter) {
+        try {
+            DateTimeFormatter.ofPattern(timeFormatter)
+        } catch (e: Exception) {
+            println("⚠️ Invalid time format '$timeFormatter': ${e.message}")
+            DateTimeFormatter.ofPattern("HH:mm:ss")
         }
     }
 
-    Text(
-        text = time.format(formatter),
-        color = textColor,
-        style = MaterialTheme.typography.bodyMedium
-    )
+    val dateFormat = remember(dateFormatter) {
+        try {
+            DateTimeFormatter.ofPattern(dateFormatter)
+        } catch (e: Exception) {
+            println("⚠️ Invalid date format '$dateFormatter': ${e.message}")
+            DateTimeFormatter.ofPattern("MMM dd")
+        }
+    }
+
+    var time by remember { mutableStateOf(LocalTime.now()) }
+    var date by remember { mutableStateOf(java.time.LocalDate.now()) }
+
+    // Update every second if timeFormatter contains 'ss', else every minute
+    val updateInterval = if ("ss" in timeFormatter) 1_000L else 60_000L
+
+    LaunchedEffect(timeFormatter, dateFormatter) {
+        while (true) {
+            time = LocalTime.now()
+            date = java.time.LocalDate.now()
+            delay(updateInterval)
+        }
+    }
+
+    val timeText = try {
+        time.format(timeFormat)
+    } catch (e: Exception) {
+        println("⚠️ Time formatting failed: ${e.message}")
+        time.format(DateTimeFormatter.ofPattern("HH:mm"))
+    }
+
+    val dateText = try {
+        date.format(dateFormat)
+    } catch (e: Exception) {
+        println("⚠️ Date formatting failed: ${e.message}")
+        date.format(DateTimeFormatter.ofPattern("MMM dd"))
+    }
+    val displayText = when {
+        showTime && showDate -> "$timeText | $dateText"
+        showDate -> dateText
+        showTime -> timeText
+        else -> ""
+    }
+
+    if (displayText.isNotEmpty()) {
+        Text(
+            text = displayText,
+            color = textColor,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
 }

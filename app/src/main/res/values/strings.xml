@@ -204,4 +204,10 @@
     <string name="show_status_bar">Show Status bar</string>
     <string name="status_bar_background">Status Bar Background</string>
     <string name="status_bar_text_color">Status Bar Text Color</string>
+    <string name="show_date">Show Date</string>
+    <string name="time_format_title">Time Format</string>
+    <string name="time_format_examples">Examples: HH:mm, HH:mm:ss, h:mm a, HH.mm</string>
+    <string name="date_format_title">Date Format</string>
+    <string name="date_format_examples">Examples: MMM dd, E dd, dd/MM, MMMM d</string>
+    <string name="invalid_format">Invalid format. Check examples above.</string>
 </resources>

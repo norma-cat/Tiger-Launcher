@@ -127,8 +127,14 @@ fun MainScreen(
     val showTime by StatusBarSettingsStore.getShowTime(ctx)
         .collectAsState(initial = true)
 
-    val showSeconds by StatusBarSettingsStore.getShowSeconds(ctx)
-        .collectAsState(initial = true)
+    val showDate by StatusBarSettingsStore.getShowDate(ctx)
+        .collectAsState(initial = false)
+
+    val timeFormatter by StatusBarSettingsStore.getTimeFormatter(ctx)
+        .collectAsState("HH:mm")
+
+    val dateFormatter by StatusBarSettingsStore.getDateFormatter(ctx)
+        .collectAsState("MMM dd")
 
     val showNotifications by StatusBarSettingsStore.getShowNotifications(ctx)
         .collectAsState(initial = true)
@@ -283,7 +289,9 @@ fun MainScreen(
                 backgroundColor = statusBarBackground,
                 textColor = statusBarText,
                 showTime = showTime,
-                showSeconds = showSeconds,
+                showDate = showDate,
+                timeFormatter = timeFormatter,
+                dateFormatter = dateFormatter,
                 showNotifications = showNotifications,
                 showBattery = showBattery,
                 showConnectivity = showConnectivity

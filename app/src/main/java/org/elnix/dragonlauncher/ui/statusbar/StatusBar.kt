@@ -17,7 +17,9 @@ fun StatusBar(
     backgroundColor: Color,
     textColor: Color,
     showTime: Boolean,
-    showSeconds: Boolean,
+    showDate: Boolean,
+    timeFormatter: String,
+    dateFormatter: String,
     showNotifications: Boolean,
     showBattery: Boolean,
     showConnectivity: Boolean
@@ -30,9 +32,13 @@ fun StatusBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        if (showTime) {
-            StatusBarClock(showSeconds, textColor)
-        }
+        StatusBarClock(
+            showTime = showTime,
+            showDate = showDate,
+            timeFormatter = timeFormatter,
+            dateFormatter = dateFormatter,
+            textColor = textColor
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 

@@ -1,7 +1,13 @@
 package org.elnix.dragonlauncher.ui.settings.customization
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -19,6 +25,10 @@ import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.statusbar.StatusBar
+import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.utils.isValidDateFormat
+import org.elnix.dragonlauncher.utils.isValidTimeFormat
 import org.elnix.dragonlauncher.utils.openUrl
 
 @Composable
@@ -40,8 +50,14 @@ fun StatusBarTab(
     val showTime by StatusBarSettingsStore.getShowTime(ctx)
         .collectAsState(initial = true)
 
-    val showSeconds by StatusBarSettingsStore.getShowSeconds(ctx)
-        .collectAsState(initial = true)
+    val showDate by StatusBarSettingsStore.getShowDate(ctx)
+        .collectAsState(initial = false)
+
+    val timeFormatter by StatusBarSettingsStore.getTimeFormatter(ctx)
+        .collectAsState("HH:mm:ss")
+
+    val dateFormatter by StatusBarSettingsStore.getDateFormatter(ctx)
+        .collectAsState("MMM dd")
 
     val showNotifications by StatusBarSettingsStore.getShowNotifications(ctx)
         .collectAsState(initial = false)
@@ -52,125 +68,231 @@ fun StatusBarTab(
     val showConnectivity by StatusBarSettingsStore.getShowConnectivity(ctx)
         .collectAsState(initial = false)
 
-    SettingsLazyHeader(
-        title = stringResource(R.string.status_bar),
-        onBack = onBack,
-        helpText = stringResource(R.string.status_bar_tab_text),
-        onReset = {
-            scope.launch {
-                StatusBarSettingsStore.resetAll(ctx)
-            }
-        }
-    ) {
 
-        item {
-            Text(
-                text = "For the little nerds that uses my app, I would like a lot of feedback on this status bar, the rule I fixed to me is that Dragon will never have any network access (btw to show the connectivity icons it's annoying). You can feedback me on github issues or tell me on discord",
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        }
 
-        item {
-            Text(
-                text = "Github Issues",
-                modifier = Modifier.clickable { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/issues/new") },
-                color = MaterialTheme.colorScheme.onBackground,
-                textDecoration = TextDecoration.Underline
 
-            )
-        }
+    Column{
 
-        item {
-            Text(
-                text = "Discord",
-                modifier = Modifier.clickable { ctx.openUrl("https://discord.gg/XXKXQeXpvF") },
-                color = MaterialTheme.colorScheme.onBackground,
-                textDecoration = TextDecoration.Underline
-            )
-        }
+        StatusBar(
+            backgroundColor = statusBarBackground,
+            textColor = statusBarText,
+            showTime = showTime,
+            showDate = showDate,
+            timeFormatter = timeFormatter,
+            dateFormatter = dateFormatter,
+            showNotifications = showNotifications,
+            showBattery = showBattery,
+            showConnectivity = showConnectivity
+        )
 
-        item {
-            SwitchRow(
-                state = showStatusBar,
-                text = stringResource(R.string.show_status_bar)
-            ) {
+        SettingsLazyHeader(
+            title = stringResource(R.string.status_bar),
+            onBack = onBack,
+            helpText = stringResource(R.string.status_bar_tab_text),
+            onReset = {
                 scope.launch {
-                    StatusBarSettingsStore.setShowStatusBar(ctx, it)
+                    StatusBarSettingsStore.resetAll(ctx)
                 }
             }
-        }
+        ) {
 
-        item { TextDivider(stringResource(R.string.display)) }
+            item {
+                Text(
+                    text = "For the little nerds that uses my app, I would like a lot of feedback on this status bar, the rule I fixed to me is that Dragon will never have any network access (btw to show the connectivity icons it's annoying). You can feedback me on github issues or tell me on discord",
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
 
-        item {
-            ColorPickerRow(
-                label = stringResource(R.string.status_bar_background),
-                defaultColor = Color.Transparent,
-                currentColor = statusBarBackground,
-            ) {
-                scope.launch {
-                    StatusBarSettingsStore.setBarBackgroundColor(ctx, it)
+            item {
+                Text(
+                    text = "Github Issues",
+                    modifier = Modifier.clickable { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/issues/new") },
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textDecoration = TextDecoration.Underline
+
+                )
+            }
+
+            item {
+                Text(
+                    text = "Discord",
+                    modifier = Modifier.clickable { ctx.openUrl("https://discord.gg/XXKXQeXpvF") },
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textDecoration = TextDecoration.Underline
+                )
+            }
+
+            item {
+                SwitchRow(
+                    state = showStatusBar,
+                    text = stringResource(R.string.show_status_bar)
+                ) {
+                    scope.launch {
+                        StatusBarSettingsStore.setShowStatusBar(ctx, it)
+                    }
                 }
             }
-        }
 
-        item {
-            ColorPickerRow(
-                label = stringResource(R.string.status_bar_text_color),
-                defaultColor = MaterialTheme.colorScheme.onBackground,
-                currentColor = statusBarText,
-            ) {
-                scope.launch {
-                    StatusBarSettingsStore.setBarTextColor(ctx, it)
+            item { TextDivider(stringResource(R.string.display)) }
+
+            item {
+                ColorPickerRow(
+                    label = stringResource(R.string.status_bar_background),
+                    defaultColor = Color.Transparent,
+                    currentColor = statusBarBackground,
+                ) {
+                    scope.launch {
+                        StatusBarSettingsStore.setBarBackgroundColor(ctx, it)
+                    }
                 }
             }
-        }
 
-        item {
-            SwitchRow(
-                state = showTime,
-                text = stringResource(R.string.show_time)
-            ) {
-                scope.launch { StatusBarSettingsStore.setShowTime(ctx, it) }
+            item {
+                ColorPickerRow(
+                    label = stringResource(R.string.status_bar_text_color),
+                    defaultColor = MaterialTheme.colorScheme.onBackground,
+                    currentColor = statusBarText,
+                ) {
+                    scope.launch {
+                        StatusBarSettingsStore.setBarTextColor(ctx, it)
+                    }
+                }
             }
-        }
 
-        item {
-            SwitchRow(
-                state = showSeconds,
-                text = stringResource(R.string.show_seconds)
-            ) {
-                scope.launch { StatusBarSettingsStore.setShowSeconds(ctx, it) }
+            item {
+                SwitchRow(
+                    state = showTime,
+                    text = stringResource(R.string.show_time)
+                ) {
+                    scope.launch { StatusBarSettingsStore.setShowTime(ctx, it) }
+                }
             }
-        }
 
-        item {
-            SwitchRow(
-                state = showNotifications,
-                enabled = false,
-                text = stringResource(R.string.show_notifications),
-                subText = "Not implemented"
-            ) {
-                scope.launch { StatusBarSettingsStore.setShowNotifications(ctx, it) }
+            item {
+                Column {
+                    Text(
+                        text = stringResource(R.string.time_format_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(R.string.time_format_examples),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = timeFormatter,
+                        onValueChange = { newValue ->
+                            scope.launch {
+                                StatusBarSettingsStore.setTimeFormatter(ctx, newValue)
+                            }
+                        },
+                        singleLine = true,
+                        isError = !isValidTimeFormat(timeFormatter),
+                        supportingText = if (!isValidTimeFormat(timeFormatter)) {
+                            { Text(stringResource(R.string.invalid_format)) }
+                        } else null,
+                        placeholder = { Text("HH:mm:ss") },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Restore,
+                                contentDescription = stringResource(R.string.reset),
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.clickable {
+                                    scope.launch {
+                                        StatusBarSettingsStore.setTimeFormatter(ctx, "HH:mm:ss")
+                                    }
+                                }
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = AppObjectsColors.outlinedTextFieldColors()
+                    )
+                }
             }
-        }
 
-        item {
-            SwitchRow(
-                state = showBattery,
-                text = stringResource(R.string.show_battery)
-            ) {
-                scope.launch { StatusBarSettingsStore.setShowBattery(ctx, it) }
+
+            item {
+                SwitchRow(
+                    state = showDate,
+                    text = stringResource(R.string.show_date)
+                ) {
+                    scope.launch { StatusBarSettingsStore.setShowDate(ctx, it) }
+                }
             }
-        }
 
-        item {
-            SwitchRow(
-                state = showConnectivity,
-                text = stringResource(R.string.show_connectivity),
-                subText = "Kinda buggy RN, so working so well, but you can try"
-            ) {
-                scope.launch { StatusBarSettingsStore.setShowConnectivity(ctx, it) }
+
+            item {
+                Column {
+                    Text(
+                        text = stringResource(R.string.date_format_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(R.string.date_format_examples),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = dateFormatter,
+                        onValueChange = { newValue ->
+                            scope.launch {
+                                StatusBarSettingsStore.setDateFormatter(ctx, newValue)
+                            }
+                        },
+                        singleLine = true,
+                        isError = !isValidDateFormat(dateFormatter),
+                        supportingText = if (!isValidDateFormat(dateFormatter)) {
+                            { Text(stringResource(R.string.invalid_format)) }
+                        } else null,
+                        placeholder = { Text("MMM dd") },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Restore,
+                                contentDescription = stringResource(R.string.reset),
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.clickable {
+                                    scope.launch {
+                                        StatusBarSettingsStore.setDateFormatter(ctx, "MMM dd")
+                                    }
+                                }
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = AppObjectsColors.outlinedTextFieldColors()
+                    )
+                }
+            }
+
+            item {
+                SwitchRow(
+                    state = showNotifications,
+                    enabled = false,
+                    text = stringResource(R.string.show_notifications),
+                    subText = "Not implemented"
+                ) {
+                    scope.launch { StatusBarSettingsStore.setShowNotifications(ctx, it) }
+                }
+            }
+
+            item {
+                SwitchRow(
+                    state = showBattery,
+                    text = stringResource(R.string.show_battery)
+                ) {
+                    scope.launch { StatusBarSettingsStore.setShowBattery(ctx, it) }
+                }
+            }
+
+            item {
+                SwitchRow(
+                    state = showConnectivity,
+                    text = stringResource(R.string.show_connectivity),
+                    subText = "Kinda buggy RN, so working so well, but you can try"
+                ) {
+                    scope.launch { StatusBarSettingsStore.setShowConnectivity(ctx, it) }
+                }
             }
         }
     }
