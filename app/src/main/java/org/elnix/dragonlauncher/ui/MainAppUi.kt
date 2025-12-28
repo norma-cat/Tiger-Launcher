@@ -160,6 +160,7 @@ fun MainAppUi(
     val currentRoute = navBackStackEntry?.destination?.route
 
 
+    val autoBackupEnabled by BackupSettingsStore.getAutoBackupEnabled(ctx).collectAsState(initial = false)
     val autoBackupUriString by BackupSettingsStore.getAutoBackupUri(ctx).collectAsState(initial = null)
     val autoBackupUri = autoBackupUriString?.toUri()
 
@@ -222,9 +223,10 @@ fun MainAppUi(
 
 
     val showReselectAutoBackupFile =
+        autoBackupEnabled &&
         hasAutoBackupPermission == false &&
-                autoBackupUri != null &&
-                currentRoute != ROUTES.WELCOME
+        autoBackupUri != null &&
+        currentRoute != ROUTES.WELCOME
 
 
 
