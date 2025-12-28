@@ -198,21 +198,25 @@ fun BackupTab(
         ActivityResultContracts.CreateDocument("application/json")
     ) { uri ->
         if (uri != null) {
-            ctx.contentResolver.takePersistableUriPermission(
-                uri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            )
-            scope.launch {
-                BackupSettingsStore.setAutoBackupUri(ctx, uri)
-                BackupSettingsStore.setAutoBackupEnabled(ctx, true)
+            try {
+                ctx.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                // Proceed only if successful
+                scope.launch {
+                    BackupSettingsStore.setAutoBackupUri(ctx, uri)
+                    BackupSettingsStore.setAutoBackupEnabled(ctx, true)
+                }
+                backupViewModel.setResult(BackupResult(export = true, error = false, title = "Auto-backup enabled"))
+            } catch (e: SecurityException) {
+                // Fallback: Store non-persistable URI or notify user
+                backupViewModel.setResult(BackupResult(export = true, error = true, title = "Backup saved (limited persistence)"))
+                Log.e("Backup", "Persistable permission not available for URI: $uri", e)
             }
-            backupViewModel.setResult(BackupResult(
-                export = true,
-                error = false,
-                title = "Auto-backup enabled"
-            ))
         }
     }
+
 
     // ------------------------------------------------------------
     // UI
