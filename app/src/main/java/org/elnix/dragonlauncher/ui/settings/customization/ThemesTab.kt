@@ -1,7 +1,5 @@
-package org.elnix.dragonlauncher.ui.welcome
+package org.elnix.dragonlauncher.ui.settings.customization
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,10 +11,13 @@ import androidx.compose.ui.res.stringResource
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.helpers.ThemeObject
 import org.elnix.dragonlauncher.ui.helpers.ThemesList
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.utils.loadThemes
 
 @Composable
-fun WelcomePageTheme() {
+fun ThemesTab(
+    onBack: () -> Unit
+) {
     val ctx = LocalContext.current
 
     var themes by remember { mutableStateOf<List<ThemeObject>?>(null) }
@@ -27,10 +28,13 @@ fun WelcomePageTheme() {
         loading = false
     }
 
-    WelcomePagerHeader(
+    SettingsLazyHeader(
         title = stringResource(R.string.theme_selector),
-    icon = Icons.Default.ColorLens
-    ) {
-        ThemesList(loading, themes)
-    }
+        onBack = onBack,
+        helpText = stringResource(R.string.theme_selector_help),
+        onReset = null,
+        content = {
+            ThemesList(loading, themes)
+        }
+    )
 }

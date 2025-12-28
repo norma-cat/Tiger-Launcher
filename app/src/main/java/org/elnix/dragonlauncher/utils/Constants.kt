@@ -10,3 +10,9 @@ val ignoredReturnRoutes = listOf(
     SETTINGS.BACKUP,
     SETTINGS.WALLPAPER
 )
+
+
+
+/* Themes loader utils */
+const val themesDir = "themes"
+val imageExts = listOf("png", "jpg", "jpeg", "webp")
