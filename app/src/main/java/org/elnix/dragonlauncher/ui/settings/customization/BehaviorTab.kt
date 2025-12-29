@@ -23,13 +23,13 @@ import org.elnix.dragonlauncher.ui.helpers.CustomActionSelector
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 
 
 @Composable
 fun BehaviorTab(
-    appsViewModel: AppDrawerViewModel,
+    appsViewModel: AppsViewModel,
     workspaceViewModel: WorkspaceViewModel,
     onBack: () -> Unit
 ) {

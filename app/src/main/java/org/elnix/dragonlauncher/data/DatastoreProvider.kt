@@ -22,7 +22,7 @@ enum class DataStoreName(val value: String, val backupKey: String?, val store: B
     COLOR_MODE("colorModeDatastore", "color_mode", ColorModesSettingsStore),
     COLOR("colorDatastore", "color", ColorSettingsStore),
     PRIVATE_SETTINGS("privateSettingsStore", null, PrivateSettingsStore),
-    SWIPE("swipePointsDatastore", "actions", SwipeSettingsStore),
+    SWIPE("swipePointsDatastore", "new_actions", SwipeSettingsStore),
     LANGUAGE("languageDatastore", "language", LanguageSettingsStore),
     DRAWER("drawerDatastore", "drawer", DrawerSettingsStore),
     DEBUG("debugDatastore", "debug", DebugSettingsStore),
@@ -33,6 +33,9 @@ enum class DataStoreName(val value: String, val backupKey: String?, val store: B
     WALLPAPER("wallpaperDatastore", "wallpaper", WallpaperSettingsStore),
     STATUS_BAR("statusDatastore", "status_bar", StatusBarSettingsStore)
 }
+
+val allStores = DataStoreName.entries
+val backupableStores = allStores.filter { it.backupKey != null }
 
 val Context.uiDatastore by preferencesDataStore(name = DataStoreName.UI.value)
 val Context.colorModeDatastore by preferencesDataStore(name = DataStoreName.COLOR_MODE.value)

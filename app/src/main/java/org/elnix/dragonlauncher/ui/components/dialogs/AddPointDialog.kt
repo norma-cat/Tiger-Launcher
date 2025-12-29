@@ -2,7 +2,6 @@ package org.elnix.dragonlauncher.ui.components.dialogs
 
 import android.content.pm.ShortcutInfo
 import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,30 +40,33 @@ import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.actionTint
 import org.elnix.dragonlauncher.ui.drawer.AppModel
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
+import org.elnix.dragonlauncher.utils.PackageManagerCompat
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import org.elnix.dragonlauncher.utils.actions.loadDrawableResAsBitmap
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
-import org.elnix.dragonlauncher.utils.queryAppShortcuts
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable
 fun AddPointDialog(
-    appsViewModel: AppDrawerViewModel,
+    appsViewModel: AppsViewModel,
     workspaceViewModel: WorkspaceViewModel,
     onDismiss: () -> Unit,
     onActionSelected: (SwipeActionSerializable) -> Unit
 ) {
     val ctx = LocalContext.current
 
+    val pm = ctx.packageManager
+    val packageManagerCompat = PackageManagerCompat(pm, ctx)
+
     var showAppPicker by remember { mutableStateOf(false) }
     var showUrlInput by remember { mutableStateOf(false) }
     var showFilePicker by remember { mutableStateOf(false) }
 
-    // All actions except those requiring special sub-dialogs
     val actions = listOf(
+        SwipeActionSerializable.OpenCircleNest(0),
         SwipeActionSerializable.LaunchApp(""),
         SwipeActionSerializable.OpenUrl(""),
         SwipeActionSerializable.OpenFile(""),
@@ -139,6 +141,17 @@ fun AddPointDialog(
                             Spacer(Modifier.height(8.dp))
                         }
 
+//                        is SwipeActionSerializable.OpenCircleNest -> {
+//                            AddPointColumn(
+//                                action = action,
+//                                icons = icons,
+//                                onSelected = {
+//                                    onActionSelected(action)
+//                                    TODO("CREATE NEW NEST")
+//                                }
+//                            )
+//                            Spacer(Modifier.height(8.dp))
+//                        }
                         // Direct actions
                         else -> {
                             AddPointColumn(
@@ -167,12 +180,10 @@ fun AddPointDialog(
 
 
                 val list = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    queryAppShortcuts(ctx, app.packageName)
+                    packageManagerCompat.queryAppShortcuts(app.packageName)
                 } else {
                     emptyList()
                 }
-
-                Log.e("Shortcuts", list.toString())
 
                 if (list.isNotEmpty()) {
                     selectedApp = app

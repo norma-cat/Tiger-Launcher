@@ -7,6 +7,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -19,7 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -31,11 +37,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
+import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.helpers.DrawerActions
 import org.elnix.dragonlauncher.data.stores.BackupSettingsStore
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.data.stores.WallpaperSettingsStore
+import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.drawer.AppDrawerScreen
 import org.elnix.dragonlauncher.ui.helpers.ReselectAutoBackupBanner
 import org.elnix.dragonlauncher.ui.helpers.SetDefaultLauncherBanner
@@ -59,7 +67,7 @@ import org.elnix.dragonlauncher.utils.getVersionCode
 import org.elnix.dragonlauncher.utils.hasUriReadWritePermission
 import org.elnix.dragonlauncher.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.utils.loadChangelogs
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.BackupViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 
@@ -94,12 +102,14 @@ object ROUTES {
 @Composable
 fun MainAppUi(
     backupViewModel: BackupViewModel,
-    appViewModel: AppDrawerViewModel,
+    appsViewModel: AppsViewModel,
     workspaceViewModel: WorkspaceViewModel,
     navController: NavHostController
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    val result by backupViewModel.result.collectAsState()
 
     // Changelogs system
     val lastSeenVersionCode by PrivateSettingsStore.getLastSeenVersionCode(ctx)
@@ -272,7 +282,7 @@ fun MainAppUi(
             // Main App (LauncherScreen)
             composable(ROUTES.MAIN) {
                 MainScreen(
-                    appsViewModel = appViewModel,
+                    appsViewModel = appsViewModel,
                     wallpaper = mainWallpaper,
                     useWallpaper = useMainWallpaper,
                     onAppDrawer = { goDrawer() },
@@ -283,7 +293,7 @@ fun MainAppUi(
 
             composable(ROUTES.DRAWER) {
                 AppDrawerScreen(
-                    appsViewModel = appViewModel,
+                    appsViewModel = appsViewModel,
                     workspaceViewModel = workspaceViewModel,
                     showIcons = showAppIconsInDrawer,
                     showLabels = showAppLabelsInDrawer,
@@ -312,23 +322,23 @@ fun MainAppUi(
 
             composable(SETTINGS.ROOT) {
                 SettingsScreen(
-                    appsViewModel = appViewModel,
+                    appsViewModel = appsViewModel,
                     workspaceViewModel = workspaceViewModel,
                     onAdvSettings = { goAdvSettingsRoot() },
                     onBack = { goMainScreen() }
                 )
             }
-            composable(SETTINGS.ADVANCED_ROOT) { AdvancedSettingsScreen(appViewModel, navController, onReset = { goMainScreen() } ) { goSettingsRoot() } }
+            composable(SETTINGS.ADVANCED_ROOT) { AdvancedSettingsScreen(appsViewModel, navController, onReset = { goMainScreen() } ) { goSettingsRoot() } }
 
             composable(SETTINGS.APPEARANCE) { AppearanceTab(navController) { goAdvSettingsRoot() } }
             composable(SETTINGS.WALLPAPER)  { WallpaperTab { goAppearance() } }
-            composable(SETTINGS.ICON_PACK)  { IconPackTab(appViewModel) { goAppearance() } }
+            composable(SETTINGS.ICON_PACK)  { IconPackTab(appsViewModel) { goAppearance() } }
             composable(SETTINGS.STATUS_BAR) { StatusBarTab { goAppearance() } }
             composable(SETTINGS.THEME)      { ThemesTab { goAppearance() } }
-            composable(SETTINGS.BEHAVIOR)   { BehaviorTab(appViewModel, workspaceViewModel) { goAdvSettingsRoot() } }
-            composable(SETTINGS.DRAWER)     { DrawerTab(appViewModel) { goAdvSettingsRoot() } }
+            composable(SETTINGS.BEHAVIOR)   { BehaviorTab(appsViewModel, workspaceViewModel) { goAdvSettingsRoot() } }
+            composable(SETTINGS.DRAWER)     { DrawerTab(appsViewModel) { goAdvSettingsRoot() } }
             composable(SETTINGS.COLORS)     { ColorSelectorTab { goAppearance() } }
-            composable(SETTINGS.DEBUG)      { DebugTab(navController, onShowWelcome = { goWelcome() } ) { goAdvSettingsRoot() } }
+            composable(SETTINGS.DEBUG)      { DebugTab(navController, appsViewModel, onShowWelcome = { goWelcome() } ) { goAdvSettingsRoot() } }
             composable(SETTINGS.LANGUAGE)   { LanguageTab { goAdvSettingsRoot() } }
             composable(SETTINGS.BACKUP)     { BackupTab(backupViewModel) { goAdvSettingsRoot() } }
             composable(SETTINGS.CHANGELOGS) { ChangelogsScreen { goAdvSettingsRoot() } }
@@ -351,7 +361,7 @@ fun MainAppUi(
             ) { backStack ->
                 WorkspaceDetailScreen(
                     workspaceId = backStack.arguments!!.getString("id")!!,
-                    appsViewModel = appViewModel,
+                    appsViewModel = appsViewModel,
                     workspaceViewModel = workspaceViewModel,
                     showIcons = showAppIconsInDrawer,
                     showLabels = showAppLabelsInDrawer,
@@ -369,5 +379,34 @@ fun MainAppUi(
             showWhatsNewBottomSheet = false
             scope.launch { PrivateSettingsStore.setLastSeenVersionCode(ctx, currentVersionCode) }
         }
+    }
+
+    // ------------------------------------------------------------
+    // RESULT DIALOG
+    // ------------------------------------------------------------
+    result?.let { res ->
+        val isError = res.error
+        val isExport = res.export
+        val errorMessage = res.message
+
+        UserValidation(
+            title = when {
+                isError && isExport -> stringResource(R.string.export_failed)
+                isError && !isExport -> stringResource(R.string.import_failed)
+                !isError && isExport -> stringResource(R.string.export_successful)
+                else -> stringResource(R.string.import_successful)
+            },
+            message = when {
+                isError -> errorMessage.ifBlank { stringResource(R.string.unknown_error) }
+                isExport -> stringResource(R.string.export_successful)
+                else -> stringResource(R.string.import_successful)
+            },
+            titleIcon = if (isError) Icons.Default.Warning else Icons.Default.Check,
+            titleColor = if (isError) MaterialTheme.colorScheme.error else Color.Green,
+            cancelText = null,
+            copy = isError,
+            onCancel = {},
+            onAgree = { backupViewModel.setResult(null) }
+        )
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,12 +47,12 @@ import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
 import org.elnix.dragonlauncher.ui.helpers.rememberHoldToOpenSettings
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable
 fun MainScreen(
-    appsViewModel: AppDrawerViewModel,
+    appsViewModel: AppsViewModel,
     wallpaper: Bitmap?,
     useWallpaper: Boolean,
     onAppDrawer: () -> Unit,
@@ -94,6 +95,7 @@ fun MainScreen(
 
     var start by remember { mutableStateOf<Offset?>(null) }
     var current by remember { mutableStateOf<Offset?>(null) }
+    var nestId by remember { mutableIntStateOf(0) }
     var isDragging by remember { mutableStateOf(false) }
     var size by remember { mutableStateOf(IntSize.Zero) }
 
@@ -175,7 +177,8 @@ fun MainScreen(
             onReloadApps = { scope.launch { appsViewModel.reloadApps(ctx) } },
             onReselectFile = { showFilePicker = point },
             onAppSettings = onLongPress3Sec,
-            onAppDrawer = onAppDrawer
+            onAppDrawer = onAppDrawer,
+            onOpenNestCircle = { nestId = it }
         )
     }
 
@@ -306,6 +309,7 @@ fun MainScreen(
             icons = icons,
             start = start,
             current = current,
+            nestId = nestId,
             isDragging = isDragging,
             surface = size,
             points = points,
@@ -337,7 +341,7 @@ fun MainScreen(
 
 
                 scope.launch {
-                    SwipeSettingsStore.save(ctx, finalList)
+                    SwipeSettingsStore.savePoints(ctx, finalList)
                 }
 
                 showFilePicker = null

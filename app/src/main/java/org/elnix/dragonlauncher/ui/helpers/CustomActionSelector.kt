@@ -41,13 +41,13 @@ import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 
 
 @Composable
 fun CustomActionSelector(
-    appsViewModel: AppDrawerViewModel,
+    appsViewModel: AppsViewModel,
     workspaceViewModel: WorkspaceViewModel,
     icons: Map<String, ImageBitmap>,
     currentAction: SwipeActionSerializable?,

@@ -93,6 +93,7 @@ private fun createUntintedBitmap(action: SwipeActionSerializable, context: Conte
         is SwipeActionSerializable.OpenFile -> loadDrawableResAsBitmap(context, R.drawable.ic_action_open_file)
         SwipeActionSerializable.ReloadApps -> loadDrawableResAsBitmap(context, R.drawable.ic_action_reload)
         SwipeActionSerializable.OpenRecentApps -> loadDrawableResAsBitmap(context, R.drawable.ic_action_recent)
+        is SwipeActionSerializable.OpenCircleNest -> loadDrawableResAsBitmap(context, R.drawable.ic_action_target)
     }
 }
 

@@ -57,7 +57,7 @@ import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
 import org.elnix.dragonlauncher.utils.copyToClipboard
 import org.elnix.dragonlauncher.utils.getVersionCode
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.obtainiumPackageName
 import org.elnix.dragonlauncher.utils.openUrl
 import org.elnix.dragonlauncher.utils.showToast
@@ -66,7 +66,7 @@ import org.elnix.dragonlauncher.utils.showToast
 @Suppress("AssignedValueIsNeverRead")
 @Composable
 fun AdvancedSettingsScreen(
-    appViewModel: AppDrawerViewModel,
+    appViewModel: AppsViewModel,
     navController: NavController,
     onReset: () -> Unit,
     onBack: () -> Unit
@@ -326,10 +326,7 @@ fun AdvancedSettingsScreen(
                             }
 
                             else -> {
-                                scope.launch {
-                                    DebugSettingsStore.setDebugEnabled(ctx, true)
-                                    navController.navigate(SETTINGS.DEBUG)
-                                }
+                                scope.launch { DebugSettingsStore.setDebugEnabled(ctx, true) }
                             }
                         }
                     }

@@ -20,7 +20,38 @@ data class SwipePointSerializable(
     @SerializedName("a") val circleNumber: Int,
     @SerializedName("b") val angleDeg: Double,
     @SerializedName("c") val action: SwipeActionSerializable? = null,
-    @SerializedName("d") val id: String? = null
+    @SerializedName("d") val id: String? = null,
+    @SerializedName("e") val nestId: Int? = 0
+)
+
+/**
+ * New CircleNest system, where every bloc of circles is contained inside one of those*
+ * This way, we can navigate across those nests, to achieve more actions, using the jump actions
+ */
+data class CircleNest(
+    /**
+     *  By default the id 0 is the first nest that is available,
+     *  I'll try to make the old system importable, to avoid breaking changes like empty actions circle
+     */
+    val id: Int = 0,
+    /**
+     * Holds the cancel zone (index -1), and the circle numbers for each drag distances
+     * for all the circles in the nest (index positive integer)
+     * the key is the circle number, made for allowing not ascending order drag distances
+     * For the last one, the drag distance has no limit, it's not even counted
+     */
+    val dragDistances: Map<Int, Int> = mapOf(
+        -1 to 150,
+        0 to 400,
+        1 to 700,
+        2 to 1000
+    ),
+
+    /**
+     * The id of the nest that holds this one, used for drawing correctly the outer circles
+     * And also to navigate across nests
+     */
+    val parentId: Int = 0
 )
 
 // Use sealed class for actions
@@ -46,6 +77,7 @@ sealed class SwipeActionSerializable {
     @Serializable object ReloadApps: SwipeActionSerializable()
 
     @Serializable object OpenRecentApps: SwipeActionSerializable()
+    @Serializable data class OpenCircleNest(val nestId: Int): SwipeActionSerializable()
 }
 
 // Gson type adapter for sealed class
@@ -83,6 +115,11 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
                 obj.addProperty("packageName", src.packageName)
                 obj.addProperty("shortcutId", src.shortcutId)
             }
+
+            is SwipeActionSerializable.OpenCircleNest -> {
+                obj.addProperty("type", "OpenCircleNest")
+                obj.addProperty("nestId", src.nestId)
+            }
         }
         return obj
     }
@@ -112,6 +149,9 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
                 obj.get("packageName").asString,
                 obj.get("shortcutId").asString
             )
+            "OpenCircleNest" -> SwipeActionSerializable.OpenCircleNest(
+                obj.get("nestId").asInt
+            )
             else -> null
         }
     }
@@ -127,11 +167,12 @@ object SwipeJson {
         .registerTypeAdapter(SwipeActionSerializable::class.java, SwipeActionAdapter())
         .create()
 
+    private val pointsType = object : TypeToken<List<SwipePointSerializable>>() {}.type
+    private val nestsType = object : TypeToken<List<CircleNest>>() {}.type
+
+
+    /* ---------- Old format, keep it for legacy support ---------- */
     private val listType = object : TypeToken<List<SwipePointSerializable>>() {}.type
-
-    fun encode(points: List<SwipePointSerializable>): String = gson.toJson(points, listType)
-
-    fun encodePretty(points: List<SwipePointSerializable>): String = gsonPretty.toJson(points, listType)
 
     fun decode(jsonString: String): List<SwipePointSerializable> {
         if (jsonString.isBlank()) return emptyList()
@@ -142,6 +183,28 @@ object SwipeJson {
             emptyList()
         }
     }
+
+    /* ---------- Points ---------- */
+
+    fun encodePoints(points: List<SwipePointSerializable>): String =
+        gson.toJson(points, pointsType)
+
+    fun encodePointsPretty(points: List<SwipePointSerializable>): String =
+        gsonPretty.toJson(points, pointsType)
+
+    fun decodePoints(json: String): List<SwipePointSerializable> =
+        decodeSafe(json, pointsType)
+
+    /* ---------- Nests ---------- */
+
+    fun encodeNests(nests: List<CircleNest>): String =
+        gson.toJson(nests, nestsType)
+
+    fun encodeNestsPretty(nests: List<CircleNest>): String =
+        gsonPretty.toJson(nests, nestsType)
+
+    fun decodeNests(json: String): List<CircleNest> =
+        decodeSafe(json, nestsType)
 
 
     // Kinda hacky but its the best way I managed to make it work
@@ -168,13 +231,27 @@ object SwipeJson {
             """{"type":"ReloadApps"}"""
         is SwipeActionSerializable.OpenRecentApps ->
             """{"type":"OpenRecentApps"}"""
+        is SwipeActionSerializable.OpenCircleNest ->
+            """{"type":"OpenCircleNest","nestId":"${action.nestId}"}"""
     }
+
     fun decodeAction(jsonString: String): SwipeActionSerializable? {
         if (jsonString.isBlank() || jsonString == "{}") return null
         return try {
             gson.fromJson(jsonString, SwipeActionSerializable::class.java)
         } catch (_: Throwable) {
             null
+        }
+    }
+
+
+    private fun <T> decodeSafe(json: String, type: Type): List<T> {
+        if (json.isBlank()) return emptyList()
+        return try {
+            gson.fromJson(json, type)
+        } catch (e: Throwable) {
+            Log.e("SwipeJson", "Decode failed: ${e.message}", e)
+            emptyList()
         }
     }
 }

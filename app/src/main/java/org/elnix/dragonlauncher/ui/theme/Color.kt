@@ -94,3 +94,8 @@ object LightDefault : ThemeColors {
     override val ReloadColor = Color(0xFF886300)
     override val OpenRecentAppsColor = Color(0xFF880081)
 }
+
+
+val copyColor = Color(0xFFE19807)
+val moveColor = Color(0xFF14E7EE)
+val addRemoveCirclesColor = Color(0xFF1BEE14)

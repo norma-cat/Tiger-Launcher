@@ -20,9 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.data.DataStoreName
+import org.elnix.dragonlauncher.data.backupableStores
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.json.JSONObject
-import java.util.Locale
 
 @Composable
 fun ImportSettingsDialog(
@@ -30,11 +30,11 @@ fun ImportSettingsDialog(
     onDismiss: () -> Unit,
     onConfirm: (selectedStores: List<DataStoreName>) -> Unit
 ) {
-    val allStores = DataStoreName.entries
 
     // Filter stores that exist in backup JSON
-    val availableStores = allStores.filter {
-        backupJson.has(it.backupKey) && it.backupKey != null
+    val availableStores = backupableStores.filter {
+        backupJson.has(it.backupKey) ||
+        backupJson.has("actions") // Old actions store, for legacy support
     }
 
     val selected = remember(availableStores) {
@@ -75,12 +75,7 @@ fun ImportSettingsDialog(
                             ),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
-                            store.backupKey!!.replaceFirstChar {
-                                if (it.isLowerCase()) it.titlecase(Locale.ROOT)
-                                else it.toString()
-                            }
-                        )
+                        Text(store.store.name)
                         Checkbox(
                             checked = selected[store] ?: true,
                             onCheckedChange = null

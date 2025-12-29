@@ -30,3 +30,24 @@
     public static ** valueOf(java.lang.String);
 }
 -keep enum * { *; }
+
+
+
+# Was in cas of the serialization bug was still active, but this ain't the case anymore
+# so I'll just keep the mignifications for a lighter app
+
+## Keep field names for Gson serialization
+#-keepclassmembers,allowobfuscation class * {
+#    @com.google.gson.annotations.SerializedName <fields>;
+#}
+#
+## Alternative: Keep ALL field names in models (more aggressive)
+##-keepclassmembers class org.elnix.dragonlauncher.ui.drawer.** {
+##    <fields>;
+##}
+#
+## Keep AppModel class structure entirely
+#-keep class org.elnix.dragonlauncher.ui.drawer.AppModel {
+#    <fields>;
+#    <init>(...);
+#}

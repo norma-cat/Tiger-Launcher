@@ -6,9 +6,14 @@ import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import org.elnix.dragonlauncher.data.BackupTypeException
 import org.elnix.dragonlauncher.data.BaseSettingsStore
 import org.elnix.dragonlauncher.data.debugDatastore
+import org.elnix.dragonlauncher.data.getBooleanStrict
+import org.elnix.dragonlauncher.data.putIfNonDefault
+import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.DEBUG_ENABLED
+import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.DEBUG_INFOS
+import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.FORCE_APP_LANGUAGE_SELECTOR
+import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.SETTINGS_DEBUG_INFOS
 
 object DebugSettingsStore : BaseSettingsStore() {
 
@@ -20,6 +25,7 @@ object DebugSettingsStore : BaseSettingsStore() {
     private data class DebugSettingsBackup(
         val debugEnabled: Boolean = false,
         val debugInfos: Boolean = false,
+        val settingsDebugInfo: Boolean = false,
         val forceAppLanguageSelector: Boolean = false
     )
 
@@ -29,14 +35,19 @@ object DebugSettingsStore : BaseSettingsStore() {
     // Keys object for safer reference
     // -------------------------------------------------------------------------
     private object Keys {
-        const val DEBUG_ENABLED = "debugEnabled"
-        const val DEBUG_INFOS = "debugInfos"
-        const val FORCE_APP_LANGUAGE_SELECTOR = "forceAppLanguageSelector"
+        val DEBUG_ENABLED = booleanPreferencesKey(DebugSettingsBackup::debugEnabled.name)
+        val DEBUG_INFOS = booleanPreferencesKey(DebugSettingsBackup::debugInfos.name)
+        val SETTINGS_DEBUG_INFOS = booleanPreferencesKey(DebugSettingsBackup::settingsDebugInfo.name)
+        val FORCE_APP_LANGUAGE_SELECTOR = booleanPreferencesKey(DebugSettingsBackup::forceAppLanguageSelector.name)
+
+        val ALL = listOf(
+            DEBUG_ENABLED,
+            DEBUG_INFOS,
+            SETTINGS_DEBUG_INFOS,
+            FORCE_APP_LANGUAGE_SELECTOR
+        )
     }
 
-    private val DEBUG_ENABLED = booleanPreferencesKey(Keys.DEBUG_ENABLED)
-    private val DEBUG_INFOS = booleanPreferencesKey(Keys.DEBUG_INFOS)
-    private val FORCE_APP_LANGUAGE_SELECTOR = booleanPreferencesKey(Keys.FORCE_APP_LANGUAGE_SELECTOR)
 
     // -------------------------------------------------------------------------
     // Accessors + Mutators
@@ -59,6 +70,15 @@ object DebugSettingsStore : BaseSettingsStore() {
         ctx.debugDatastore.edit { it[DEBUG_INFOS] = enabled }
     }
 
+    fun getSettingsDebugInfos(ctx: Context): Flow<Boolean> =
+        ctx.debugDatastore.data.map { prefs ->
+            prefs[SETTINGS_DEBUG_INFOS] ?: defaults.settingsDebugInfo
+        }
+
+    suspend fun setSettingsDebugInfos(ctx: Context, enabled: Boolean) {
+        ctx.debugDatastore.edit { it[SETTINGS_DEBUG_INFOS] = enabled }
+    }
+
     fun getForceAppLanguageSelector(ctx: Context): Flow<Boolean> =
         ctx.debugDatastore.data.map { prefs ->
             prefs[FORCE_APP_LANGUAGE_SELECTOR] ?: defaults.forceAppLanguageSelector
@@ -73,29 +93,21 @@ object DebugSettingsStore : BaseSettingsStore() {
     // -------------------------------------------------------------------------
     override suspend fun resetAll(ctx: Context) {
         ctx.debugDatastore.edit { prefs ->
-            prefs.remove(DEBUG_ENABLED)
-            prefs.remove(DEBUG_INFOS)
-            prefs.remove(FORCE_APP_LANGUAGE_SELECTOR)
+            Keys.ALL.forEach { prefs.remove(it) }
         }
     }
 
     // -------------------------------------------------------------------------
     // Backup export
     // -------------------------------------------------------------------------
-    suspend fun getAll(ctx: Context): Map<String, Boolean> {
+    suspend fun getAll(ctx: Context): Map<String, Any> {
         val prefs = ctx.debugDatastore.data.first()
 
         return buildMap {
-
-            fun putIfNonDefault(key: String, value: Boolean?, defaultVal: Boolean) {
-                if (value != null && value != defaultVal) {
-                    put(key, value)
-                }
-            }
-
-            putIfNonDefault(Keys.DEBUG_ENABLED, prefs[DEBUG_ENABLED], defaults.debugEnabled)
-            putIfNonDefault(Keys.DEBUG_INFOS, prefs[DEBUG_INFOS], defaults.debugInfos)
-            putIfNonDefault(Keys.FORCE_APP_LANGUAGE_SELECTOR, prefs[FORCE_APP_LANGUAGE_SELECTOR], defaults.forceAppLanguageSelector)
+            putIfNonDefault(DEBUG_ENABLED, prefs[DEBUG_ENABLED], defaults.debugEnabled)
+            putIfNonDefault(DEBUG_INFOS, prefs[DEBUG_INFOS], defaults.debugInfos)
+            putIfNonDefault(SETTINGS_DEBUG_INFOS, prefs[SETTINGS_DEBUG_INFOS], defaults.settingsDebugInfo)
+            putIfNonDefault(FORCE_APP_LANGUAGE_SELECTOR, prefs[FORCE_APP_LANGUAGE_SELECTOR], defaults.forceAppLanguageSelector)
         }
     }
 
@@ -104,31 +116,19 @@ object DebugSettingsStore : BaseSettingsStore() {
     // -------------------------------------------------------------------------
     suspend fun setAll(ctx: Context, backup: Map<String, Any?>) {
 
-        fun getBooleanStrict(key: String): Boolean {
-            val v = backup[key] ?: return when (key) {
-                Keys.DEBUG_ENABLED -> defaults.debugEnabled
-                Keys.DEBUG_INFOS -> defaults.debugInfos
-                Keys.FORCE_APP_LANGUAGE_SELECTOR -> defaults.forceAppLanguageSelector
-                else -> throw BackupTypeException(key, "Boolean", null, null)
-            }
-            return v as? Boolean ?: throw BackupTypeException(
-                key = key,
-                expected = "Boolean",
-                actual = v::class.simpleName,
-                value = v
-            )
-        }
-
-        val backupValues = DebugSettingsBackup(
-            debugEnabled = getBooleanStrict(Keys.DEBUG_ENABLED),
-            debugInfos = getBooleanStrict(Keys.DEBUG_INFOS),
-            forceAppLanguageSelector = getBooleanStrict(Keys.FORCE_APP_LANGUAGE_SELECTOR)
-        )
-
         ctx.debugDatastore.edit { prefs ->
-            prefs[DEBUG_ENABLED] = backupValues.debugEnabled
-            prefs[DEBUG_INFOS] = backupValues.debugInfos
-            prefs[FORCE_APP_LANGUAGE_SELECTOR] = backupValues.forceAppLanguageSelector
+
+            prefs[DEBUG_ENABLED] =
+                getBooleanStrict(backup, DEBUG_ENABLED, defaults.debugEnabled)
+
+            prefs[DEBUG_INFOS] =
+                getBooleanStrict(backup, DEBUG_INFOS, defaults.debugInfos)
+
+            prefs[SETTINGS_DEBUG_INFOS] =
+                getBooleanStrict(backup, SETTINGS_DEBUG_INFOS, defaults.settingsDebugInfo)
+
+            prefs[FORCE_APP_LANGUAGE_SELECTOR] =
+                getBooleanStrict(backup,FORCE_APP_LANGUAGE_SELECTOR, defaults.forceAppLanguageSelector)
         }
     }
 }

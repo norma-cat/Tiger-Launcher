@@ -82,11 +82,22 @@ object SettingsBackupManager {
                 requestedStores.forEach { store ->
                     when (store) {
                         DataStoreName.SWIPE -> {
-                            val pointsList = SwipeSettingsStore.getAll(ctx)
-                            if (pointsList.isNotEmpty()) {
-                                put(store.backupKey!!, JSONArray(SwipeJson.encodePretty(pointsList)))
+                            val pointsList = SwipeSettingsStore.getPoints(ctx)
+                            val nestsList = SwipeSettingsStore.getNests(ctx)
+
+                            if (pointsList.isNotEmpty() || nestsList.isNotEmpty()) {
+                                val swipeObj = JSONObject().apply {
+                                    if (pointsList.isNotEmpty()) {
+                                        put("points", JSONArray(SwipeJson.encodePointsPretty(pointsList)))
+                                    }
+                                    if (nestsList.isNotEmpty()) {
+                                        put("nests", JSONArray(SwipeJson.encodeNestsPretty(nestsList))) // Add encodeNestsPretty if needed
+                                    }
+                                }
+                                put(store.backupKey!!, swipeObj)
                             }
                         }
+
                         DataStoreName.DRAWER -> DrawerSettingsStore.getAll(ctx).takeIf { it.isNotEmpty() }?.let {
                             put(store.backupKey!!, JSONObject(it))
                         }
@@ -164,16 +175,19 @@ object SettingsBackupManager {
             withContext(Dispatchers.IO) {
                 requestedStores.forEach { store ->
                     when (store) {
-                        DataStoreName.SWIPE -> jsonObj.optJSONArray(store.backupKey)?.let { jsonArr ->
-                            val cleanJsonString = jsonArr.toString(2) // Pretty print = clean JSON
+                        DataStoreName.SWIPE -> {
+                            // Try NEW format first (has nests/points objects) (new key: "new_actions")
+                            val swipeObj = jsonObj.optJSONObject(store.backupKey)
 
-                            Log.e("Debug", "Raw array: $jsonArr")
-                            Log.e("Debug", "Clean JSON: $cleanJsonString")
+                            if (swipeObj != null) {
+                                importNewSwipeFormat(swipeObj, ctx)
+                                return@forEach // Success, skip old format
+                            }
 
-                            val pointsList = SwipeJson.decode(cleanJsonString)
-
-                            Log.e("Debug", "Decoded points: $pointsList")
-                            SwipeSettingsStore.save(ctx, pointsList)
+                            // Fallback to old format (key was "actions")
+                            jsonObj.optJSONArray("actions")?.let { jsonArr ->
+                                importOldSwipeFormat(jsonArr.toString(2), ctx)
+                            }
                         }
                         DataStoreName.DRAWER -> jsonObj.optJSONObject(store.backupKey)?.let {
                             DrawerSettingsStore.setAll(ctx, jsonToStringMap(it))
@@ -233,4 +247,26 @@ object SettingsBackupManager {
     private fun jsonToStringMap(obj: JSONObject) = buildMap {
         obj.keys().forEach { key -> put(key, obj.optString(key)) }
     }
+}
+private suspend fun importNewSwipeFormat(swipeObj: JSONObject, ctx: Context) {
+    swipeObj.optJSONArray("points")?.let { jsonArr ->
+        val pointsJson = jsonArr.toString(2)
+        Log.d("Import", "New format points: $pointsJson")
+        val pointsList = SwipeJson.decodePoints(pointsJson)
+        SwipeSettingsStore.savePoints(ctx, pointsList)
+    }
+
+    swipeObj.optJSONArray("nests")?.let { jsonArr ->
+        val nestsJson = jsonArr.toString(2)
+        Log.d("Import", "New format nests: $nestsJson")
+        val nestsList = SwipeJson.decodeNests(nestsJson)
+        SwipeSettingsStore.saveNests(ctx, nestsList)
+    }
+}
+
+private suspend fun importOldSwipeFormat(jsonString: String, ctx: Context) {
+    Log.d("Import", "Old format detected: $jsonString")
+    val pointsList = SwipeJson.decode(jsonString) // Old decoder
+    SwipeSettingsStore.savePoints(ctx, pointsList) // Save to new format, for upgrade
+    Log.d("Import", "Imported old points into new format: $pointsList")
 }

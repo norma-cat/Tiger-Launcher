@@ -25,7 +25,8 @@ fun launchSwipeAction(
     onReloadApps: (() -> Unit)? = null,
     onReselectFile: (() -> Unit)? = null,
     onAppSettings: (() -> Unit)? = null,
-    onAppDrawer: (() -> Unit)? = null
+    onAppDrawer: (() -> Unit)? = null,
+    onOpenNestCircle: ((nestId: Int) -> Unit)? = null,
 ) {
     if (action == null) return
 
@@ -128,5 +129,7 @@ fun launchSwipeAction(
             }
             SystemControl.openRecentApps(ctx)
         }
+
+        is SwipeActionSerializable.OpenCircleNest -> onOpenNestCircle?.invoke(action.nestId)
     }
 }

@@ -7,11 +7,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.data.stores.LanguageSettingsStore
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 
 class MyApplication : Application() {
     val appViewModel by lazy {
-        AppDrawerViewModel(this)
+        AppsViewModel(this)
     }
 
     override fun onCreate() {

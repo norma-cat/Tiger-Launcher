@@ -39,10 +39,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.elnix.dragonlauncher.data.CircleNest
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
+import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
@@ -61,6 +63,7 @@ fun MainScreenOverlay(
     icons: Map<String, ImageBitmap>,
     start: Offset?,
     current: Offset?,
+    nestId: Int,
     isDragging: Boolean,
     surface: IntSize,
     points: List<SwipePointSerializable>,
@@ -106,17 +109,14 @@ fun MainScreenOverlay(
     var cumulativeAngle by remember { mutableDoubleStateOf(0.0) }   // continuous rotation without jumps
 
 
-    val circleR1 by UiSettingsStore.getFirstCircleDragDistance(ctx)
-        .collectAsState(initial = 400)
-    val circleR2 by UiSettingsStore.getSecondCircleDragDistance(ctx)
-        .collectAsState(initial = 700)
-    val cancelZone by UiSettingsStore.getCancelZoneDragDistance(ctx)
-        .collectAsState(initial = 150)
     val minAngleFromAPointToActivateIt by UiSettingsStore.getMinAngleFromAPointToActivateIt(ctx)
         .collectAsState(initial = 0)
 
 
-    val dragRadii = listOf(cancelZone, circleR1, circleR2)
+    val nests by SwipeSettingsStore.getNestsFlow(ctx)
+        .collectAsState(initial = emptyList())
+
+    val dragRadii = nests.find { it.id == nestId }?.dragDistances ?: CircleNest().dragDistances
 
     val dx: Float
     val dy: Float
@@ -181,17 +181,19 @@ fun MainScreenOverlay(
     // The chosen swipe action
     var currentAction: SwipePointSerializable? by remember { mutableStateOf(null) }
 
-    val targetCircle =
-        when {
-            dist < circleR1 -> 0
-            dist < circleR2 -> 1
-            else -> 2
-        }
+
+    // The circle that corresponds to the distance of which the user drags
+    val targetCircle = dragRadii.entries
+        .firstOrNull { (_, distance) -> dist <= distance }
+        ?.key
+        ?: dragRadii.keys.maxOrNull() ?: -1
+
+
 
     if (start != null && current != null && isDragging) {
 
         val closestPoint =
-            points.filter { it.circleNumber == targetCircle }
+            points.filter { it.nestId == nestId && it.circleNumber == targetCircle }
                 .minByOrNull {
                     val d = kotlin.math.abs(it.angleDeg - angle0to360)
                     minOf(d, 360 - d)
@@ -214,7 +216,8 @@ fun MainScreenOverlay(
             }
         }
 
-        currentAction = if (dist > cancelZone) selectedPoint else null
+        currentAction = selectedPoint
+//        currentAction = if (dist > dragRadii[0]) selectedPoint else null
 
         hoveredAction = currentAction
         bannerVisible = currentAction != null
@@ -341,7 +344,7 @@ fun MainScreenOverlay(
                 }
 
 
-                // The angle rotating around the start point (have to fiw that and allow more customization
+                // The angle rotating around the start point (have to fix that and allow more customization) TODO
                 // The "do you hate it" thing in settings
                 if (showAppAnglePreview) {
                     val arcRadius = 72f
@@ -367,18 +370,19 @@ fun MainScreenOverlay(
                     hoveredAction?.let { point ->
                         val action = point.action!!
 
+                        // same circle radii as SettingsScreen
+                        val radius = dragRadii[targetCircle -1]!!.toFloat()
                         // Main circle (the selected) drawn before any apps to be behind
                         if (showAppCirclePreview) {
                             drawCircle(
-                                color = circleColor ?: AmoledDefault.CircleColor,
-                                radius = dragRadii[targetCircle].toFloat(),
+                                color = circleColor,
+                                radius = radius,
                                 center = start,
                                 style = Stroke(4f)
                             )
                         }
 
-                        // same circle radii as SettingsScreen
-                        val radius = dragRadii[targetCircle].toFloat()
+
 
                         // compute point position relative to origin
                         val px = start.x +
@@ -403,14 +407,16 @@ fun MainScreenOverlay(
                         // the selected one, that is always drawn last to prevent overlapping issues,
                         // even though it shouldn't happened due to my separatePoints functions
                         if (showAllActionsOnCurrentCircle) {
-                            points.filter { it.circleNumber == targetCircle && it != point }.forEach { p ->
+                            points.filter { it.nestId == nestId && it.circleNumber == targetCircle && it != point }.forEach { p ->
                                 val px = start.x + radius * sin(Math.toRadians(p.angleDeg)).toFloat()
                                 val py = start.y - radius * cos(Math.toRadians(p.angleDeg)).toFloat()
 
                                 actionsInCircle(
+                                    selected = false,
                                     drawScope = this,
                                     action = p.action!!,
-                                    circleColor = circleColor ?: AmoledDefault.CircleColor,
+                                    nests = nests,
+                                    circleColor = circleColor,
                                     backgroundColor = null, // Null for now to erase bg (maybe settings later)
                                     colorAction = actionColor(p.action, extraColors),
                                     px = px, py = py,
@@ -424,13 +430,15 @@ fun MainScreenOverlay(
                         // Draw here the actual selected action (if requested)
                         if (showAppLaunchPreview) {
                             actionsInCircle(
+                                selected = true,
                                 drawScope = this,
                                 action = action,
+                                nests = nests,
                                 px = px, py = py,
                                 ctx = ctx,
                                 backgroundColor = null, // Null for now to erase bg (maybe settings later)
                                 colorAction = colorAction,
-                                circleColor = circleColor ?: AmoledDefault.CircleColor,
+                                circleColor = circleColor,
                                 icons = icons,
                                 drawBorder = showActionIconBorder
                             )
@@ -444,14 +452,16 @@ fun MainScreenOverlay(
                     val currentAction = hoveredAction!!.action!!
 
                     actionsInCircle(
+                        selected = false,
                         drawScope = this,
                         action = currentAction,
+                        nests = nests,
                         px = start.x, py = start.y,
                         ctx = ctx,
                         drawBorder = false,
                         backgroundColor = null, // Null for now to erase bg (maybe settings later)
                         colorAction = colorAction,
-                        circleColor = circleColor ?: AmoledDefault.CircleColor,
+                        circleColor = circleColor,
                         icons = icons
                     )
                 }

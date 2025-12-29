@@ -7,13 +7,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.utils.PackageManagerCompat
 import org.elnix.dragonlauncher.utils.getFilePathFromUri
-import org.elnix.dragonlauncher.utils.queryAppShortcuts
 
 @Composable
 fun actionLabel(action: SwipeActionSerializable): String {
     val ctx = LocalContext.current
     val pm = ctx.packageManager
+    val packageManagerCompat = PackageManagerCompat(pm, ctx)
 
     return when (action) {
 
@@ -38,7 +39,7 @@ fun actionLabel(action: SwipeActionSerializable): String {
 
             val shortcutLabel = try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    queryAppShortcuts(ctx, action.packageName)
+                    packageManagerCompat.queryAppShortcuts(action.packageName)
                         .firstOrNull { it.id == action.shortcutId }
                         ?.shortLabel
                         ?.toString()
@@ -73,5 +74,6 @@ fun actionLabel(action: SwipeActionSerializable): String {
         is SwipeActionSerializable.OpenFile -> getFilePathFromUri(ctx, action.uri.toUri())
         SwipeActionSerializable.ReloadApps -> "Reload Apps"
         SwipeActionSerializable.OpenRecentApps -> stringResource(R.string.recent_apps)
+        is SwipeActionSerializable.OpenCircleNest -> stringResource(R.string.open_nest_circle)
     }
 }

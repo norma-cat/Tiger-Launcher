@@ -33,11 +33,12 @@ import org.elnix.dragonlauncher.ui.drawer.Workspace
 import org.elnix.dragonlauncher.ui.drawer.WorkspaceType
 import org.elnix.dragonlauncher.ui.drawer.resolveApp
 import org.elnix.dragonlauncher.utils.PackageManagerCompat
+import org.elnix.dragonlauncher.utils.TAG
 import org.elnix.dragonlauncher.utils.actions.loadDrawableAsBitmap
 import org.xmlpull.v1.XmlPullParser
 
 
-class AppDrawerViewModel(application: Application) : AndroidViewModel(application) {
+class AppsViewModel(application: Application) : AndroidViewModel(application) {
 
 
     private val _reloadTrigger = MutableStateFlow(0)
@@ -63,12 +64,12 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
     private val iconPackCache = mutableMapOf<String, Map<String, String>>()
 
 
-    private val pm: PackageManager = application.packageManager
-    private val pmCompat = PackageManagerCompat(pm)
-    private val resourceIdCache = mutableMapOf<String, Int>()
-
     @SuppressLint("StaticFieldLeak")
     private val ctx = application.applicationContext
+
+    private val pm: PackageManager = application.packageManager
+    private val pmCompat = PackageManagerCompat(pm, ctx)
+    private val resourceIdCache = mutableMapOf<String, Int>()
 
 
     private val gson = Gson()
@@ -113,20 +114,23 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
 
     private fun loadApps() {
         viewModelScope.launch(Dispatchers.IO) {
-            // Load cached apps first
             val cachedJson = AppsSettingsStore.getCachedApps(ctx)
 
             if (!cachedJson.isNullOrEmpty()) {
-                val type = object : TypeToken<List<AppModel>>() {}.type
-                _apps.value = gson.fromJson(cachedJson, type)
+                try {
+                    val type = object : TypeToken<List<AppModel>>() {}.type
+                    _apps.value = gson.fromJson(cachedJson, type) ?: emptyList()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to parse cached apps, clearing: ${e.message}")
+                    AppsSettingsStore.saveCachedApps(ctx, "") // Clear bad cache
+                    _apps.value = emptyList()
+                }
             }
 
-            // Refresh in background
-            viewModelScope.launch {
-                reloadApps(ctx)
-            }
+            viewModelScope.launch { reloadApps(ctx) }
         }
     }
+
 
     /**
      * Reloads apps fresh from PackageManager.
@@ -154,7 +158,7 @@ class AppDrawerViewModel(application: Application) : AndroidViewModel(applicatio
             apps.associate { app ->
                 val packIconName = getCachedIconMapping(app.packageName)
                 val drawable = packIconName?.let { loadIconFromPack(selectedIconPack.value?.packageName, it) }
-                val finalDrawable = drawable ?: pmCompat.getAppIcon(app.packageName, ctx)
+                val finalDrawable = drawable ?: pmCompat.getAppIcon(app.packageName)
                 app.packageName to loadDrawableAsBitmap(finalDrawable, 128, 128)
             }
         }

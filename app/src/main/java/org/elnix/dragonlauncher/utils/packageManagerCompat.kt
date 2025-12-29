@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ShortcutInfo
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.core.content.ContextCompat
@@ -16,7 +17,7 @@ import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.ui.drawer.AppModel
 import org.elnix.dragonlauncher.utils.actions.loadDrawableAsBitmap
 
-class PackageManagerCompat(private val pm: PackageManager) {
+class PackageManagerCompat(private val pm: PackageManager, private val ctx: Context) {
 
     fun getInstalledPackages(flags: Int = 0): List<PackageInfo> {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -78,7 +79,7 @@ class PackageManagerCompat(private val pm: PackageManager) {
                 (appInfo.packageName.startsWith("com.android.") || appInfo.packageName.startsWith("android"))
     }
 
-    fun getAppIcon(pkgName: String, ctx: Context): Drawable {
+    fun getAppIcon(pkgName: String): Drawable {
         return try {
             val appInfo = pm.getApplicationInfo(pkgName, 0)
             appInfo.loadUnbadgedIcon(pm)
@@ -90,24 +91,61 @@ class PackageManagerCompat(private val pm: PackageManager) {
     fun getResourcesForApplication(pkgName: String): android.content.res.Resources {
         return pm.getResourcesForApplication(pkgName)
     }
-}
 
+    @RequiresApi(Build.VERSION_CODES.R)
+    fun queryAppShortcuts(packageName: String): List<ShortcutInfo> {
+        Log.e(TAG, "Starting queryAppShortcuts for package: $packageName")
 
+        try {
+            Log.e(TAG, "Getting LauncherApps service...")
+            val launcherApps = ctx.getSystemService(LauncherApps::class.java)
+            if (launcherApps == null) {
+                Log.e(TAG, "LauncherApps service is null - returning empty list")
+                return emptyList()
+            }
+            Log.e(TAG, "LauncherApps service obtained successfully")
 
-@RequiresApi(Build.VERSION_CODES.R)
-fun queryAppShortcuts(context: Context, packageName: String): List<ShortcutInfo> {
-    val launcherApps = context.getSystemService(LauncherApps::class.java) ?: return emptyList()
-    val query = LauncherApps.ShortcutQuery()
-        .setPackage(packageName)
-        .setQueryFlags(
-            LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC or
-                    LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST or
-                    LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED
-        )
+            Log.e(TAG, "Creating ShortcutQuery with flags...")
+            val query = LauncherApps.ShortcutQuery()
+                .setPackage(packageName)
+                .setQueryFlags(
+                    LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC or
+                            LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST or
+                            LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED
+                )
+            Log.e(TAG, "ShortcutQuery created with package: $packageName and flags: $query")
 
-    val userHandle = android.os.Process.myUserHandle()
-    val shortcuts = launcherApps.getShortcuts(query, userHandle)
-    return shortcuts ?: emptyList()
+            Log.e(TAG, "Getting current userHandle...")
+            val userHandle = android.os.Process.myUserHandle()
+            Log.e(TAG, "UserHandle obtained: $userHandle")
+
+            Log.e(TAG, "Calling getShortcuts with query and userHandle...")
+            val shortcuts = launcherApps.getShortcuts(query, userHandle)
+            Log.e(TAG, "getShortcuts returned: ${shortcuts?.size ?: 0} shortcuts")
+
+            if (shortcuts != null) {
+                Log.e(TAG, "Shortcuts details: ${shortcuts.joinToString { it.id }}")
+                return shortcuts
+            } else {
+                Log.e(TAG, "getShortcuts returned null - returning empty list")
+                return emptyList()
+            }
+
+        } catch (e: SecurityException) {
+            Log.e(TAG, "SecurityException: ${e.message}", e)
+            ctx.showToast("Need to be default launcher to query shortcuts")
+            return emptyList()
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "IllegalStateException: ${e.message}", e)
+            return emptyList()
+        } catch (e: NullPointerException) {
+            Log.e(TAG, "NullPointerException: ${e.message}", e)
+            return emptyList()
+        } catch (e: Exception) {
+            Log.e(TAG, "Unexpected exception: ${e.message}", e)
+            return emptyList()
+        }
+    }
 }
 
 

@@ -59,7 +59,7 @@ import org.elnix.dragonlauncher.ui.components.dialogs.RenameAppDialog
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
 import org.elnix.dragonlauncher.utils.ImageUtils
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 import org.elnix.dragonlauncher.utils.openSearch
 import org.elnix.dragonlauncher.utils.showToast
@@ -68,7 +68,7 @@ import org.elnix.dragonlauncher.utils.showToast
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AppDrawerScreen(
-    appsViewModel: AppDrawerViewModel,
+    appsViewModel: AppsViewModel,
     workspaceViewModel: WorkspaceViewModel,
     showIcons: Boolean,
     showLabels: Boolean,

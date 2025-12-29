@@ -16,3 +16,8 @@ val ignoredReturnRoutes = listOf(
 /* Themes loader utils */
 const val themesDir = "themes"
 val imageExts = listOf("png", "jpg", "jpeg", "webp")
+
+
+const val TAG = "DragonLauncherDebug"
+
+const val TAGSwipe = "SwipeDebug"

@@ -101,6 +101,11 @@ android {
             isShrinkResources = true
             isDebuggable = true
         }
+        debug {
+            isDebuggable = true
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
     }
 
     compileOptions {

@@ -1,15 +1,16 @@
 package org.elnix.dragonlauncher.ui.drawer
 
+import com.google.gson.annotations.SerializedName
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 
 data class AppModel(
-    val name: String,
-    val packageName: String,
-    val isEnabled: Boolean,
-    val isSystem: Boolean,
-    val isWorkProfile: Boolean,
-    val isLaunchable: Boolean?,
-    val settings: Map<String, Any> = emptyMap()
+    @SerializedName("a") val name: String,
+    @SerializedName("b") val packageName: String,
+    @SerializedName("c") val isEnabled: Boolean,
+    @SerializedName("d") val isSystem: Boolean,
+    @SerializedName("e") val isWorkProfile: Boolean,
+    @SerializedName("f") val isLaunchable: Boolean?,
+    @SerializedName("g") val settings: Map<String, Any> = emptyMap()
 ) {
     val action = SwipeActionSerializable.LaunchApp(packageName)
 }

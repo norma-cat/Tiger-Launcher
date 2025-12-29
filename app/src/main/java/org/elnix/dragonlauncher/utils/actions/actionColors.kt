@@ -20,4 +20,5 @@ fun actionColor(
         is SwipeActionSerializable.ReloadApps -> extra.reload
         SwipeActionSerializable.OpenRecentApps -> extra.openRecentApps
         null -> Color.Unspecified
+        is SwipeActionSerializable.OpenCircleNest -> extra.circle
     }

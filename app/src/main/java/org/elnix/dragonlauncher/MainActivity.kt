@@ -34,7 +34,7 @@ import org.elnix.dragonlauncher.ui.ROUTES
 import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
 import org.elnix.dragonlauncher.utils.ignoredReturnRoutes
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.AppLifecycleViewModel
 import org.elnix.dragonlauncher.utils.models.BackupViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
@@ -43,7 +43,7 @@ import java.util.UUID
 class MainActivity : ComponentActivity() {
 
     private val appLifecycleViewModel : AppLifecycleViewModel by viewModels()
-    private val appsViewModel : AppDrawerViewModel by viewModels()
+    private val appsViewModel : AppsViewModel by viewModels()
     private val backupViewModel : BackupViewModel by viewModels()
     private val workspaceViewModel : WorkspaceViewModel by viewModels()
 
@@ -111,7 +111,7 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(hasInitialized) {
                 if (!hasInitialized) {
-                    SwipeSettingsStore.save(ctx,
+                    SwipeSettingsStore.savePoints(ctx,
                         listOf(
                             SwipePointSerializable(
                                 circleNumber = 0,
@@ -208,7 +208,7 @@ class MainActivity : ComponentActivity() {
 
                 MainAppUi(
                     backupViewModel = backupViewModel,
-                    appViewModel = appsViewModel,
+                    appsViewModel = appsViewModel,
                     workspaceViewModel = workspaceViewModel,
                     navController = navController
                 )

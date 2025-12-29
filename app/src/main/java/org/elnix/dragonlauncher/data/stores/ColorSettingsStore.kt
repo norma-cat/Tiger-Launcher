@@ -179,7 +179,7 @@ object ColorSettingsStore : BaseSettingsStore() {
     }
 
     fun getCircleColor(ctx: Context) =
-        ctx.colorDatastore.data.map { it[CIRCLE_COLOR]?.let { color -> Color(color) } }
+        ctx.colorDatastore.data.map { it[CIRCLE_COLOR]?.let { color -> Color(color) } ?: AmoledDefault.CircleColor }
 
     suspend fun setCircleColor(ctx: Context, color: Color) {
         ctx.colorDatastore.edit { it[CIRCLE_COLOR] = color.toArgb() }

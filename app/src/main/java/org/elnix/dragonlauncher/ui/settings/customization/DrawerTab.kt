@@ -42,12 +42,12 @@ import org.elnix.dragonlauncher.ui.helpers.GridSizeSlider
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 
 
 @Composable
 fun DrawerTab(
-    appsViewModel: AppDrawerViewModel,
+    appsViewModel: AppsViewModel,
     onBack: () -> Unit
 ) {
 

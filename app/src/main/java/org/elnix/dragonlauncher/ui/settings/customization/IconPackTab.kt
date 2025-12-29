@@ -38,11 +38,11 @@ import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 
 @Composable
 fun IconPackTab(
-    appsViewModel: AppDrawerViewModel = viewModel(),
+    appsViewModel: AppsViewModel = viewModel(),
     onBack: () -> Unit
 ) {
     val ctx = LocalContext.current

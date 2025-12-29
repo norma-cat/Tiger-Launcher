@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.ui
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -18,10 +19,14 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
@@ -31,8 +36,10 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Grid3x3
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.OpenWith
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.ChangeCircle
@@ -42,10 +49,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
@@ -75,27 +80,34 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.data.CircleNest
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.UiCircle
 import org.elnix.dragonlauncher.data.UiSwipePoint
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
+import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
 import org.elnix.dragonlauncher.ui.components.dialogs.AddPointDialog
+import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.RepeatingPressButton
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
+import org.elnix.dragonlauncher.ui.theme.addRemoveCirclesColor
+import org.elnix.dragonlauncher.ui.theme.copyColor
+import org.elnix.dragonlauncher.ui.theme.moveColor
+import org.elnix.dragonlauncher.utils.TAG
+import org.elnix.dragonlauncher.utils.TAGSwipe
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import org.elnix.dragonlauncher.utils.circles.autoSeparate
 import org.elnix.dragonlauncher.utils.circles.normalizeAngle
 import org.elnix.dragonlauncher.utils.circles.randomFreeAngle
-import org.elnix.dragonlauncher.utils.colors.adjustBrightness
-import org.elnix.dragonlauncher.utils.models.AppDrawerViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 import java.math.RoundingMode
 import java.util.UUID
@@ -105,20 +117,18 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.round
 import kotlin.math.sin
+import kotlin.random.Random
 
 // Config
-val MIN_ANGLE_GAP = listOf(
-    27.0,
-    16.0,
-    11.0
-)
+fun minAngleGapForCircle(circleIndex: Int): Double {
+    return when (circleIndex) {
+        0 -> 27.0
+        1 -> 16.0
+        2 -> 11.0
+        else -> 8.0 + (3.0 / (circleIndex + 1)) // Decreases asymptotically
+    }
+}
 
-@Immutable
-data class CircleData(
-    val name: String,
-    val color: Color,
-    val radius: Int
-)
 
 private const val POINT_RADIUS_PX = 40f
 private const val TOUCH_THRESHOLD_PX = 100f
@@ -128,7 +138,7 @@ private const val SNAP_STEP_DEG = 15.0
 @Suppress("AssignedValueIsNeverRead")
 @Composable
 fun SettingsScreen(
-    appsViewModel: AppDrawerViewModel,
+    appsViewModel: AppsViewModel,
     workspaceViewModel: WorkspaceViewModel,
     onAdvSettings: () -> Unit,
     onBack: () -> Unit
@@ -145,34 +155,88 @@ fun SettingsScreen(
     val showActionIconBorder by UiSettingsStore.getShowActionIconBorder(ctx)
         .collectAsState(initial = false)
 
+    val settingsDebugInfos by DebugSettingsStore.getSettingsDebugInfos(ctx)
+        .collectAsState(initial = false)
+
     var center by remember { mutableStateOf(Offset.Zero) }
 
     val points: SnapshotStateList<UiSwipePoint> = remember { mutableStateListOf() }
     val circles: SnapshotStateList<UiCircle> = remember { mutableStateListOf() }
 
     var selectedPoint by remember { mutableStateOf<UiSwipePoint?>(null) }
-    var lastSelectedCircle by remember { mutableIntStateOf(1) }
+    var lastSelectedCircle by remember { mutableIntStateOf(0) }
     val aPointIsSelected = selectedPoint != null
 
     var showAddDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf<UiSwipePoint?>(null) }
     var recomposeTrigger by remember { mutableIntStateOf(0) }
 
+    var showDeleteNestDialog by remember { mutableStateOf<UiSwipePoint?>(null) }
 
-    val circleR1 by UiSettingsStore.getFirstCircleDragDistance(ctx)
-        .collectAsState(initial = 400)
-    val circleR2 by UiSettingsStore.getSecondCircleDragDistance(ctx)
-        .collectAsState(initial = 700)
-    val cancelZone by UiSettingsStore.getCancelZoneDragDistance(ctx)
-        .collectAsState(initial = 150)
 
-    val circleDataList by remember {
-        derivedStateOf {
-            listOf(
-                CircleData("circleR1", Color.Green, circleR1),
-                CircleData("circleR2", Color.Red, circleR2),
-                CircleData("cancelZone", Color.Gray, cancelZone)
-            )
+    /**
+     * NESTS SYSTEM
+     * - Collects the nests from the datastore, then initialize the base nest to 0 (always the default)
+     * while all the other have a random id
+     */
+
+
+    val nests by SwipeSettingsStore.getNestsFlow(ctx)
+        .collectAsState(initial = emptyList())
+
+
+    var nestId by remember { mutableStateOf(0) }
+
+    val currentNest = nests.find { it.id == nestId } ?: CircleNest(id = nestId, parentId = 0)
+
+    val goBack = {
+        if (currentNest.parentId != nestId) {
+            nestId = currentNest.parentId
+        }
+    }
+
+    val goToNest = { newNestId: Int ->
+        if (newNestId != nestId) {
+            nestId = newNestId
+        }
+    }
+
+
+    /**
+     * The number of circles if the size of the current nest, minus one, cause it ignores the
+     * cancel zone
+     */
+    val circleNumber = currentNest.dragDistances.size - 1
+//    val circleKeys = currentNest.dragDistances.keys.filter { it > -1 }
+//    val circleNumber = circleKeys.maxOrNull() ?: 0  // Highest circle ID
+
+    /**
+     * Computes an even distance for the circles spacing, for clean integration
+     */
+    val circlesWidthIncrement = (1f / circleNumber).takeIf { it != 0f } ?: 1f
+
+    var pendingNestUpdate by remember { mutableStateOf<List<CircleNest>?>(null) }
+
+
+    /**
+     * Used to ensure that there is always a 0-id nest, the default one, the most important
+     */
+    LaunchedEffect(nestId, nests.size) {
+        if (nests.isNotEmpty() && nests.none { it.id == nestId }) {
+            Log.d(TAG, "Creating missing nest $nestId")
+            pendingNestUpdate = nests + CircleNest(id = nestId, parentId = 0)
+        }
+    }
+
+    /**
+     * Saving system, the nests are immutable, they are saved using a pending value, that
+     * asynchronously saves the nests in the datastore
+     */
+    LaunchedEffect(pendingNestUpdate) {
+        pendingNestUpdate?.let { nests ->
+            Log.e(TAG, "Saving: ${nests.size} nests")
+            SwipeSettingsStore.saveNests(ctx, nests)
+            pendingNestUpdate = null
         }
     }
 
@@ -272,14 +336,6 @@ fun SettingsScreen(
         val closest = circles.minByOrNull { c -> abs(c.radius - distFromCenter) }
             ?: return
 
-        // 4. Reassign to new circle if needed
-        if (point.circleNumber != closest.id) {
-            val oldCircle = circles.find { it.id == point.circleNumber }
-            oldCircle?.points?.removeIf { it.id == point.id }
-
-            closest.points.add(point)
-            haveToApplyToStack = true
-        }
 
         if (haveToApplyToStack) applyChange {
             point.angleDeg = finalAngle
@@ -296,15 +352,10 @@ fun SettingsScreen(
                 it.id ?: UUID.randomUUID().toString(),
                 it.angleDeg,
                 it.action ?: SwipeActionSerializable.ControlPanel,
-                it.circleNumber
+                it.circleNumber,
+                it.nestId ?: 0
             )
         })
-
-        // assign points into circles
-        points.forEach { p ->
-            val circle = circles.getOrNull(p.circleNumber)
-            circle?.points?.add(p)
-        }
     }
 
 
@@ -313,14 +364,15 @@ fun SettingsScreen(
         snapshotFlow { points.toList() }
             .distinctUntilChanged()
             .collect { list ->
-                SwipeSettingsStore.save(
+                SwipeSettingsStore.savePoints(
                     ctx,
                     list.map {
                         SwipePointSerializable(
                             id = it.id,
                             angleDeg = it.angleDeg,
                             action = it.action,
-                            circleNumber = it.circleNumber
+                            circleNumber = it.circleNumber,
+                            nestId = it.nestId
                         )
                     }
                 )
@@ -330,7 +382,8 @@ fun SettingsScreen(
 
     BackHandler {
         if (isCircleDistanceMode) isCircleDistanceMode = false
-        if (selectedPoint != null) selectedPoint = null
+        else if (selectedPoint != null) selectedPoint = null
+        else if (nestId != 0) goBack()
         else onBack()
     }
 
@@ -376,7 +429,6 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
-                .padding(32.dp)
                 .onSizeChanged { size ->
                     val w = size.width.toFloat()
                     val h = size.height.toFloat()
@@ -384,29 +436,24 @@ fun SettingsScreen(
                     availableWidth = w - (POINT_RADIUS_PX * 2)  // Safe space for points + padding
 
                     // Proportional radii: largest fits screen, others reduce evenly
-                    val baseRadius = availableWidth * 0.65f  // ~35% of screen width
+                    val baseRadius = availableWidth / 2 * 0.95f // almost half of screen width
                     circles.clear()
-                    circles.add(
-                        UiCircle(
-                            id = 0,
-                            radius = baseRadius * 0.35f,
-                            points = mutableStateListOf()
-                        )
-                    )
-                    circles.add(
-                        UiCircle(
-                            id = 1,
-                            radius = baseRadius * 0.60f,
-                            points = mutableStateListOf()
-                        )
-                    )
-                    circles.add(
-                        UiCircle(
-                            id = 2,
-                            radius = baseRadius * 0.85f,
-                            points = mutableStateListOf()
-                        )
-                    )
+                    Log.e(TAGSwipe, "--------")
+
+                    currentNest.dragDistances.filter { it.key != -1 }
+                        .forEach { (circleNumber, distance) ->
+
+                            Log.e(TAGSwipe, "$circleNumber to $distance")
+                            // Computes the radius from the base radius and increase it evenly depending on the circle number
+                            val radius = circlesWidthIncrement * (circleNumber + 1) * baseRadius
+
+                            circles.add(
+                                UiCircle(
+                                    id = circleNumber,
+                                    radius = radius,
+                                )
+                            )
+                        }
                 }
         ) {
 
@@ -418,78 +465,51 @@ fun SettingsScreen(
                         // 1. Draw all circles
                         circles.forEach { circle ->
                             drawCircle(
-                                color = circleColor ?: AmoledDefault.CircleColor,
+                                color = circleColor,
                                 radius = circle.radius,
                                 center = center,
                                 style = Stroke(4f)
                             )
-                        }
 
-                        // 2. Draw all non-selected points
-                        points.filter { it.id != selectedPoint?.id }.forEach { p ->
-                            val circle = circles.getOrNull(p.circleNumber) ?: return@forEach
-                            val px = center.x + circle.radius * sin(Math.toRadians(p.angleDeg)).toFloat()
-                            val py = center.y - circle.radius * cos(Math.toRadians(p.angleDeg)).toFloat()
+                            val filteredPoints = points.filter { it.circleNumber == circle.id && it.nestId == nestId }
 
-                            actionsInCircle(
-                                drawScope = this,
-                                action = p.action,
-                                circleColor = circleColor ?: AmoledDefault.CircleColor,
-                                backgroundColor = backgroundColor,
-                                colorAction = actionColor(p.action, extraColors),
-                                px = px, py = py,
-                                ctx = ctx,
-                                icons = icons,
-                                drawBorder = showActionIconBorder
-                            )
-                        }
+                            // 2. Draw all points, selected last
+                            filteredPoints.sortedBy { it.id == selectedPoint?.id }.forEach { p ->
+                                val px =
+                                    center.x + circle.radius * sin(Math.toRadians(p.angleDeg)).toFloat()
+                                val py =
+                                    center.y - circle.radius * cos(Math.toRadians(p.angleDeg)).toFloat()
 
-                        // 3. Selected point drawn last
-                        val selected = points.find { it.id == selectedPoint?.id }
-                        selected?.let { p ->
-                            val circle = circles.getOrNull(p.circleNumber) ?: return@let
-                            val px = center.x + circle.radius * sin(Math.toRadians(p.angleDeg)).toFloat()
-                            val py = center.y - circle.radius * cos(Math.toRadians(p.angleDeg)).toFloat()
-
-                            drawCircle(
-                                color = (circleColor ?: AmoledDefault.CircleColor).adjustBrightness(2f),
-                                radius = POINT_RADIUS_PX + 10,
-                                center = Offset(px, py)
-                            )
-
-                            actionsInCircle(
-                                drawScope = this,
-                                action = p.action,
-                                circleColor = circleColor ?: AmoledDefault.CircleColor,
-                                backgroundColor = backgroundColor,
-                                colorAction = actionColor(p.action, extraColors),
-                                px = px, py = py,
-                                ctx = ctx,
-                                icons = icons,
-                                drawBorder = showActionIconBorder
-                            )
+                                actionsInCircle(
+                                    selected = p.id == selectedPoint?.id,
+                                    drawScope = this,
+                                    action = p.action,
+                                    nests = nests,
+                                    circleColor = circleColor,
+                                    backgroundColor = backgroundColor,
+                                    colorAction = actionColor(p.action, extraColors),
+                                    px = px, py = py,
+                                    ctx = ctx,
+                                    icons = icons,
+                                    drawBorder = showActionIconBorder
+                                )
+                            }
                         }
                     }
                 } else {
                     Canvas(Modifier.fillMaxSize()) {
-                        circleDataList.sortedBy { it.radius }.reversed().forEach { circleData ->
 
+                        currentNest.dragDistances.forEach { (_, distance)->
                             drawCircle(
-                                color = backgroundColor,
-                                radius = circleData.radius.toFloat(),
-                                center = center,
-                                style = Fill
-                            )
-                            drawCircle(
-                                color = circleData.color.copy(0.1f),
-                                radius = circleData.radius.toFloat(),
+                                color = circleColor.copy(0.1f),
+                                radius = distance.toFloat(),
                                 center = center,
                                 style = Fill
                             )
 
                             drawCircle(
-                                color = circleData.color,
-                                radius = circleData.radius.toFloat(),
+                                color = circleColor,
+                                radius = distance.toFloat(),
                                 center = center,
                                 style = Stroke(4f)
                             )
@@ -503,13 +523,19 @@ fun SettingsScreen(
                 Box(
                     Modifier
                         .matchParentSize()
+                        .then(
+                            if (settingsDebugInfos) {
+                                Modifier.background(Color.DarkGray.copy(0.3f))
+                            } else Modifier
+                        )
                         .pointerInput(Unit) {
                             detectDragGestures(
                                 onDragStart = { offset ->
                                     var closest: UiSwipePoint? = null
                                     var best = Float.MAX_VALUE
 
-                                    points.forEach { p ->
+                                    // Can only select points on the same nest
+                                    points.filter { it.nestId == nestId }.forEach { p ->
                                         val circle =
                                             circles.getOrNull(p.circleNumber) ?: return@forEach
                                         val px =
@@ -541,7 +567,7 @@ fun SettingsScreen(
 
                                     // All points that are part of the same circle
                                     val sameCirclePoints =
-                                        points.filter { it.circleNumber == selected.circleNumber }
+                                        points.filter { it.nestId == nestId && it.circleNumber == selected.circleNumber }
                                     if (sameCirclePoints.isEmpty()) return@detectDragGestures
 
                                     val p = points.find { it.id == selectedPoint?.id }
@@ -568,7 +594,7 @@ fun SettingsScreen(
                                     var tapped: UiSwipePoint? = null
                                     var best = Float.MAX_VALUE
 
-                                    points.forEach { p ->
+                                    points.filter { it.nestId == nestId }.forEach { p ->
                                         val circle =
                                             circles.getOrNull(p.circleNumber) ?: return@forEach
                                         val px =
@@ -602,6 +628,74 @@ fun SettingsScreen(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         ){
+
+            Row (
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+            ) {
+                val nestToGo =
+                    if (selectedPoint?.action is SwipeActionSerializable.OpenCircleNest) {
+                        (selectedPoint!!.action as SwipeActionSerializable.OpenCircleNest).nestId
+                    } else null
+
+                val canGoNest = nestToGo != null
+
+                Box(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable(canGoNest) {
+                            // Open selected nest
+                            goToNest(nestToGo!!)
+                            selectedPoint = null
+                        }
+                        .background(addRemoveCirclesColor.copy(if (canGoNest) 0.2f else 0f))
+                        .border(
+                            width = 1.dp,
+                            color = addRemoveCirclesColor.copy(if (canGoNest) 1f else 0.5f),
+                            shape = CircleShape
+                        )
+                        .size(40.dp)
+                        .padding(7.dp),
+                    contentAlignment = Alignment.Center
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.OpenWith,
+                        contentDescription = "Open nest",
+                        tint = addRemoveCirclesColor.copy(if (canGoNest) 1f else 0.5f)
+                    )
+                }
+
+
+                val canGoback = currentNest.parentId != nestId
+
+                Box(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable(canGoback) {
+                            // Go back one nest
+                            goBack()
+                            selectedPoint = null
+                        }
+                        .background(addRemoveCirclesColor.copy(if (canGoback) 0.2f else 0f))
+                        .border(
+                            width = 1.dp,
+                            color = addRemoveCirclesColor.copy(if (canGoback) 1f else 0.5f),
+                            shape = CircleShape
+                        )
+                        .size(40.dp)
+                        .padding(7.dp),
+                    contentAlignment = Alignment.Center
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FullscreenExit,
+                        contentDescription = "Go revious nest",
+                        tint = addRemoveCirclesColor.copy(if (canGoback) 1f else 0.5f)
+                    )
+                }
+            }
+
+
             Icon(
                 imageVector = if (isCircleDistanceMode) {
                     Icons.Filled.ChangeCircle
@@ -624,7 +718,7 @@ fun SettingsScreen(
                         color = MaterialTheme.colorScheme.primary.copy(if (isCircleDistanceMode) 1f else 0.5f),
                         shape = CircleShape
                     )
-                    .padding(15.dp)
+                    .padding(10.dp)
             )
 
             if (!isCircleDistanceMode) {
@@ -677,7 +771,7 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.primary.copy(if (snapPoints) 1f else 0.2f),
                             shape = CircleShape
                         )
-                        .padding(15.dp)
+                        .padding(10.dp)
                 )
 
 
@@ -700,16 +794,16 @@ fun SettingsScreen(
                     Icon(
                         imageVector = Icons.Default.ChevronLeft,
                         contentDescription = "Move point to left",
-                        tint = Color(0xFF14E7EE).copy(if (aPointIsSelected) 1f else 0.2f),
+                        tint = moveColor.copy(if (aPointIsSelected) 1f else 0.2f),
                         modifier = Modifier
                             .clip(CircleShape)
-                            .background(Color(0xFF14E7EE).copy(if (aPointIsSelected) 0.2f else 0f))
+                            .background(moveColor.copy(if (aPointIsSelected) 0.2f else 0f))
                             .border(
                                 width = 1.dp,
-                                color = Color(0xFF14E7EE).copy(if (aPointIsSelected) 1f else 0.2f),
+                                color = moveColor.copy(if (aPointIsSelected) 1f else 0.2f),
                                 shape = CircleShape
                             )
-                            .padding(15.dp)
+                            .padding(10.dp)
                     )
                 }
 
@@ -751,16 +845,16 @@ fun SettingsScreen(
                     Icon(
                         imageVector = Icons.Default.ChevronRight,
                         contentDescription = "Move point to right",
-                        tint = Color(0xFF14E7EE).copy(if (aPointIsSelected) 1f else 0.2f),
+                        tint = moveColor.copy(if (aPointIsSelected) 1f else 0.2f),
                         modifier = Modifier
                             .clip(CircleShape)
-                            .background(Color(0xFF14E7EE).copy(if (aPointIsSelected) 0.2f else 0f))
+                            .background(moveColor.copy(if (aPointIsSelected) 0.2f else 0f))
                             .border(
                                 width = 1.dp,
-                                color = Color(0xFF14E7EE).copy(if (aPointIsSelected) 1f else 0.2f),
+                                color = moveColor.copy(if (aPointIsSelected) 1f else 0.2f),
                                 shape = CircleShape
                             )
-                            .padding(15.dp)
+                            .padding(10.dp)
                     )
                 }
             }
@@ -769,7 +863,8 @@ fun SettingsScreen(
                 Modifier
                     .fillMaxWidth()
                     .padding(20.dp),
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -784,7 +879,7 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.primary.copy(0.5f),
                             shape = CircleShape
                         )
-                        .padding(25.dp)
+                        .padding(20.dp)
                 )
 
                 Icon(
@@ -800,7 +895,7 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.secondary.copy(if (aPointIsSelected) 1f else 0.2f),
                             shape = CircleShape
                         )
-                        .padding(25.dp)
+                        .padding(20.dp)
                 )
 
                 Icon(
@@ -810,14 +905,19 @@ fun SettingsScreen(
                     modifier = Modifier
                         .clip(CircleShape)
                         .clickable(aPointIsSelected) {
-                            selectedPoint?.id.let { id ->
-                                val index = points.indexOfFirst { it.id == id }
-                                if (index >= 0) {
-                                    applyChange {
-                                        points.removeAt(index)
+                            selectedPoint?.let { point ->
+
+                                if (point.action is SwipeActionSerializable.OpenCircleNest) {
+                                    showDeleteNestDialog = point
+                                } else {
+                                    val index = points.indexOfFirst { it.id == point.id }
+                                    if (index >= 0) {
+                                        applyChange {
+                                            points.removeAt(index)
+                                        }
                                     }
+                                    selectedPoint = null
                                 }
-                                selectedPoint = null
                             }
                         }
                         .background(MaterialTheme.colorScheme.error.copy(if (aPointIsSelected) 0.2f else 0f))
@@ -826,13 +926,13 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.error.copy(if (aPointIsSelected) 1f else 0.2f),
                             shape = CircleShape
                         )
-                        .padding(25.dp)
+                        .padding(20.dp)
                 )
 
                 Icon(
                     imageVector = Icons.Default.ContentCopy,
                     contentDescription = "Copy point",
-                    tint = Color(0xFFE19807).copy(if (aPointIsSelected) 1f else 0.2f),
+                    tint = copyColor.copy(if (aPointIsSelected) 1f else 0.2f),
                     modifier = Modifier
                         .clip(CircleShape)
                         .clickable(aPointIsSelected) {
@@ -844,7 +944,8 @@ fun SettingsScreen(
                                     id = UUID.randomUUID().toString(),
                                     angleDeg = newAngle,
                                     action = oldPoint.action,
-                                    circleNumber = circleNumber
+                                    circleNumber = circleNumber,
+                                    nestId = nestId
                                 )
 
                                 applyChange {
@@ -854,53 +955,149 @@ fun SettingsScreen(
                                 selectedPoint = newPoint
                             }
                         }
-                        .background(Color(0xFFE19807).copy(if (aPointIsSelected) 0.2f else 0f))
+                        .background(copyColor.copy(if (aPointIsSelected) 0.2f else 0f))
                         .border(
                             width = 1.dp,
-                            color = Color(0xFFE19807).copy(if (aPointIsSelected) 1f else 0.2f),
+                            color = copyColor.copy(if (aPointIsSelected) 1f else 0.2f),
                             shape = CircleShape
                         )
-                        .padding(25.dp)
+                        .padding(20.dp)
                 )
+
+                Column(
+                    modifier = Modifier,
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .clickable {
+
+                                Log.e(TAG, nests.toString())
+                                Log.e(TAG, "Received add update, current nests size: ${nests.size}")
+
+
+                                // The new circle id is the size minus one, cause circleIndexes
+                                // starts at 0 and the cancel zone is always in the list
+                                val newCircleNumber = currentNest.dragDistances.size - 1
+
+                                Log.e(TAG, "new circle number: $newCircleNumber")
+
+                                Log.e(TAG, nests.map {
+                                    if (it.id == nestId) {
+                                        it.copy(
+                                            dragDistances = it.dragDistances + (newCircleNumber to defaultDragDistance(
+                                                newCircleNumber
+                                            ))
+                                        )
+                                    } else it
+                                }.toString())
+                                // Add a new circle
+                                pendingNestUpdate = nests.map {
+                                    if (it.id == nestId) {
+                                        it.copy(
+                                            dragDistances = it.dragDistances + (newCircleNumber to defaultDragDistance(
+                                                newCircleNumber
+                                            ))
+                                        )
+                                    } else it
+                                }
+                            }
+                            .background(addRemoveCirclesColor.copy(0.2f))
+                            .border(
+                                width = 1.dp,
+                                color = addRemoveCirclesColor,
+                                shape = CircleShape
+                            )
+                            .size(40.dp)
+                            .padding(7.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "+1",
+                            color = addRemoveCirclesColor,
+                        )
+                    }
+
+                    val canRemoveCircle = circleNumber > 1
+
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .clickable(canRemoveCircle) {
+
+                                // Remove last circle
+                                pendingNestUpdate = nests.map {
+                                    if (it.id == nestId) {
+
+                                        // Filters keys that are above zero (cannot remove if only one circle, it's a safe guard
+                                        val maxCircle =
+                                            it.dragDistances.keys.filter { k -> k > 0 }.maxOrNull()
+                                        val updatedDistances = if (maxCircle != null) {
+                                            it.dragDistances - maxCircle
+                                        } else {
+                                            it.dragDistances
+                                        }
+                                        it.copy(dragDistances = updatedDistances)
+                                    } else it
+                                }
+                            }
+                            .background(addRemoveCirclesColor.copy(if (canRemoveCircle) 0.2f else 0f))
+                            .border(
+                                width = 1.dp,
+                                color = addRemoveCirclesColor.copy(if (canRemoveCircle) 1f else 0.2f),
+                                shape = CircleShape
+                            )
+                            .size(40.dp)
+                            .padding(7.dp),
+                        contentAlignment = Alignment.Center
+
+                    ) {
+                        Text(
+                            text = "-1",
+                            color = addRemoveCirclesColor.copy(if (canRemoveCircle) 1f else 0.2f),
+                        )
+                    }
+                }
             }
         } else {
             Column(
                 Modifier
                     .fillMaxWidth()
+                    .height(300.dp)
+                    .verticalScroll(rememberScrollState())
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
-                SliderWithLabel(
-                    label = stringResource(R.string.circleR1),
-                    value = circleR1,
-                    valueRange = 0f..1000f,
-                    showValue = false,
-                    color = circleDataList.find { it.name == "circleR1" }!!.color,
-                    onReset = { scope.launch { UiSettingsStore.setFirstCircleDragDistance(ctx, 400) } }
-                ) {
-                    scope.launch { UiSettingsStore.setFirstCircleDragDistance(ctx, it) }
-                }
-
-                SliderWithLabel(
-                    label = stringResource(R.string.circleR2),
-                    value = circleR2,
-                    valueRange = 0f..1000f,
-                    showValue = false,
-                    color = circleDataList.find { it.name == "circleR2" }!!.color,
-                    onReset = { scope.launch { UiSettingsStore.setSecondCircleDragDistance(ctx, 700) } }
-                ) {
-                    scope.launch { UiSettingsStore.setSecondCircleDragDistance(ctx, it) }
-                }
-
-                SliderWithLabel(
-                    label = stringResource(R.string.cancelZone),
-                    value = cancelZone,
-                    valueRange = 0f..1000f,
-                    showValue = false,
-                    color = circleDataList.find { it.name == "cancelZone" }!!.color,
-                    onReset = { scope.launch { UiSettingsStore.setCancelZoneDragDistance(ctx, 150) } }
-                ) {
-                    scope.launch { UiSettingsStore.setCancelZoneDragDistance(ctx, it) }
+                currentNest.dragDistances.forEach { (index, distance) ->
+                    SliderWithLabel(
+                        label = if (index == -1) stringResource(R.string.cancel_zone)
+                        else "${stringResource(R.string.circle)}: $index",
+                        value = distance,
+                        valueRange = 0f..1000f,
+                        showValue = false,
+                        color = MaterialTheme.colorScheme.primary,
+                        onReset = {
+                           pendingNestUpdate = nests.map { nest ->
+                                if (nest.id == nestId) {
+                                    val newDistances = nest.dragDistances.toMutableMap().apply {
+                                        this[index] = defaultDragDistance(index)
+                                    }
+                                    nest.copy(dragDistances = newDistances)
+                                } else nest
+                            }
+                        }
+                    ) { newValue ->
+                        pendingNestUpdate = nests.map { nest ->
+                            if (nest.id == currentNest.id) {
+                                val newDistances = nest.dragDistances.toMutableMap().apply {
+                                    this[index] = newValue
+                                }
+                                nest.copy(dragDistances = newDistances)
+                            } else nest
+                        }
+                    }
                 }
             }
         }
@@ -914,15 +1111,26 @@ fun SettingsScreen(
                 showAddDialog = false
             },
             onActionSelected = { action ->
-                val circleNumber = lastSelectedCircle
+                val circleNumber = lastSelectedCircle.coerceAtMost(circleNumber - 1)
                 val newAngle = randomFreeAngle(circleNumber, points)
+
+
+                var finalAction = action
+
+                if (action is SwipeActionSerializable.OpenCircleNest) {
+                    finalAction = action.copy(nestId = Random.nextInt())
+                    pendingNestUpdate = nests + CircleNest(id = finalAction.nestId, parentId = nestId)
+                }
 
                 val point = UiSwipePoint(
                     id = UUID.randomUUID().toString(),
                     angleDeg = newAngle,
-                    action = action,
-                    circleNumber = circleNumber
+                    action = finalAction,
+                    circleNumber = circleNumber,
+                    nestId = nestId
                 )
+
+
 
                 applyChange {
                     points.add(point)
@@ -952,6 +1160,29 @@ fun SettingsScreen(
         )
     }
 
+    if (showDeleteNestDialog != null) {
+        val nestToDelete = showDeleteNestDialog!!
+        UserValidation(
+            title = stringResource(R.string.delete_circle_nest),
+            message = stringResource(R.string.are_you_sure_to_delete_this_nest),
+            onCancel = { showDeleteNestDialog = null }
+        ) {
+            // Delete nest, leave points on it for now
+            pendingNestUpdate = nests.filter { it.id != nestToDelete.nestId}
+
+            val index = points.indexOfFirst { it.id == nestToDelete.id }
+            if (index >= 0) {
+                applyChange {
+                    points.removeAt(index)
+                }
+            }
+
+            selectedPoint = null
+            showDeleteNestDialog = null
+
+        }
+    }
+
     if (selectedPoint != null) {
         val currentPoint = selectedPoint!!
         val currentAction = currentPoint.action
@@ -965,4 +1196,37 @@ fun SettingsScreen(
             label = label
         )
     }
+
+    if (settingsDebugInfos) {
+        Box(
+            modifier = Modifier
+                .background(Color.DarkGray.copy(0.5f))
+                .padding(5.dp)
+        ) {
+            Column {
+                Text("current nests id: $nestId")
+                Text("nests number: ${nests.size}")
+                Text("circle number: $circleNumber")
+                Text("currentNest size: ${currentNest.dragDistances.size}")
+                Text("circle width incr: $circlesWidthIncrement")
+                Text("current dragDistances: ${currentNest.dragDistances}")
+                selectedPoint?.let {
+                    Text(it.toString())
+                }
+                 Column(
+                     verticalArrangement = Arrangement.spacedBy(5.dp)
+                 ) {
+                     nests.forEach { Text(it.toString()) }
+                 }
+            }
+        }
+    }
+}
+
+private fun defaultDragDistance(id: Int): Int = when (id) {
+    -1 -> 150 // Cancel Zone (below no actions activation)
+    0 -> 400  // First circle (between 150 and 400)
+    1 -> 700  // Second circle (between 400 and 700)
+    2 -> 800  // Third (default there are 3 so its supposed to be infinite)
+    else -> 600 + 100*id // 900 for 4th circle, and so on, nobody's dumb enough to use 10 circles
 }

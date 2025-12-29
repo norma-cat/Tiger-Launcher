@@ -2,16 +2,30 @@ package org.elnix.dragonlauncher.ui.settings.debug
 
 import android.os.Build
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -21,20 +35,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.DataStoreName
+import org.elnix.dragonlauncher.data.stores.AppsSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 
 @Composable
 fun DebugTab(
     navController: NavController,
+    appsViewModel: AppsViewModel,
     onShowWelcome: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -46,7 +64,8 @@ fun DebugTab(
 
     val debugInfos by DebugSettingsStore.getDebugInfos(ctx)
         .collectAsState(initial = false)
-
+    val settingsDebugInfos by DebugSettingsStore.getSettingsDebugInfos(ctx)
+        .collectAsState(initial = false)
 
     val useAccessibilityInsteadOfContextToExpandActionPanel by PrivateSettingsStore
         .getUseAccessibilityInsteadOfContextToExpandActionPanel(ctx)
@@ -65,6 +84,22 @@ fun DebugTab(
 
 
     val settingsStores = DataStoreName.entries.map { it.store }
+
+    var isAppCacheExpanded by remember { mutableStateOf(false) }
+
+    var appCacheJson by remember { mutableStateOf("") }
+
+    val allApps by appsViewModel.allApps.collectAsState()
+
+    fun reloadAppCacheJson() {
+        scope.launch {
+            appCacheJson = AppsSettingsStore.getCachedApps(ctx) ?: ""
+        }
+
+    }
+    LaunchedEffect(Unit) {
+        reloadAppCacheJson()
+    }
 
     SettingsLazyHeader(
         title = stringResource(R.string.debug),
@@ -97,6 +132,18 @@ fun DebugTab(
             ) {
                 scope.launch {
                     DebugSettingsStore.setDebugInfos(ctx, it)
+                }
+            }
+        }
+
+        item{
+            SwitchRow(
+                state = settingsDebugInfos,
+                text = "Show debug infos in settings page",
+                defaultValue = false
+            ) {
+                scope.launch {
+                    DebugSettingsStore.setSettingsDebugInfos(ctx, it)
                 }
             }
         }
@@ -189,6 +236,50 @@ fun DebugTab(
             ) {
                 scope.launch {
                     PrivateSettingsStore.setShowMethodAsking(ctx, it)
+                }
+            }
+        }
+
+        item {
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            reloadAppCacheJson()
+                            isAppCacheExpanded = !isAppCacheExpanded
+                        }
+                        .padding(vertical = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = if (isAppCacheExpanded) Icons.Default.ArrowDropDown else Icons.AutoMirrored.Filled.ArrowRight,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(5.dp)
+                    )
+
+                    TextDivider("App cache json")
+                }
+
+
+                if (isAppCacheExpanded) {
+                    val detailApp = allApps.first()
+                    Text(
+                        text = """
+                            name: ${detailApp.name},
+                            packageName: ${detailApp.packageName},
+                            enabled: ${detailApp.isEnabled},
+                            system: ${detailApp.isSystem},
+                            workProfile: ${detailApp.isWorkProfile},
+                            launchable: ${detailApp.isLaunchable},
+                        """.trimIndent()
+                    )
+                    Text(
+                        text = appCacheJson,
+                        fontSize = 10.sp
+                    )
                 }
             }
         }

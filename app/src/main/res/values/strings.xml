@@ -90,9 +90,8 @@
     <string name="close">Close</string>
     <string name="dragging_distance_selection">Dragging Distance Selection</string>
     <string name="swipe_points_selection">Swipe Point Selection</string>
-    <string name="circleR1">First Circle Drag</string>
-    <string name="circleR2">Second CIrcle Drag</string>
-    <string name="cancelZone">Cancel Zone Drag</string>
+    <string name="circle">Circle Drag Distance</string>
+    <string name="cancel_zone">Cancel Zone Drag</string>
     <string name="android_settings">Android Settings</string>
     <string name="changelogs">Changelogs</string>
     <string name="changelogs_help">The list of updates the app got since the first version</string>
@@ -215,5 +214,8 @@
     <string name="no_alarms_set">No alarms</string>
     <string name="show_next_alarm">Show Next Alarm</string>
     <string name="theme_selector_help">Select a predefined themes, you can backup your settings and propose you theme in a pull request on github</string>
+    <string name="open_nest_circle">Open Circle Nest</string>
+    <string name="delete_circle_nest">Delete Circle Nest</string>
+    <string name="are_you_sure_to_delete_this_nest">Are you sure to  delete this nest? This cannot be undone, the points on it are lost forever</string>
 
 </resources>

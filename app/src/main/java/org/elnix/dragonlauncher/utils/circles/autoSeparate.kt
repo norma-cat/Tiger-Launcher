@@ -1,7 +1,7 @@
 package org.elnix.dragonlauncher.utils.circles
 
 import org.elnix.dragonlauncher.data.UiSwipePoint
-import org.elnix.dragonlauncher.ui.MIN_ANGLE_GAP
+import org.elnix.dragonlauncher.ui.minAngleGapForCircle
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -28,7 +28,7 @@ fun autoSeparate(
                 val b = normalizeAngle(p2.angleDeg)
 
                 val diff = absAngleDiff(a, b)
-                if (diff < MIN_ANGLE_GAP[circleNumber]) {
+                if (diff < minAngleGapForCircle(circleNumber)) {
 
                     if (draggedPoint.id == p1.id || draggedPoint.id == p2.id) {
                         // Check if dragged point crossed midpoint
@@ -55,7 +55,7 @@ fun autoSeparate(
                     // Normal separation (no swap, just push apart)
                     val signed = signedAngleDiff(a, b)
                     val mid = normalizeAngle(a + signed / 2.0)
-                    val halfGap = MIN_ANGLE_GAP[circleNumber] / 2.0
+                    val halfGap = minAngleGapForCircle(circleNumber) / 2.0
 
                     p1.angleDeg = normalizeAngle(mid - halfGap)
                     p2.angleDeg = normalizeAngle(mid + halfGap)
