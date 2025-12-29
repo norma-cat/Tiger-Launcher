@@ -59,7 +59,11 @@
 
 * **No** data collection
 * Dragon Launcher has no even access to internet -> it cannot steal your data
-* No intrusive permissions requested for the app to work (except accessibility for notifications but it's optional)
+* No intrusive permissions requested for the app to work
+  * Uses Accessibility permissions (optionally) to:
+    1. Expand notifications panel (needed by android)
+    2. Lock screen
+    3. Open recent apps
 * All data stored locally (you can backup manually or use the auto backup feature)
 
 ---
