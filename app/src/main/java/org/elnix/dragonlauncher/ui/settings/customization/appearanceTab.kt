@@ -209,7 +209,7 @@ fun AppearanceTab(
 
         item {
             SliderWithLabel(
-                label = "Min Distance to activate action (0 for infinite)",
+                label = stringResource(R.string.min_dist_to_activate_action),
                 value = minAngleFromAPointToActivateIt,
                 showValue = true,
                 valueRange = 0f..360f,

@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
@@ -579,7 +580,8 @@ fun ColorSelectorTab(
                                 Text(
                                     text = defaultThemeName(it),
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    style = MaterialTheme.typography.labelSmall
+                                    style = MaterialTheme.typography.labelSmall,
+                                    textAlign = TextAlign.Center
                                 )
 
                                 RadioButton(

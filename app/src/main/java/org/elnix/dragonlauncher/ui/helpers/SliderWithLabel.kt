@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import kotlin.math.roundToInt
@@ -40,8 +41,7 @@ fun SliderWithLabel(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -71,7 +71,8 @@ fun SliderWithLabel(
             onValueChange = onChange,
             valueRange = 0f..1f,
             steps = 254,
-            colors = AppObjectsColors.sliderColors(color)
+            colors = AppObjectsColors.sliderColors(color),
+            modifier = Modifier.height(25.dp)
         )
     }
 }
@@ -98,8 +99,7 @@ fun SliderWithLabel(
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
-            .height(50.dp),
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -121,7 +121,8 @@ fun SliderWithLabel(
             onValueChangeFinished = { onDragStateChange(false) },
             valueRange = 0f..1f,
             steps = 99,
-            colors = AppObjectsColors.sliderColors(color)
+            colors = AppObjectsColors.sliderColors(color),
+            modifier = Modifier.height(25.dp)
         )
     }
 }
@@ -129,7 +130,6 @@ fun SliderWithLabel(
 
 /**
  * Integer slider for discrete values without drag state tracking.
- *
  * @param label Optional label displayed above the slider
  * @param value Current slider value (integer)
  * @param valueRange Range of allowed values (converted to float for slider)
@@ -150,8 +150,7 @@ fun SliderWithLabel(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -164,7 +163,9 @@ fun SliderWithLabel(
             if (label != null) {
                 Text(
                     text = label,
-                    color = color
+                    color = color,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f)
                 )
             }
 
@@ -195,7 +196,8 @@ fun SliderWithLabel(
             },
             valueRange = valueRange,
             steps = 100,
-            colors = AppObjectsColors.sliderColors(color)
+            colors = AppObjectsColors.sliderColors(color),
+            modifier = Modifier.height(25.dp)
         )
     }
 }
@@ -225,8 +227,7 @@ fun SliderWithLabel(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp),
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -274,7 +275,8 @@ fun SliderWithLabel(
             },
             valueRange = valueRange,
             steps = 100,
-            colors = AppObjectsColors.sliderColors(color)
+            colors = AppObjectsColors.sliderColors(color),
+            modifier = Modifier.height(25.dp)
         )
     }
 }

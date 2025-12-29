@@ -217,5 +217,6 @@
     <string name="open_nest_circle">Open Circle Nest</string>
     <string name="delete_circle_nest">Delete Circle Nest</string>
     <string name="are_you_sure_to_delete_this_nest">Are you sure to  delete this nest? This cannot be undone, the points on it are lost forever</string>
+    <string name="min_dist_to_activate_action">Min Distance to activate action (0 for infinite)</string>
 
 </resources>
