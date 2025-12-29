@@ -6,14 +6,21 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,13 +30,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.data.helpers.WorkspaceViewMode
+import org.elnix.dragonlauncher.data.helpers.WorkspaceViewMode.ADDED
+import org.elnix.dragonlauncher.data.helpers.WorkspaceViewMode.DEFAULTS
+import org.elnix.dragonlauncher.data.helpers.WorkspaceViewMode.REMOVED
+import org.elnix.dragonlauncher.data.helpers.workspaceViewMode
 import org.elnix.dragonlauncher.ui.components.dialogs.AppPickerDialog
 import org.elnix.dragonlauncher.ui.components.dialogs.RenameAppDialog
 import org.elnix.dragonlauncher.ui.drawer.AppLongPressDialog
@@ -58,20 +72,17 @@ fun WorkspaceDetailScreen(
     val workspaceState by workspaceViewModel.state.collectAsState()
     val workspace = workspaceState.workspaces.first { it.id == workspaceId }
 
+
+    var selectedView by remember { mutableStateOf(DEFAULTS) }
+
+    val getOnlyRemoved = selectedView == REMOVED
+    val getOnlyAdded = selectedView == ADDED
+
     val apps by appsViewModel
-        .appsForWorkspace(workspace, workspaceState.appOverrides)
+        .appsForWorkspace(workspace, workspaceState.appOverrides, getOnlyAdded, getOnlyRemoved)
         .collectAsState(initial = emptyList())
 
     val icons by appsViewModel.icons.collectAsState()
-
-    val iconsMerged = icons.toMutableMap()
-    apps.forEach { app ->
-        val base64 = workspaceState.appOverrides[app.packageName]?.customIconBase64
-        if (base64 != null) {
-            val bmp = ImageUtils.base64ToImageBitmap(base64)
-            if (bmp != null) iconsMerged[app.packageName] = bmp
-        }
-    }
 
     var showAppPicker by remember { mutableStateOf(false) }
     var showDetailScreen by remember { mutableStateOf<AppModel?>(null) }
@@ -120,9 +131,35 @@ fun WorkspaceDetailScreen(
             resetTitle = stringResource(R.string.reset_workspace),
             resetText = stringResource(R.string.reset_this_workspace_to_default_apps),
             content = {
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    WorkspaceViewMode.entries.forEach { mode ->
+                        val isSelected = mode == selectedView
+                        Text(
+                            text = workspaceViewMode(mode),
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(10.dp))
+                                .clickable { selectedView = mode }
+                                .background(
+                                    if (isSelected) MaterialTheme.colorScheme.secondary
+                                    else MaterialTheme.colorScheme.surface
+                                )
+                                .padding(12.dp),
+                            color = if (isSelected) MaterialTheme.colorScheme.onSecondary
+                                    else MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+
                 AppGrid(
                     apps = apps,
-                    icons = iconsMerged,
+                    icons = icons,
                     gridSize = gridSize,
                     txtColor = Color.White,
                     showIcons = showIcons,

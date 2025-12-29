@@ -85,30 +85,60 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
+
+    /**
+     * Returns a filtered and sorted list of apps for the specified workspace as a reactive Flow.
+     *
+     * @param workspace The target workspace configuration defining app filtering rules
+     * @param overrides Custom app overrides to apply (icon/label changes, etc.)
+     * @param getOnlyAdded If true, returns ONLY apps explicitly added to this workspace [default: false]
+     * @param getOnlyRemoved If true, returns ONLY apps hidden/removed from this workspace [default: false]
+     * @return Flow of filtered, sorted, and resolved [AppModel] list
+     *
+     * @throws IllegalArgumentException if both [getOnlyAdded] and [getOnlyRemoved] are true
+     *
+     * @see WorkspaceType for base filtering behavior
+     * @see AppOverride for override application details
+     * @see resolveApp for final app resolution logic
+     */
     fun appsForWorkspace(
         workspace: Workspace,
         overrides: Map<String, AppOverride>,
-    ): Flow<List<AppModel>> =
-        allApps.map { list ->
-            val base = when (workspace.type) {
-                WorkspaceType.ALL, WorkspaceType.CUSTOM -> list
-                WorkspaceType.USER -> list.filter { !it.isSystem && !it.isWorkProfile && it.isLaunchable == true }
-                WorkspaceType.SYSTEM -> list.filter { it.isSystem }
-                WorkspaceType.WORK -> list.filter { it.isWorkProfile }
+        getOnlyAdded: Boolean = false,
+        getOnlyRemoved: Boolean = false
+    ): Flow<List<AppModel>> {
+
+        require(!(getOnlyAdded && getOnlyRemoved))
+
+        // May be null cause I added the removed app ids lately, so some user may still have the old app model without it
+        val removed = workspace.removedAppIds ?: emptyList()
+
+        return allApps.map { list ->
+            when {
+                getOnlyAdded -> list.filter { it.packageName in workspace.appIds }
+                getOnlyRemoved -> list.filter { it.packageName in removed }
+                else -> {
+                    val base = when (workspace.type) {
+                        WorkspaceType.ALL, WorkspaceType.CUSTOM -> list
+                        WorkspaceType.USER -> list.filter { !it.isSystem && !it.isWorkProfile && it.isLaunchable == true }
+                        WorkspaceType.SYSTEM -> list.filter { it.isSystem }
+                        WorkspaceType.WORK -> list.filter { it.isWorkProfile }
+                    }
+
+                    val added = list.filter { it.packageName in workspace.appIds }
+
+                    // Use the base list, and add the new ones (present in added list) and filter them,
+                    // to remove the removed packages from the workspace
+                    (base + added)
+                        .distinctBy { it.packageName }
+                        .filter { it.packageName !in removed }
+                        .sortedBy { it.name.lowercase() }
+                        .map { resolveApp(it, overrides) }
+                }
             }
-
-            // May be null cause I added the removed app ids lately, so some user may still have the old app model without it
-            val removed = workspace.removedAppIds ?: emptyList()
-
-            val added = list.filter { it.packageName in workspace.appIds }
-
-            // Use the base list, and add the new ones (present in added list) and filter them, to remove the removed packages from the workspace
-            (base + added)
-                .distinctBy { it.packageName }
-                .filter { it.packageName !in removed }
-                .sortedBy { it.name.lowercase() }
-                .map { resolveApp(it,overrides) }
         }
+    }
+
 
 
 
