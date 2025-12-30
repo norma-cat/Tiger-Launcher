@@ -15,6 +15,7 @@ import org.elnix.dragonlauncher.data.getBooleanStrict
 import org.elnix.dragonlauncher.data.getIntStrict
 import org.elnix.dragonlauncher.data.getStringStrict
 import org.elnix.dragonlauncher.data.putIfNonDefault
+import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.AUTO_SEPARATE_POINTS
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.FULLSCREEN
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.ICON_PACK_KEY
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.LINE_PREVIEW_SNAP_TO_ACTION
@@ -47,6 +48,7 @@ object UiSettingsStore : BaseSettingsStore() {
         val showLinePreview: Boolean = true,
         val showAnglePreview: Boolean = true,
         val snapPoints: Boolean = true,
+        val autoSeparatePoints: Boolean = true,
         val showAppPreviewIconCenterStartPosition: Boolean = false,
         val linePreviewSnapToAction: Boolean = false,
         val minAngleFromAPointToActivateIt: Int = 30,
@@ -68,6 +70,7 @@ object UiSettingsStore : BaseSettingsStore() {
         val SHOW_LINE_PREVIEW = booleanPreferencesKey(UiSettingsBackup::showLinePreview.name)
         val SHOW_ANGLE_PREVIEW = booleanPreferencesKey("show_app_angle_preview")
         val SNAP_POINTS = booleanPreferencesKey(UiSettingsBackup::snapPoints.name)
+        val AUTO_SEPARATE_POINTS = booleanPreferencesKey(UiSettingsBackup::autoSeparatePoints.name)
         val SHOW_APP_PREVIEW_ICON_CENTER_START_POSITION = booleanPreferencesKey("showAppPreviewIconCenterStartPosition")
         val LINE_PREVIEW_SNAP_TO_ACTION = booleanPreferencesKey("linePreviewSnapToAction")
         val MIN_ANGLE_FROM_A_POINT_TO_ACTIVATE_IT = intPreferencesKey("minAngleFromAPointToActivateIt")
@@ -87,6 +90,7 @@ object UiSettingsStore : BaseSettingsStore() {
             SHOW_LINE_PREVIEW,
             SHOW_ANGLE_PREVIEW,
             SNAP_POINTS,
+            AUTO_SEPARATE_POINTS,
             SHOW_APP_PREVIEW_ICON_CENTER_START_POSITION,
             LINE_PREVIEW_SNAP_TO_ACTION,
             MIN_ANGLE_FROM_A_POINT_TO_ACTIVATE_IT,
@@ -164,6 +168,13 @@ object UiSettingsStore : BaseSettingsStore() {
 
     suspend fun setSnapPoints(ctx: Context, value: Boolean) {
         ctx.uiDatastore.edit { it[SNAP_POINTS] = value }
+    }
+
+    fun getAutoSeparatePoints(ctx: Context): Flow<Boolean> =
+        ctx.uiDatastore.data.map { it[AUTO_SEPARATE_POINTS] ?: defaults.autoSeparatePoints }
+
+    suspend fun setAutoSeparatePoints(ctx: Context, value: Boolean) {
+        ctx.uiDatastore.edit { it[AUTO_SEPARATE_POINTS] = value }
     }
 
     fun getShowAppPreviewIconCenterStartPosition(ctx: Context): Flow<Boolean> =
@@ -294,6 +305,12 @@ object UiSettingsStore : BaseSettingsStore() {
             )
 
             putIfNonDefault(
+                AUTO_SEPARATE_POINTS,
+                prefs[AUTO_SEPARATE_POINTS],
+                defaults.autoSeparatePoints
+            )
+
+            putIfNonDefault(
                 SHOW_APP_PREVIEW_ICON_CENTER_START_POSITION,
                 prefs[SHOW_APP_PREVIEW_ICON_CENTER_START_POSITION],
                 defaults.showAppPreviewIconCenterStartPosition
@@ -364,6 +381,9 @@ object UiSettingsStore : BaseSettingsStore() {
 
             prefs[SNAP_POINTS] =
                 getBooleanStrict(backup, SNAP_POINTS, defaults.snapPoints)
+
+            prefs[AUTO_SEPARATE_POINTS] =
+                getBooleanStrict(backup, AUTO_SEPARATE_POINTS, defaults.autoSeparatePoints)
 
             prefs[SHOW_APP_PREVIEW_ICON_CENTER_START_POSITION] =
                 getBooleanStrict(

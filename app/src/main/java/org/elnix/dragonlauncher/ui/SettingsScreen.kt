@@ -31,6 +31,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoMode
 import androidx.compose.material.icons.filled.ChangeCircle
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
@@ -152,6 +153,7 @@ fun SettingsScreen(
     val circleColor by ColorSettingsStore.getCircleColor(ctx)
         .collectAsState(initial = AmoledDefault.CircleColor)
     val snapPoints by UiSettingsStore.getSnapPoints(ctx).collectAsState(initial = true)
+    val autoSeparatePoints by UiSettingsStore.getAutoSeparatePoints(ctx).collectAsState(initial = true)
 
     val showActionIconBorder by UiSettingsStore.getShowActionIconBorder(ctx)
         .collectAsState(initial = false)
@@ -590,7 +592,7 @@ fun SettingsScreen(
                                     val p =
                                         currentFilteredPoints.find { it.id == selectedPoint?.id }
                                             ?: return@detectDragGestures
-                                    autoSeparate(points, nestId, circles.find { it.id == p.circleNumber }, p)
+                                    if (autoSeparatePoints) autoSeparate(points, nestId, circles.find { it.id == p.circleNumber }, p)
                                 }
                             )
                         }
@@ -783,6 +785,28 @@ fun SettingsScreen(
                         .padding(10.dp)
                 )
 
+                Icon(
+                    imageVector = Icons.Filled.AutoMode,
+                    contentDescription = stringResource(R.string.auto_separate),
+                    tint = MaterialTheme.colorScheme.primary.copy(if (autoSeparatePoints) 1f else 0.2f),
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable {
+                            scope.launch {
+                                UiSettingsStore.setAutoSeparatePoints(ctx, !autoSeparatePoints)
+                            }
+                        }
+                        .background(
+                            MaterialTheme.colorScheme.primary.copy(if (autoSeparatePoints) 0.2f else 0f)
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary.copy(if (autoSeparatePoints) 1f else 0.2f),
+                            shape = CircleShape
+                        )
+                        .padding(10.dp)
+                )
+
 
                 RepeatingPressButton(
                     enabled = aPointIsSelected,
@@ -794,7 +818,7 @@ fun SettingsScreen(
                                 if (snapPoints) point.angleDeg = point.angleDeg
                                     .toInt()
                                     .toDouble()
-                                autoSeparate(points, nestId, circles.find { it.id == point.circleNumber }, point)
+                                if (autoSeparatePoints) autoSeparate(points, nestId, circles.find { it.id == point.circleNumber }, point)
                                 recomposeTrigger++
                             }
                         }
@@ -845,7 +869,7 @@ fun SettingsScreen(
                                 if (snapPoints) point.angleDeg = point.angleDeg
                                     .toInt()
                                     .toDouble()
-                                autoSeparate(points, nestId, circles.find { it.id == point.circleNumber }, point)
+                                if (autoSeparatePoints) autoSeparate(points, nestId, circles.find { it.id == point.circleNumber }, point)
                                 recomposeTrigger++
                             }
                         }

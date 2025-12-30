@@ -229,4 +229,5 @@
     <string name="dragon_launcher_settings">Dragon Launcher Settings</string>
     <string name="lock">Lock</string>
     <string name="reload_apps">Reload Apps</string>
+    <string name="auto_separate">Auto Separate</string>
 </resources>
