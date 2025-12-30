@@ -21,6 +21,7 @@ NR==1 { version=$0; next }
 NR==2 { date=$0; print "# " version " (" date ")"; print ""; next }
 NR>=3 {
   gsub(/^[ \t]+|[ \t]+$/, "")
+  if ($0 ~ /^\[NOTE\]$/) { print "### NOTE"; next }
   if ($0 ~ /^\[NEW\]$/) { print "### NEW"; next }
   if ($0 ~ /^\[IMPROVED\]$/) { print "### IMPROVED"; next }
   if ($0 ~ /^\[FIXED\]$/) { print "### FIXED"; next }

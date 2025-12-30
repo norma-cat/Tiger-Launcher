@@ -59,6 +59,13 @@ fun UpdateCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            update.note?.takeIf { it.isNotEmpty() }?.let {
+                UpdateSection(
+                    title = "Note",
+                    items = it
+                )
+            }
+
             update.whatsNew?.takeIf { it.isNotEmpty() }?.let {
                 UpdateSection(
                     title = "What’s new",

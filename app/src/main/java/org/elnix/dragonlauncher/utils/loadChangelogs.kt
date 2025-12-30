@@ -42,6 +42,7 @@ suspend fun loadChangelogs(
                 dateFormat.parse(lines[1])
             }.getOrElse { Date(0) }
 
+            val note = mutableListOf<String>()
             val whatsNew = mutableListOf<String>()
             val improved = mutableListOf<String>()
             val fixed = mutableListOf<String>()
@@ -51,6 +52,7 @@ suspend fun loadChangelogs(
 
             lines.drop(2).forEach { line ->
                 when (line) {
+                    "[NOTE]" -> currentSection = note
                     "[NEW]" -> currentSection = whatsNew
                     "[IMPROVED]" -> currentSection = improved
                     "[FIXED]" -> currentSection = fixed
@@ -69,6 +71,7 @@ suspend fun loadChangelogs(
                 versionCode = versionCode,
                 versionName = versionName,
                 date = date,
+                note = note.takeIf { it.isNotEmpty() },
                 whatsNew = whatsNew.takeIf { it.isNotEmpty() },
                 improved = improved.takeIf { it.isNotEmpty() },
                 fixed = fixed.takeIf { it.isNotEmpty() },
