@@ -1188,7 +1188,7 @@ fun SettingsScreen(
     }
 
     if (showEditDialog != null) {
-        val editPoint = showEditDialog!!
+        val editPoint = showEditDialog
 
         AddPointDialog(
             appsViewModel = appsViewModel,
@@ -1197,7 +1197,7 @@ fun SettingsScreen(
             onActionSelected = { action ->
 
                 applyChange {
-                    points.find { it.id == editPoint.id }?.action = action
+                    points.find { it.id == editPoint?.id }?.action = action
                 }
 
                 showEditDialog = null
