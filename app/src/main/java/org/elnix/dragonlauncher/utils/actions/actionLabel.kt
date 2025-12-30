@@ -55,25 +55,26 @@ fun actionLabel(action: SwipeActionSerializable): String {
         }
 
 
-        is SwipeActionSerializable.OpenUrl ->
-            action.url
+        is SwipeActionSerializable.OpenUrl -> action.url
 
-        SwipeActionSerializable.NotificationShade ->
-            "Notifications"
+        SwipeActionSerializable.NotificationShade -> stringResource(R.string.notifications)
 
-        SwipeActionSerializable.ControlPanel ->
-            "Control Panel"
+        SwipeActionSerializable.ControlPanel -> stringResource(R.string.control_panel)
 
-        SwipeActionSerializable.OpenAppDrawer ->
-            "App Drawer"
+        SwipeActionSerializable.OpenAppDrawer -> stringResource(R.string.app_drawer)
 
-        SwipeActionSerializable.OpenDragonLauncherSettings ->
-            "Dragon Launcher Settings"
+        SwipeActionSerializable.OpenDragonLauncherSettings -> stringResource(R.string.dragon_launcher_settings)
 
-        SwipeActionSerializable.Lock -> "Lock"
-        is SwipeActionSerializable.OpenFile -> getFilePathFromUri(ctx, action.uri.toUri())
-        SwipeActionSerializable.ReloadApps -> "Reload Apps"
+        SwipeActionSerializable.Lock -> stringResource(R.string.lock)
+
+        is SwipeActionSerializable.OpenFile ->
+            getFilePathFromUri(ctx, action.uri.toUri())
+
+        SwipeActionSerializable.ReloadApps -> stringResource(R.string.reload_apps)
+
         SwipeActionSerializable.OpenRecentApps -> stringResource(R.string.recent_apps)
+
         is SwipeActionSerializable.OpenCircleNest -> stringResource(R.string.open_nest_circle)
+        SwipeActionSerializable.GoParentNest -> stringResource(R.string.go_parent_nest)
     }
 }

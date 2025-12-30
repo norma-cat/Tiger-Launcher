@@ -71,6 +71,8 @@ fun DragonLauncherTheme(
     customOpenFileColor: Color? = null,
     customReloadAppsColor: Color? = null,
     customOpenRecentAppsColor: Color? = null,
+    customOpenCircleNest: Color? = null,
+    customGoParentNest: Color? = null,
 
     content: @Composable () -> Unit
 ) {
@@ -107,7 +109,8 @@ fun DragonLauncherTheme(
     val openFile = customOpenFileColor ?: AmoledDefault.OpenFileColor
     val reloadApps = customReloadAppsColor ?: AmoledDefault.ReloadColor
     val openRecentApps = customOpenRecentAppsColor ?: AmoledDefault.OpenRecentAppsColor
-
+    val openCircleNest = customOpenCircleNest ?: AmoledDefault.OpenCircleNestColor
+    val goParentNest = customGoParentNest ?: AmoledDefault.GoParentNestColor
 
     val extraColors = ExtraColors(
         angleLine,
@@ -121,9 +124,10 @@ fun DragonLauncherTheme(
         lock,
         openFile,
         reloadApps,
-        openRecentApps
+        openRecentApps,
+        openCircleNest,
+        goParentNest
     )
-
 
     val colorScheme = generateColorScheme(
         primary = primary,

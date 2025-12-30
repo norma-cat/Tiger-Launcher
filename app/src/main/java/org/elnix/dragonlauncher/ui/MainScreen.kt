@@ -169,10 +169,12 @@ fun MainScreen(
     LaunchedEffect(Unit) { lastClickTime = 0 }
 
     val points by SwipeSettingsStore.getPointsFlow(ctx).collectAsState(emptyList())
+    val nests by SwipeSettingsStore.getNestsFlow(ctx).collectAsState(emptyList())
 
 
     fun launchAction(point: SwipePointSerializable?) {
         isDragging = false
+        nestId = 0
         start = null
         current = null
 
@@ -189,8 +191,14 @@ fun MainScreen(
         )
     }
 
+    /**
+     * 1. Tests if the current nest is the main, if not, go back one nest
+     * 2. Activate the back actions
+     */
     BackHandler {
-        if (backAction != null) {
+        if (nestId != 0) {
+            nestId = nests.find { it.id == nestId }?.parentId ?: 0
+        } else if (backAction != null) {
             launchAction(
                 SwipePointSerializable(
                     circleNumber = 0,
@@ -322,6 +330,7 @@ fun MainScreen(
             isDragging = isDragging,
             surface = size,
             points = points,
+            nests = nests,
             onLaunch = { launchAction(it) }
         )
 

@@ -54,7 +54,10 @@ data class CircleNest(
     @SerializedName("parentId") val parentId: Int = 0
 )
 
-// Use sealed class for actions
+/**
+ * Swipe Actions Serializable, the core of the main gesture idea
+ * Holds all the different actions the user can do
+ */
 @Serializable
 sealed class SwipeActionSerializable {
     @Serializable data class LaunchApp(val packageName: String) : SwipeActionSerializable()
@@ -78,6 +81,7 @@ sealed class SwipeActionSerializable {
 
     @Serializable object OpenRecentApps: SwipeActionSerializable()
     @Serializable data class OpenCircleNest(val nestId: Int): SwipeActionSerializable()
+    @Serializable object GoParentNest: SwipeActionSerializable()
 }
 
 // Gson type adapter for sealed class
@@ -120,6 +124,7 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
                 obj.addProperty("type", "OpenCircleNest")
                 obj.addProperty("nestId", src.nestId)
             }
+            SwipeActionSerializable.GoParentNest -> { obj.addProperty("type", "GoParentNest") }
         }
         return obj
     }
@@ -152,6 +157,7 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
             "OpenCircleNest" -> SwipeActionSerializable.OpenCircleNest(
                 obj.get("nestId").asInt
             )
+            "GoParentNest" -> SwipeActionSerializable.GoParentNest
             else -> null
         }
     }
@@ -208,7 +214,7 @@ object SwipeJson {
 
 
     // Kinda hacky but its the best way I managed to make it work
-    fun encodeAction(action: SwipeActionSerializable): String = when (action) {
+/*    fun encodeAction(action: SwipeActionSerializable): String = when (action) {
         is SwipeActionSerializable.LaunchApp ->
             """{"type":"LaunchApp","packageName":"${action.packageName}"}"""
         is SwipeActionSerializable.LaunchShortcut ->
@@ -233,7 +239,11 @@ object SwipeJson {
             """{"type":"OpenRecentApps"}"""
         is SwipeActionSerializable.OpenCircleNest ->
             """{"type":"OpenCircleNest","nestId":"${action.nestId}"}"""
-    }
+    }*/
+
+    fun encodeAction(action: SwipeActionSerializable?): String =
+        gson.toJson(action, SwipeActionSerializable::class.java)
+
 
     fun decodeAction(jsonString: String): SwipeActionSerializable? {
         if (jsonString.isBlank() || jsonString == "{}") return null
@@ -257,6 +267,10 @@ object SwipeJson {
 }
 
 
+/**
+ * Used to reach the same package name, just since they are different instances, the compiler
+ * complains about accessing directly .packageName
+ */
 fun SwipeActionSerializable.targetPackage(): String? = when (this) {
     is SwipeActionSerializable.LaunchApp -> packageName
     is SwipeActionSerializable.LaunchShortcut -> packageName

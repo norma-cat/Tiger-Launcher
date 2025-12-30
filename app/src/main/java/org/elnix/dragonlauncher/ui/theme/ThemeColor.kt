@@ -31,4 +31,6 @@ interface ThemeColors {
     val OpenFileColor: Color
     val ReloadColor: Color
     val OpenRecentAppsColor: Color
+    val OpenCircleNestColor: Color
+    val GoParentNestColor: Color
 }

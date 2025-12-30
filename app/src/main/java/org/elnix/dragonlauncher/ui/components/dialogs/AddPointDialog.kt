@@ -67,6 +67,7 @@ fun AddPointDialog(
 
     val actions = listOf(
         SwipeActionSerializable.OpenCircleNest(0),
+        SwipeActionSerializable.GoParentNest,
         SwipeActionSerializable.LaunchApp(""),
         SwipeActionSerializable.OpenUrl(""),
         SwipeActionSerializable.OpenFile(""),

@@ -15,7 +15,9 @@ data class ExtraColors(
     val lock: Color,
     val openFile: Color,
     val reload: Color,
-    val openRecentApps: Color
+    val openRecentApps: Color,
+    val openCircleNest: Color,
+    val goParentNest: Color
 )
 
 
@@ -33,6 +35,8 @@ val LocalExtraColors = staticCompositionLocalOf {
         lock = AmoledDefault.LockColor,
         openFile = AmoledDefault.OpenFileColor,
         reload = AmoledDefault.ReloadColor,
-        openRecentApps = AmoledDefault.OpenRecentAppsColor
+        openRecentApps = AmoledDefault.OpenRecentAppsColor,
+        openCircleNest = AmoledDefault.OpenCircleNestColor,
+        goParentNest = AmoledDefault.GoParentNestColor
     )
 }

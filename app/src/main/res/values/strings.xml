@@ -155,6 +155,8 @@
     <string name="auto_backup_stores">Automatic Backup Stores</string>
     <string name="recent_apps">Recent apps</string>
     <string name="open_recent_apps_color">Open Recent Apps Color</string>
+    <string name="open_circle_nest_color">Open Circle Nest Color</string>
+    <string name="go_parent_nest_color">Go Parent Nest Color</string>
     <string name="left_padding">Left Padding</string>
     <string name="right_padding">Right Padding</string>
     <string name="up_padding">Top Padding</string>
@@ -222,4 +224,9 @@
     <string name="workspace_added">Added apps</string>
     <string name="workspace_removed">Hidden apps</string>
     <string name="padding">Padding</string>
+    <string name="go_parent_nest">Go Parent Nest</string>
+    <string name="control_panel">Control Panel</string>
+    <string name="dragon_launcher_settings">Dragon Launcher Settings</string>
+    <string name="lock">Lock</string>
+    <string name="reload_apps">Reload Apps</string>
 </resources>

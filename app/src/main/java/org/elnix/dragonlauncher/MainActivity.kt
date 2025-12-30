@@ -34,8 +34,8 @@ import org.elnix.dragonlauncher.ui.ROUTES
 import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
 import org.elnix.dragonlauncher.utils.ignoredReturnRoutes
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.AppLifecycleViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.BackupViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 import java.util.UUID
@@ -171,6 +171,8 @@ class MainActivity : ComponentActivity() {
             val openFileColor by ColorSettingsStore.getOpenFileColor(ctx).collectAsState(initial = null)
             val reloadColor by ColorSettingsStore.getReloadColor(ctx).collectAsState(initial = null)
             val openRecentAppsColor by ColorSettingsStore.getOpenRecentApps(ctx).collectAsState(initial = null)
+            val openCircleNestColor by ColorSettingsStore.getOpenCircleNest(ctx).collectAsState(initial = null)
+            val goParentCircleColor by ColorSettingsStore.getGoParentNest(ctx).collectAsState(initial = null)
 
 
 
@@ -200,7 +202,9 @@ class MainActivity : ComponentActivity() {
                 customLockColor = lockColor,
                 customOpenFileColor = openFileColor,
                 customReloadAppsColor = reloadColor,
-                customOpenRecentAppsColor = openRecentAppsColor
+                customOpenRecentAppsColor = openRecentAppsColor,
+                customOpenCircleNest = openCircleNestColor,
+                customGoParentNest = goParentCircleColor
             ) {
 
                 val navController = rememberNavController()

@@ -44,7 +44,6 @@ import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
-import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
@@ -67,6 +66,7 @@ fun MainScreenOverlay(
     isDragging: Boolean,
     surface: IntSize,
     points: List<SwipePointSerializable>,
+    nests: List<CircleNest>,
     onLaunch: (SwipePointSerializable?) -> Unit
 ) {
     val ctx = LocalContext.current
@@ -113,8 +113,7 @@ fun MainScreenOverlay(
         .collectAsState(initial = 0)
 
 
-    val nests by SwipeSettingsStore.getNestsFlow(ctx)
-        .collectAsState(initial = emptyList())
+
 
     val dragRadii = nests.find { it.id == nestId }?.dragDistances ?: CircleNest().dragDistances
 

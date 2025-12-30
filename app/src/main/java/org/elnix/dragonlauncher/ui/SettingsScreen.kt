@@ -647,10 +647,10 @@ fun SettingsScreen(
                             goToNest(nestToGo!!)
                             selectedPoint = null
                         }
-                        .background(addRemoveCirclesColor.copy(if (canGoNest) 0.2f else 0f))
+                        .background(extraColors.openCircleNest.copy(if (canGoNest) 0.2f else 0f))
                         .border(
                             width = 1.dp,
-                            color = addRemoveCirclesColor.copy(if (canGoNest) 1f else 0.5f),
+                            color = extraColors.openCircleNest.copy(if (canGoNest) 1f else 0.5f),
                             shape = CircleShape
                         )
                         .size(40.dp)
@@ -661,7 +661,7 @@ fun SettingsScreen(
                     Icon(
                         imageVector = Icons.Default.OpenWith,
                         contentDescription = "Open nest",
-                        tint = addRemoveCirclesColor.copy(if (canGoNest) 1f else 0.5f)
+                        tint = extraColors.openCircleNest.copy(if (canGoNest) 1f else 0.5f)
                     )
                 }
 
@@ -676,10 +676,10 @@ fun SettingsScreen(
                             goBack()
                             selectedPoint = null
                         }
-                        .background(addRemoveCirclesColor.copy(if (canGoback) 0.2f else 0f))
+                        .background(extraColors.goParentNest.copy(if (canGoback) 0.2f else 0f))
                         .border(
                             width = 1.dp,
-                            color = addRemoveCirclesColor.copy(if (canGoback) 1f else 0.5f),
+                            color = extraColors.goParentNest.copy(if (canGoback) 1f else 0.5f),
                             shape = CircleShape
                         )
                         .size(40.dp)
@@ -690,7 +690,7 @@ fun SettingsScreen(
                     Icon(
                         imageVector = Icons.Default.FullscreenExit,
                         contentDescription = "Go revious nest",
-                        tint = addRemoveCirclesColor.copy(if (canGoback) 1f else 0.5f)
+                        tint = extraColors.goParentNest.copy(if (canGoback) 1f else 0.5f)
                     )
                 }
             }

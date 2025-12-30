@@ -104,6 +104,8 @@ fun ColorSelectorTab(
     val openFileColor by ColorSettingsStore.getOpenFileColor(ctx).collectAsState(initial = null)
     val reloadColor by ColorSettingsStore.getReloadColor(ctx).collectAsState(initial = null)
     val openRecentAppsColor by ColorSettingsStore.getOpenRecentApps(ctx).collectAsState(initial = null)
+    val openCircleNest by ColorSettingsStore.getOpenCircleNest(ctx).collectAsState(initial = null)
+    val goParentCircle by ColorSettingsStore.getGoParentNest(ctx).collectAsState(initial = null)
 
     val colorCustomisationMode by ColorModesSettingsStore.getColorCustomisationMode(ctx).collectAsState(initial = ColorCustomisationMode.DEFAULT)
     val selectedDefaultTheme by ColorModesSettingsStore.getDefaultTheme(ctx).collectAsState(initial = DefaultThemes.DARK)
@@ -447,6 +449,20 @@ fun ColorSelectorTab(
                         defaultColor = AmoledDefault.OpenRecentAppsColor,
                         currentColor = openRecentAppsColor ?: LocalExtraColors.current.openRecentApps
                     ) { scope.launch { ColorSettingsStore.setOpenRecentApps(ctx, it) } }
+                }
+                item {
+                    ColorPickerRow(
+                        label = stringResource(R.string.open_circle_nest_color),
+                        defaultColor = AmoledDefault.OpenCircleNestColor,
+                        currentColor = openCircleNest ?: LocalExtraColors.current.openCircleNest
+                    ) { scope.launch { ColorSettingsStore.setOpenCircleNest(ctx, it) } }
+                }
+                item {
+                    ColorPickerRow(
+                        label = stringResource(R.string.go_parent_nest_color),
+                        defaultColor = AmoledDefault.GoParentNestColor,
+                        currentColor = goParentCircle ?: LocalExtraColors.current.goParentNest
+                    ) { scope.launch { ColorSettingsStore.setGoParentNest(ctx, it) } }
                 }
             }
 

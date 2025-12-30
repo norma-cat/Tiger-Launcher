@@ -26,6 +26,7 @@ fun launchSwipeAction(
     onReselectFile: (() -> Unit)? = null,
     onAppSettings: (() -> Unit)? = null,
     onAppDrawer: (() -> Unit)? = null,
+    onParentNest: (() -> Unit)? = null,
     onOpenNestCircle: ((nestId: Int) -> Unit)? = null,
 ) {
     if (action == null) return
@@ -131,5 +132,6 @@ fun launchSwipeAction(
         }
 
         is SwipeActionSerializable.OpenCircleNest -> onOpenNestCircle?.invoke(action.nestId)
+        SwipeActionSerializable.GoParentNest -> onParentNest?.invoke()
     }
 }

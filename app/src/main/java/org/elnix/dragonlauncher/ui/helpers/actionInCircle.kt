@@ -81,7 +81,7 @@ fun actionsInCircle(
             nests.find { it.id == action.nestId }!!.dragDistances.filter { it.key != -1 }.forEach { (index, _) ->
                 val radius = 100f * circlesWidthIncrement * (index +1)
                 drawScope.drawCircle(
-                    color = circleColor,
+                    color = colorAction,
                     radius = radius,
                     center = Offset(px, py),
                     style = Stroke(if (selected) 8f else 4f)

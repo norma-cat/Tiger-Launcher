@@ -20,6 +20,7 @@ import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setBackground
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setCircleColor
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setControlPanelColor
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setError
+import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setGoParentNest
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setLaunchAppColor
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setLauncherSettingsColor
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setLockColor
@@ -31,6 +32,7 @@ import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOnSecondary
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOnSurface
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOnTertiary
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOpenAppDrawerColor
+import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOpenCircleNest
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOpenFileColor
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOpenUrlColor
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore.setOutline
@@ -71,6 +73,10 @@ object ColorSettingsStore : BaseSettingsStore() {
     private val OPEN_FILE_COLOR = intPreferencesKey("open_file_color")
     private val RELOAD_COLOR = intPreferencesKey("reload_color")
     private val OPEN_RECENT_APPS = intPreferencesKey("open_recent_apps")
+
+    private val OPEN_CIRCLE_NEST = intPreferencesKey("open_circle_nest")
+    private val GO_PARENT_NEST = intPreferencesKey("go_parent_nest")
+
 
     // ------------------------------------------
     //            NORMAL COLORS
@@ -255,7 +261,19 @@ object ColorSettingsStore : BaseSettingsStore() {
         ctx.colorDatastore.edit { it[OPEN_RECENT_APPS] = color.toArgb() }
     }
 
+    fun getOpenCircleNest(ctx: Context) =
+        ctx.colorDatastore.data.map { it[OPEN_CIRCLE_NEST]?.let { c -> Color(c) } }
 
+    suspend fun setOpenCircleNest(ctx: Context, color: Color) {
+        ctx.colorDatastore.edit { it[OPEN_CIRCLE_NEST] = color.toArgb() }
+    }
+
+    fun getGoParentNest(ctx: Context) =
+        ctx.colorDatastore.data.map { it[GO_PARENT_NEST]?.let { c -> Color(c) } }
+
+    suspend fun setGoParentNest(ctx: Context, color: Color) {
+        ctx.colorDatastore.edit { it[GO_PARENT_NEST] = color.toArgb() }
+    }
 
     suspend fun resetColors(
         ctx: Context,
@@ -301,6 +319,8 @@ object ColorSettingsStore : BaseSettingsStore() {
         setOpenFileColor(ctx, random())
         setReloadColor(ctx, random())
         setOpenRecentApps(ctx, random())
+        setOpenCircleNest(ctx, random())
+        setGoParentNest(ctx, random())
     }
 
     override suspend fun resetAll(ctx: Context) {
@@ -331,6 +351,8 @@ object ColorSettingsStore : BaseSettingsStore() {
             prefs.remove(OPEN_FILE_COLOR)
             prefs.remove(RELOAD_COLOR)
             prefs.remove(OPEN_RECENT_APPS)
+            prefs.remove(OPEN_CIRCLE_NEST)
+            prefs.remove(GO_PARENT_NEST)
         }
     }
 
@@ -374,6 +396,8 @@ object ColorSettingsStore : BaseSettingsStore() {
             putIfNonDefault(OPEN_FILE_COLOR.name,         prefs[OPEN_FILE_COLOR],         default.OpenFileColor)
             putIfNonDefault(RELOAD_COLOR.name,            prefs[RELOAD_COLOR],            default.ReloadColor)
             putIfNonDefault(OPEN_RECENT_APPS.name,        prefs[OPEN_RECENT_APPS],        default.OpenRecentAppsColor)
+            putIfNonDefault(OPEN_CIRCLE_NEST.name,        prefs[OPEN_CIRCLE_NEST],        default.OpenCircleNestColor)
+            putIfNonDefault(GO_PARENT_NEST.name,          prefs[GO_PARENT_NEST],          default.GoParentNestColor)
 
         }
     }
@@ -416,6 +440,8 @@ object ColorSettingsStore : BaseSettingsStore() {
                     OPEN_FILE_COLOR.name          -> setInt(OPEN_FILE_COLOR, value)
                     RELOAD_COLOR.name             -> setInt(RELOAD_COLOR, value)
                     OPEN_RECENT_APPS.name         -> setInt(OPEN_RECENT_APPS, value)
+                    OPEN_CIRCLE_NEST.name         -> setInt(OPEN_CIRCLE_NEST, value)
+                    GO_PARENT_NEST.name         -> setInt(GO_PARENT_NEST, value)
                 }
             }
         }
@@ -449,4 +475,6 @@ private suspend fun applyThemeColors(ctx: Context, colors: ThemeColors) {
     setLockColor(ctx, colors.LockColor)
     setOpenFileColor(ctx, colors.OpenFileColor)
     setReloadColor(ctx, colors.ReloadColor)
+    setOpenCircleNest(ctx, colors.OpenCircleNestColor)
+    setGoParentNest(ctx, colors.GoParentNestColor)
 }
