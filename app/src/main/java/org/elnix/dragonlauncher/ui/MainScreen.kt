@@ -201,6 +201,7 @@ fun MainScreen(
         nestNavigation.goToNest(0)
         start = null
         current = null
+        lastClickTime = 0
 
         launchSwipeAction(
             ctx = ctx,
