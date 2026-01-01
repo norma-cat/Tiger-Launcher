@@ -37,14 +37,13 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Grid3x3
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.OpenWith
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.ChangeCircle
-import androidx.compose.material.icons.outlined.Grid3x3
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -95,6 +94,7 @@ import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
 import org.elnix.dragonlauncher.ui.components.dialogs.AddPointDialog
 import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
+import org.elnix.dragonlauncher.ui.helpers.CircleIconButton
 import org.elnix.dragonlauncher.ui.helpers.RepeatingPressButton
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
@@ -641,97 +641,64 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth()
         ){
 
-            Row (
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-            ) {
-                val nestToGo =
-                    if (selectedPoint?.action is SwipeActionSerializable.OpenCircleNest) {
-                        (selectedPoint!!.action as SwipeActionSerializable.OpenCircleNest).nestId
-                    } else null
+            if (!isCircleDistanceMode) {
+                Row (
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                ) {
+                    val nestToGo =
+                        if (selectedPoint?.action is SwipeActionSerializable.OpenCircleNest) {
+                            (selectedPoint!!.action as SwipeActionSerializable.OpenCircleNest).nestId
+                        } else null
 
-                val canGoNest = nestToGo != null
+                    val canGoNest = nestToGo != null
 
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable(canGoNest) {
-                            // Open selected nest
-                            nestNavigation.goToNest(nestToGo!!)
+
+                    CircleIconButton(
+                        icon = Icons.Filled.Fullscreen,
+                        contentDescription = stringResource(R.string.open_nest_circle),
+                        color = extraColors.goParentNest,
+                        enabled = canGoNest,
+                        clickable = canGoNest,
+                        padding = 7.dp
+                    ) {
+                        nestToGo?.let {
+                            nestNavigation.goToNest(it)
                             selectedPoint = null
                         }
-                        .background(extraColors.openCircleNest.copy(if (canGoNest) 0.2f else 0f))
-                        .border(
-                            width = 1.dp,
-                            color = extraColors.openCircleNest.copy(if (canGoNest) 1f else 0.5f),
-                            shape = CircleShape
-                        )
-                        .size(40.dp)
-                        .padding(7.dp),
-                    contentAlignment = Alignment.Center
-
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.OpenWith,
-                        contentDescription = "Open nest",
-                        tint = extraColors.openCircleNest.copy(if (canGoNest) 1f else 0.5f)
-                    )
-                }
+                    }
 
 
-                val canGoback = currentNest.parentId != nestId
+                    val canGoback = currentNest.parentId != nestId
 
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable(canGoback) {
-                            // Go back one nest
-                            nestNavigation.goBack()
-                            selectedPoint = null
-                        }
-                        .background(extraColors.goParentNest.copy(if (canGoback) 0.2f else 0f))
-                        .border(
-                            width = 1.dp,
-                            color = extraColors.goParentNest.copy(if (canGoback) 1f else 0.5f),
-                            shape = CircleShape
-                        )
-                        .size(40.dp)
-                        .padding(7.dp),
-                    contentAlignment = Alignment.Center
-
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FullscreenExit,
+                    CircleIconButton(
+                        icon = Icons.Filled.FullscreenExit,
                         contentDescription = stringResource(R.string.go_parent_nest),
-                        tint = extraColors.goParentNest.copy(if (canGoback) 1f else 0.5f)
-                    )
+                        color = extraColors.goParentNest,
+                        enabled = canGoback,
+                        clickable = canGoback,
+                        padding = 7.dp
+                    ) {
+                        nestNavigation.goBack()
+                        selectedPoint = null
+                    }
                 }
             }
 
 
-            Icon(
-                imageVector = if (isCircleDistanceMode) {
+            CircleIconButton(
+                icon =if (isCircleDistanceMode) {
                     Icons.Filled.ChangeCircle
                 } else {
                     Icons.Outlined.ChangeCircle
                 },
-                contentDescription = "Toggle drag circle editing",
-                tint = MaterialTheme.colorScheme.primary.copy(if (isCircleDistanceMode) 1f else 0.5f),
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable {
-                        isCircleDistanceMode = !isCircleDistanceMode
-                        selectedPoint = null
-                    }
-                    .background(
-                        MaterialTheme.colorScheme.primary.copy(if (isCircleDistanceMode) 0.2f else 0.1f)
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary.copy(if (isCircleDistanceMode) 1f else 0.5f),
-                        shape = CircleShape
-                    )
-                    .padding(10.dp)
-            )
+                contentDescription = stringResource(R.string.toggle_drag_cdistances_editing),
+                color = MaterialTheme.colorScheme.primary,
+                padding = 10.dp
+            ) {
+                isCircleDistanceMode = !isCircleDistanceMode
+                selectedPoint = null
+            }
+
 
             if (!isCircleDistanceMode) {
                 IconButton(onClick = { undo() }, enabled = undoStack.isNotEmpty()) {
@@ -759,54 +726,29 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Icon(
-                    imageVector = if (snapPoints) {
-                        Icons.Filled.Grid3x3
-                    } else {
-                        Icons.Outlined.Grid3x3
-                    },
-                    contentDescription = "Snap to rounded angles",
-                    tint = MaterialTheme.colorScheme.primary.copy(if (snapPoints) 1f else 0.2f),
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable {
-                            scope.launch {
-                                UiSettingsStore.setSnapPoints(ctx, !snapPoints)
-                            }
-                        }
-                        .background(
-                            MaterialTheme.colorScheme.primary.copy(if (snapPoints) 0.2f else 0f)
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary.copy(if (snapPoints) 1f else 0.2f),
-                            shape = CircleShape
-                        )
-                        .padding(10.dp)
-                )
-
-                Icon(
-                    imageVector = Icons.Filled.AutoMode,
+                CircleIconButton(
+                    icon = Icons.Default.Grid3x3,
                     contentDescription = stringResource(R.string.auto_separate),
-                    tint = MaterialTheme.colorScheme.primary.copy(if (autoSeparatePoints) 1f else 0.2f),
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable {
-                            scope.launch {
-                                UiSettingsStore.setAutoSeparatePoints(ctx, !autoSeparatePoints)
-                            }
-                        }
-                        .background(
-                            MaterialTheme.colorScheme.primary.copy(if (autoSeparatePoints) 0.2f else 0f)
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary.copy(if (autoSeparatePoints) 1f else 0.2f),
-                            shape = CircleShape
-                        )
-                        .padding(10.dp)
-                )
+                    color = MaterialTheme.colorScheme.primary,
+                    enabled = snapPoints,
+                    padding = 10.dp
+                ) {
+                    scope.launch {
+                        UiSettingsStore.setSnapPoints(ctx, !snapPoints)
+                    }
+                }
+
+                CircleIconButton(
+                    icon = Icons.Default.AutoMode,
+                    contentDescription = stringResource(R.string.auto_separate),
+                    color = MaterialTheme.colorScheme.primary,
+                    enabled = autoSeparatePoints,
+                    padding = 10.dp
+                ) {
+                    scope.launch {
+                        UiSettingsStore.setAutoSeparatePoints(ctx, !autoSeparatePoints)
+                    }
+                }
 
 
                 RepeatingPressButton(
@@ -825,19 +767,15 @@ fun SettingsScreen(
                         }
                     }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ChevronLeft,
-                        contentDescription = "Move point to left",
-                        tint = moveColor.copy(if (aPointIsSelected) 1f else 0.2f),
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(moveColor.copy(if (aPointIsSelected) 0.2f else 0f))
-                            .border(
-                                width = 1.dp,
-                                color = moveColor.copy(if (aPointIsSelected) 1f else 0.2f),
-                                shape = CircleShape
-                            )
-                            .padding(10.dp)
+
+                    CircleIconButton(
+                        icon = Icons.Default.ChevronLeft,
+                        contentDescription = stringResource(R.string.move_point_to_left),
+                        color = moveColor,
+                        clickable = false,
+                        enabled = aPointIsSelected,
+                        padding = 10.dp,
+                        onClick = null
                     )
                 }
 
@@ -876,19 +814,16 @@ fun SettingsScreen(
                         }
                     }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ChevronRight,
-                        contentDescription = "Move point to right",
-                        tint = moveColor.copy(if (aPointIsSelected) 1f else 0.2f),
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(moveColor.copy(if (aPointIsSelected) 0.2f else 0f))
-                            .border(
-                                width = 1.dp,
-                                color = moveColor.copy(if (aPointIsSelected) 1f else 0.2f),
-                                shape = CircleShape
-                            )
-                            .padding(10.dp)
+
+
+                    CircleIconButton(
+                        icon = Icons.Default.ChevronRight,
+                        contentDescription = stringResource(R.string.move_point_to_right),
+                        color = moveColor,
+                        clickable = false,
+                        enabled = aPointIsSelected,
+                        padding = 10.dp,
+                        onClick = null
                     )
                 }
             }
@@ -900,112 +835,86 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add point",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable { showAddDialog = true }
-                        .background(MaterialTheme.colorScheme.primary.copy(0.2f))
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary.copy(0.5f),
-                            shape = CircleShape
-                        )
-                        .padding(20.dp)
-                )
 
-                Icon(
-                    imageVector = Icons.Default.Edit,
+                CircleIconButton(
+                    icon = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.add_point),
+                    color = MaterialTheme.colorScheme.primary,
+                    padding = 20.dp
+                ) { showAddDialog = true }
+
+
+
+                CircleIconButton(
+                    icon = Icons.Default.Edit,
                     contentDescription = stringResource(R.string.edit_point),
-                    tint = MaterialTheme.colorScheme.secondary.copy(if (aPointIsSelected) 1f else 0.2f),
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable(aPointIsSelected) { showEditDialog = selectedPoint }
-                        .background(MaterialTheme.colorScheme.secondary.copy(if (aPointIsSelected) 0.2f else 0f))
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.secondary.copy(if (aPointIsSelected) 1f else 0.2f),
-                            shape = CircleShape
-                        )
-                        .padding(20.dp)
-                )
+                    color = MaterialTheme.colorScheme.secondary,
+                    enabled = aPointIsSelected,
+                    padding = 20.dp
+                ) { showEditDialog = selectedPoint }
 
-                Icon(
-                    imageVector = Icons.Default.Remove,
-                    contentDescription = "Remove point",
-                    tint = MaterialTheme.colorScheme.error.copy(if (aPointIsSelected) 1f else 0.2f),
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable(aPointIsSelected) {
-                            selectedPoint?.let { point ->
 
-                                if (point.action is SwipeActionSerializable.OpenCircleNest) {
-                                    showDeleteNestDialog = point
-                                } else {
-                                    val index = points.indexOfFirst { it.id == point.id }
-                                    if (index >= 0) {
-                                        applyChange {
-                                            points.removeAt(index)
-                                        }
-                                    }
-                                    selectedPoint = null
-                                }
-                            }
-                        }
-                        .background(MaterialTheme.colorScheme.error.copy(if (aPointIsSelected) 0.2f else 0f))
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.error.copy(if (aPointIsSelected) 1f else 0.2f),
-                            shape = CircleShape
-                        )
-                        .padding(20.dp)
-                )
+                CircleIconButton(
+                    icon = Icons.Default.Remove,
+                    contentDescription = stringResource(R.string.remove_point),
+                    color = MaterialTheme.colorScheme.error,
+                    enabled = aPointIsSelected,
+                    padding = 20.dp
+                ) {
+                    selectedPoint?.let { point ->
 
-                Icon(
-                    imageVector = Icons.Default.ContentCopy,
-                    contentDescription = "Copy point",
-                    tint = copyColor.copy(if (aPointIsSelected) 1f else 0.2f),
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable(aPointIsSelected) {
-                            selectedPoint?.let { oldPoint ->
-                                val circleNumber = oldPoint.circleNumber
-                                val newAngle =
-                                    randomFreeAngle(circles.find { it.id == oldPoint.circleNumber }, points) ?: run {
-                                        ctx.showToast("Error: no circle belonging to this point found")
-                                        return@clickable
-                                    }
-
-                                val newPoint = UiSwipePoint(
-                                    id = UUID.randomUUID().toString(),
-                                    angleDeg = newAngle,
-                                    action = oldPoint.action,
-                                    circleNumber = circleNumber,
-                                    nestId = nestId
-                                )
-
+                        if (point.action is SwipeActionSerializable.OpenCircleNest) {
+                            showDeleteNestDialog = point
+                        } else {
+                            val index = points.indexOfFirst { it.id == point.id }
+                            if (index >= 0) {
                                 applyChange {
-                                    points.add(newPoint)
-                                    autoSeparate(
-                                        points,
-                                        nestId,
-                                        circles.find { it.id == newPoint.circleNumber },
-                                        newPoint
-                                    )
+                                    points.removeAt(index)
                                 }
-                                selectedPoint = newPoint
                             }
+                            selectedPoint = null
                         }
-                        .background(copyColor.copy(if (aPointIsSelected) 0.2f else 0f))
-                        .border(
-                            width = 1.dp,
-                            color = copyColor.copy(if (aPointIsSelected) 1f else 0.2f),
-                            shape = CircleShape
+                    }
+                }
+
+
+                CircleIconButton(
+                    icon = Icons.Default.ContentCopy,
+                    contentDescription = stringResource(R.string.copy_point),
+                    enabled = aPointIsSelected,
+                    color = copyColor,
+                    padding = 20.dp
+                ) {
+                    selectedPoint?.let { oldPoint ->
+                        val circleNumber = oldPoint.circleNumber
+                        val newAngle =
+                            randomFreeAngle(circles.find { it.id == oldPoint.circleNumber }, points) ?: run {
+                                ctx.showToast("Error: no circle belonging to this point found")
+                                return@CircleIconButton
+                            }
+
+                        val newPoint = UiSwipePoint(
+                            id = UUID.randomUUID().toString(),
+                            angleDeg = newAngle,
+                            action = oldPoint.action,
+                            circleNumber = circleNumber,
+                            nestId = nestId
                         )
-                        .padding(20.dp)
-                )
+
+                        applyChange {
+                            points.add(newPoint)
+                            autoSeparate(
+                                points,
+                                nestId,
+                                circles.find { it.id == newPoint.circleNumber },
+                                newPoint
+                            )
+                        }
+                        selectedPoint = newPoint
+                    }
+                }
+
+
 
                 Column(
                     modifier = Modifier,
