@@ -64,7 +64,7 @@ fun actionsInCircle(
             image = actionIconBitmap(
                 icons = icons,
                 action = action,
-                context = ctx,
+                ctx = ctx,
                 tintColor = colorAction
             ),
             dstOffset = IntOffset(px.toInt() - 28, py.toInt() - 28),
@@ -88,7 +88,7 @@ fun actionsInCircle(
                 )
             }
         } ?: drawScope.drawImage(
-            image = loadDrawableResAsBitmap(ctx, R.drawable.ic_app_default),
+            image = loadDrawableResAsBitmap(ctx, R.drawable.ic_app_default, 48, 48),
             dstOffset = IntOffset(px.toInt() - 28, py.toInt() - 28),
             dstSize = IntSize(56, 56)
         )

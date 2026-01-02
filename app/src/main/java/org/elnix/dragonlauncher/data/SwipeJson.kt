@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.data
 
+import android.content.ComponentName
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -54,6 +55,9 @@ data class CircleNest(
     @SerializedName("parentId") val parentId: Int = 0
 )
 
+
+
+
 /**
  * Swipe Actions Serializable, the core of the main gesture idea
  * Holds all the different actions the user can do
@@ -82,6 +86,10 @@ sealed class SwipeActionSerializable {
     @Serializable object OpenRecentApps: SwipeActionSerializable()
     @Serializable data class OpenCircleNest(val nestId: Int): SwipeActionSerializable()
     @Serializable object GoParentNest: SwipeActionSerializable()
+    @Serializable data class OpenWidget(
+        val widgetId: Int,
+        val provider: ComponentName
+    ): SwipeActionSerializable()
 }
 
 // Gson type adapter for sealed class
@@ -94,6 +102,8 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
         if (src == null) return JsonNull.INSTANCE
         val obj = JsonObject()
         when (src) {
+
+            // Those with more parameters
             is SwipeActionSerializable.LaunchApp -> {
                 obj.addProperty("type", "LaunchApp")
                 obj.addProperty("packageName", src.packageName)
@@ -107,13 +117,6 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
                 obj.addProperty("uri", src.uri)
                 obj.addProperty("mimeType", src.mimeType)
             }
-            is SwipeActionSerializable.NotificationShade -> { obj.addProperty("type", "NotificationShade") }
-            is SwipeActionSerializable.ControlPanel -> { obj.addProperty("type", "ControlPanel") }
-            is SwipeActionSerializable.OpenAppDrawer -> { obj.addProperty("type", "OpenAppDrawer") }
-            is SwipeActionSerializable.OpenDragonLauncherSettings -> { obj.addProperty("type", "OpenDragonLauncherSettings") }
-            is SwipeActionSerializable.Lock -> { obj.addProperty("type", "Lock") }
-            is SwipeActionSerializable.ReloadApps -> { obj.addProperty("type", "ReloadApps") }
-            is SwipeActionSerializable.OpenRecentApps -> { obj.addProperty("type", "OpenRecentApps") }
             is SwipeActionSerializable.LaunchShortcut -> {
                 obj.addProperty("type", "LaunchShortcut")
                 obj.addProperty("packageName", src.packageName)
@@ -124,7 +127,25 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
                 obj.addProperty("type", "OpenCircleNest")
                 obj.addProperty("nestId", src.nestId)
             }
-            SwipeActionSerializable.GoParentNest -> { obj.addProperty("type", "GoParentNest") }
+
+
+            is SwipeActionSerializable.OpenWidget -> {
+                obj.addProperty("type", "OpenWidget")
+                obj.addProperty("widgetId", "${src.widgetId}")
+                obj.addProperty("provider", "${src.provider.packageName}:${src.provider.className}")
+
+            }
+
+            // Those with only the name as param
+            is SwipeActionSerializable.NotificationShade -> { obj.addProperty("type", "NotificationShade") }
+            is SwipeActionSerializable.ControlPanel -> { obj.addProperty("type", "ControlPanel") }
+            is SwipeActionSerializable.OpenAppDrawer -> { obj.addProperty("type", "OpenAppDrawer") }
+            is SwipeActionSerializable.OpenDragonLauncherSettings -> { obj.addProperty("type", "OpenDragonLauncherSettings") }
+            is SwipeActionSerializable.Lock -> { obj.addProperty("type", "Lock") }
+            is SwipeActionSerializable.ReloadApps -> { obj.addProperty("type", "ReloadApps") }
+            is SwipeActionSerializable.OpenRecentApps -> { obj.addProperty("type", "OpenRecentApps") }
+            is SwipeActionSerializable.GoParentNest -> { obj.addProperty("type", "GoParentNest") }
+
         }
         return obj
     }
@@ -158,6 +179,15 @@ class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, JsonDeserial
                 obj.get("nestId").asInt
             )
             "GoParentNest" -> SwipeActionSerializable.GoParentNest
+            "OpenWidget" -> {
+                val providerStr = obj.get("provider")?.asString ?: ""
+
+                val provider = ComponentName.unflattenFromString(providerStr)
+                    ?: ComponentName("", "")
+
+                val widgetId = obj.get("widgetId")?.asInt ?: 0
+                SwipeActionSerializable.OpenWidget(widgetId, provider)
+            }
             else -> null
         }
     }
@@ -212,34 +242,6 @@ object SwipeJson {
     fun decodeNests(json: String): List<CircleNest> =
         decodeSafe(json, nestsType)
 
-
-    // Kinda hacky but its the best way I managed to make it work
-/*    fun encodeAction(action: SwipeActionSerializable): String = when (action) {
-        is SwipeActionSerializable.LaunchApp ->
-            """{"type":"LaunchApp","packageName":"${action.packageName}"}"""
-        is SwipeActionSerializable.LaunchShortcut ->
-            """{"type":"LaunchShortcut","packageName":"${action.packageName}","shortcutId":"${action.shortcutId}"}"""
-        is SwipeActionSerializable.OpenUrl ->
-            """{"type":"OpenUrl","url":"${action.url}"}"""
-        is SwipeActionSerializable.OpenFile ->
-            """{"type":"OpenFile","uri":"${action.uri}","mimeType":${action.mimeType?.let { "\"$it\"" } ?: "null"}}"""
-        is SwipeActionSerializable.NotificationShade ->
-            """{"type":"NotificationShade"}"""
-        is SwipeActionSerializable.ControlPanel ->
-            """{"type":"ControlPanel"}"""
-        is SwipeActionSerializable.OpenAppDrawer ->
-            """{"type":"OpenAppDrawer"}"""
-        is SwipeActionSerializable.OpenDragonLauncherSettings ->
-            """{"type":"OpenDragonLauncherSettings"}"""
-        is SwipeActionSerializable.Lock ->
-            """{"type":"Lock"}"""
-        is SwipeActionSerializable.ReloadApps ->
-            """{"type":"ReloadApps"}"""
-        is SwipeActionSerializable.OpenRecentApps ->
-            """{"type":"OpenRecentApps"}"""
-        is SwipeActionSerializable.OpenCircleNest ->
-            """{"type":"OpenCircleNest","nestId":"${action.nestId}"}"""
-    }*/
 
     fun encodeAction(action: SwipeActionSerializable?): String =
         gson.toJson(action, SwipeActionSerializable::class.java)

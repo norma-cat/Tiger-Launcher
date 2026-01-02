@@ -46,7 +46,7 @@ import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore
 import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
-import org.elnix.dragonlauncher.ui.components.WidgetHostView
+import org.elnix.dragonlauncher.ui.components.FloatingAppsHostView
 import org.elnix.dragonlauncher.ui.components.dialogs.FilePickerDialog
 import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
@@ -56,14 +56,14 @@ import org.elnix.dragonlauncher.utils.WIDGET_TAG
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
 import org.elnix.dragonlauncher.utils.circles.rememberNestNavigation
 import org.elnix.dragonlauncher.utils.models.AppsViewModel
-import org.elnix.dragonlauncher.utils.models.WidgetsViewModel
+import org.elnix.dragonlauncher.utils.models.FloatingAppsViewModel
 
 @SuppressLint("LocalContextResourcesRead")
 @Suppress("AssignedValueIsNeverRead")
 @Composable
 fun MainScreen(
     appsViewModel: AppsViewModel,
-    widgetsViewModel: WidgetsViewModel,
+    floatingAppsViewModel: FloatingAppsViewModel,
     wallpaper: Bitmap?,
     useWallpaper: Boolean,
     onAppDrawer: () -> Unit,
@@ -77,10 +77,10 @@ fun MainScreen(
     var showMethodDialog by remember { mutableStateOf(false) }
     var lastClickTime by remember { mutableLongStateOf(0L) }
 
-    val widgets by widgetsViewModel.widgets.collectAsState()
+    val floatingAppObjects by floatingAppsViewModel.floatingApps.collectAsState()
 
-    LaunchedEffect(widgets) {
-        Log.e(WIDGET_TAG, widgets.toString())
+    LaunchedEffect(floatingAppObjects) {
+        Log.e(WIDGET_TAG, floatingAppObjects.toString())
     }
 
 //    val showMethodAsking by PrivateSettingsStore.getShowMethodAsking(ctx)
@@ -193,7 +193,7 @@ fun MainScreen(
 
     val dm = ctx.resources.displayMetrics
     val density = LocalDensity.current
-    val cellSizePx = widgetsViewModel.cellSizePx
+    val cellSizePx = floatingAppsViewModel.cellSizePx
 
 
     fun launchAction(point: SwipePointSerializable?) {
@@ -331,20 +331,31 @@ fun MainScreen(
             .then(hold.pointerModifier)
     ) {
 
-        widgets.forEach { widget ->
-            WidgetHostView(
-                widgetInfo = widget,
+        floatingAppObjects.forEach { floatingAppObject ->
+            FloatingAppsHostView(
+                floatingAppObject = floatingAppObject,
+                icons = icons,
+                cellSizePx = cellSizePx,
                 modifier = Modifier
                     .offset {
                         IntOffset(
-                            x = (widget.x * dm.widthPixels).toInt(),
-                            y = (widget.y * dm.heightPixels).toInt()
+                            x = (floatingAppObject.x * dm.widthPixels).toInt(),
+                            y = (floatingAppObject.y * dm.heightPixels).toInt()
                         )
                     }
                     .size(
-                        width = with(density) { (widget.spanX * cellSizePx).toDp() },
-                        height = with(density) { (widget.spanY * cellSizePx).toDp() }
+                        width = with(density) { (floatingAppObject.spanX * cellSizePx).toDp() },
+                        height = with(density) { (floatingAppObject.spanY * cellSizePx).toDp() }
+                    ),
+                onLaunchAction = {
+                    launchAction(
+                        SwipePointSerializable(
+                            circleNumber = 0,
+                            angleDeg = 0.0,
+                            action = floatingAppObject.action
+                        )
                     )
+                }
             )
         }
 
@@ -397,7 +408,7 @@ fun MainScreen(
 
                 // Replace only this point
                 val finalList = points.map { p ->
-                    if (p == currentPoint) updatedPoint else p
+                    if (p.id == currentPoint.id) updatedPoint else p
                 }
 
 

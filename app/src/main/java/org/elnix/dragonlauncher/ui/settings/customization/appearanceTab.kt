@@ -126,9 +126,9 @@ fun AppearanceTab(
 
         item {
             SettingsItem(
-                title = stringResource(R.string.widgets),
+                title = stringResource(R.string.widgets_floating_apps),
                 icon = Icons.Default.Widgets
-            ) { navController.navigate(SETTINGS.WIDGETS) }
+            ) { navController.navigate(SETTINGS.FLOATING_APPS) }
         }
 
         item { TextDivider(stringResource(R.string.app_display)) }

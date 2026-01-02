@@ -43,11 +43,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.res.ResourcesCompat
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.utils.models.WidgetsViewModel
+import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.utils.models.FloatingAppsViewModel
 
 @Composable
 fun WidgetPickerDialog(
-    widgetsViewModel: WidgetsViewModel,
+    floatingAppsViewModel: FloatingAppsViewModel,
     onDismiss: () -> Unit
 ) {
     val ctx = LocalContext.current
@@ -83,7 +84,7 @@ fun WidgetPickerDialog(
                             provider = provider,
                             appWidgetHost = appWidgetHost,
                             onAddWidget = {
-                                widgetsViewModel.addWidget(it)
+                                floatingAppsViewModel.addFloatingApp(SwipeActionSerializable.OpenWidget(0,provider.provider))
                                 onDismiss()
                             }
                         )
@@ -175,7 +176,7 @@ private fun WidgetPreviewImage(
     }
 }
 
-private fun loadWidgetPreview(
+fun loadWidgetPreview(
     provider: AppWidgetProviderInfo,
     context: android.content.Context
 ): android.graphics.Bitmap? {

@@ -10,7 +10,7 @@
     <string name="do_not_remind_me_again">Do not remind me again</string>
     <string name="coming_soon">Coming Soon...</string>
     <string name="settings">Settings</string>
-    <string name="appearance">Appearance</string>
+    <string name="appearance">Appearance / Customisation</string>
     <string name="appearance_tab_text">Change appearance settings</string>
     <string name="fullscreen_app">Fullscreen app</string>
     <string name="app_display">App display</string>
@@ -232,7 +232,8 @@
     <string name="auto_separate">Auto Separate</string>
     <string name="add_widget">Add Widget</string>
     <string name="widgets">Widgets</string>
-    <string name="widgets_tab_help">Manage your workspace widgets: add, reorder, resize, and position them.</string>
+    <string name="widgets_floating_apps">Widgets / Floating Apps</string>
+    <string name="floating_apps_tab_help">Manage your workspace widgets and floating apps: add, reorder, resize, and position them.</string>
     <string name="widgets_tab_intro">Click a widget to select it, then drag to move or use the buttons to reorder. Selected widgets show a border and respond to gestures.</string>
     <string name="widgets_list">Widget List</string>
     <string name="widgets_empty">No widgets added yet. Tap + to add one!</string>
@@ -247,5 +248,5 @@
     <string name="move_point_to_right">Move point to right</string>
     <string name="move_point_to_left">Move point to left</string>
     <string name="toggle_drag_cdistances_editing">Toggle drag circle editing</string>
-    <string name="center_selectded_widget">Center seelcted widget</string>
+    <string name="center_selected_floating_app">Center selected floating app / widget</string>
 </resources>

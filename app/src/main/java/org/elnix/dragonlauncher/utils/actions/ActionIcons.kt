@@ -36,10 +36,12 @@ fun appIcon(
 fun actionIconBitmap(
     icons: Map<String, ImageBitmap>,
     action: SwipeActionSerializable,
-    context: Context,
-    tintColor: Color
+    ctx: Context,
+    tintColor: Color,
+    width: Int = 48,
+    height: Int = 48
 ): ImageBitmap {
-    val bitmap = createUntintedBitmap(action, context, icons)
+    val bitmap = createUntintedBitmap(action, ctx, icons, width, height)
     return if (
         action is SwipeActionSerializable.LaunchApp ||
         action is SwipeActionSerializable.LaunchShortcut ||
@@ -51,50 +53,57 @@ fun actionIconBitmap(
     }
 }
 
-private fun createUntintedBitmap(action: SwipeActionSerializable, context: Context, icons: Map<String, ImageBitmap>): ImageBitmap {
+private fun createUntintedBitmap(
+    action: SwipeActionSerializable,
+    ctx: Context,
+    icons: Map<String, ImageBitmap>,
+    width: Int,
+    height: Int
+): ImageBitmap {
     return when (action) {
         is SwipeActionSerializable.LaunchApp,
         is SwipeActionSerializable.LaunchShortcut -> {
             val pkg = action.targetPackage()!!
 
             if (action is SwipeActionSerializable.LaunchShortcut) {
-                val shortcutIcon = loadShortcutIcon(context, pkg, action.shortcutId)
+                val shortcutIcon = loadShortcutIcon(ctx, pkg, action.shortcutId)
                 if (shortcutIcon != null) return shortcutIcon
             }
 
             try {
                 icons[pkg] ?: loadDrawableAsBitmap(
-                    context.packageManager.getApplicationIcon(pkg),
-                    48,
-                    48
+                    ctx.packageManager.getApplicationIcon(pkg),
+                    width,
+                    height
                 )
 
             } catch (_: Exception) { // If the app was uninstalled, it could not reload it
-                loadDrawableResAsBitmap(context, R.drawable.ic_app_default)
+                loadDrawableResAsBitmap(ctx, R.drawable.ic_app_default, width, height)
             }
         }
 
         is SwipeActionSerializable.OpenUrl ->
-            loadDrawableResAsBitmap(context, R.drawable.ic_action_web)
+            loadDrawableResAsBitmap(ctx, R.drawable.ic_action_web, width, height)
 
         SwipeActionSerializable.NotificationShade ->
-            loadDrawableResAsBitmap(context, R.drawable.ic_action_notification)
+            loadDrawableResAsBitmap(ctx, R.drawable.ic_action_notification, width, height)
 
         SwipeActionSerializable.ControlPanel ->
-            loadDrawableResAsBitmap(context, R.drawable.ic_action_grid)
+            loadDrawableResAsBitmap(ctx, R.drawable.ic_action_grid, width, height)
 
         SwipeActionSerializable.OpenAppDrawer ->
-            loadDrawableResAsBitmap(context, R.drawable.ic_action_drawer)
+            loadDrawableResAsBitmap(ctx, R.drawable.ic_action_drawer, width, height)
 
         SwipeActionSerializable.OpenDragonLauncherSettings ->
-            loadDrawableResAsBitmap(context, R.drawable.dragon_launcher_foreground)
+            loadDrawableResAsBitmap(ctx, R.drawable.dragon_launcher_foreground, width, height)
 
-        SwipeActionSerializable.Lock -> loadDrawableResAsBitmap(context, R.drawable.ic_action_lock)
-        is SwipeActionSerializable.OpenFile -> loadDrawableResAsBitmap(context, R.drawable.ic_action_open_file)
-        SwipeActionSerializable.ReloadApps -> loadDrawableResAsBitmap(context, R.drawable.ic_action_reload)
-        SwipeActionSerializable.OpenRecentApps -> loadDrawableResAsBitmap(context, R.drawable.ic_action_recent)
-        is SwipeActionSerializable.OpenCircleNest -> loadDrawableResAsBitmap(context, R.drawable.ic_action_target)
-        SwipeActionSerializable.GoParentNest -> loadDrawableResAsBitmap(context, R.drawable.ic_icon_go_parent_nest)
+        SwipeActionSerializable.Lock -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_lock, width, height)
+        is SwipeActionSerializable.OpenFile -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_open_file, width, height)
+        SwipeActionSerializable.ReloadApps -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_reload, width, height)
+        SwipeActionSerializable.OpenRecentApps -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_recent, width, height)
+        is SwipeActionSerializable.OpenCircleNest -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_target, width, height)
+        SwipeActionSerializable.GoParentNest -> loadDrawableResAsBitmap(ctx, R.drawable.ic_icon_go_parent_nest, width, height)
+        is SwipeActionSerializable.OpenWidget -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_widgets, width, height)
     }
 }
 
@@ -114,19 +123,27 @@ private fun tintBitmap(original: ImageBitmap, color: Color): ImageBitmap {
 
 
 // Fallback: Create a simple colored square if all else fails
-private fun createDefaultBitmap(): ImageBitmap {
-    val bitmap = createBitmap(48, 48)
+private fun createDefaultBitmap(
+    width: Int,
+    height: Int
+): ImageBitmap {
+    val bitmap = createBitmap(width, height)
     val canvas = Canvas(bitmap)
     canvas.drawColor(Color.Gray.toArgb())
     return bitmap.asImageBitmap()
 }
 
 
-fun loadDrawableResAsBitmap(context: Context, resId: Int): ImageBitmap {
+fun loadDrawableResAsBitmap(
+    context: Context,
+    resId: Int,
+    width: Int,
+    height: Int
+): ImageBitmap {
     val drawable = ContextCompat.getDrawable(context, resId)
-        ?: return createDefaultBitmap()
+        ?: return createDefaultBitmap(width, height)
 
-    return loadDrawableAsBitmap(drawable, 48, 48)
+    return loadDrawableAsBitmap(drawable, width, height)
 }
 
 @Suppress("SameParameterValue")

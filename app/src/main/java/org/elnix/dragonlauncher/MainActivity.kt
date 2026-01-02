@@ -43,7 +43,7 @@ import org.elnix.dragonlauncher.utils.ignoredReturnRoutes
 import org.elnix.dragonlauncher.utils.models.AppLifecycleViewModel
 import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.BackupViewModel
-import org.elnix.dragonlauncher.utils.models.WidgetsViewModel
+import org.elnix.dragonlauncher.utils.models.FloatingAppsViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 import org.elnix.dragonlauncher.utils.showToast
 import java.util.UUID
@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
     private val appsViewModel : AppsViewModel by viewModels()
     private val backupViewModel : BackupViewModel by viewModels()
     private val workspaceViewModel : WorkspaceViewModel by viewModels()
-    private val widgetsViewModel : WidgetsViewModel by viewModels()
+    private val floatingAppsViewModel : FloatingAppsViewModel by viewModels()
 
     private var navControllerHolder = mutableStateOf<NavHostController?>(null)
 
@@ -176,12 +176,12 @@ class MainActivity : ComponentActivity() {
             } catch (e: Exception) {
                 Log.w("WIDGET", "Failed to launch configure activity: ${e.message}")
                 this.showToast("Failed to launch configure activity: ${e.message}")
-                widgetsViewModel.addWidget(widgetId)
+                floatingAppsViewModel.addFloatingApp(SwipeActionSerializable.OpenWidget(widgetId,info.provider), info)
             }
 
         } else {
             Log.d("WIDGET", "No configuration needed, adding widget")
-            widgetsViewModel.addWidget(widgetId)
+            floatingAppsViewModel.addFloatingApp(SwipeActionSerializable.OpenWidget(widgetId,info.provider), info)
         }
     }
 
@@ -190,8 +190,15 @@ class MainActivity : ComponentActivity() {
             val widgetId = result.data?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
                 ?: return@registerForActivityResult
 
+            val info = appWidgetManager.getAppWidgetInfo(widgetId) ?: run {
+                // Widget not bound - clean up ID
+                Log.w("WidgetsViewModel", "Cannot find info for widgetId: $widgetId")
+                return@registerForActivityResult
+            }
+
+
             if (result.resultCode == RESULT_OK) {
-                widgetsViewModel.addWidget(widgetId)
+                floatingAppsViewModel.addFloatingApp(SwipeActionSerializable.OpenWidget(widgetId,info.provider), info)
             } else {
                 Log.w("WIDGET", "Widget configure canceled, deleting $widgetId")
                 appWidgetHost.deleteAppWidgetId(widgetId)
@@ -384,7 +391,7 @@ class MainActivity : ComponentActivity() {
                     backupViewModel = backupViewModel,
                     appsViewModel = appsViewModel,
                     workspaceViewModel = workspaceViewModel,
-                    widgetsViewModel = widgetsViewModel,
+                    floatingAppsViewModel = floatingAppsViewModel,
                     navController = navController,
                     onLaunchSystemWidgetPicker = { (ctx as MainActivity).launchWidgetPicker() }
                 )

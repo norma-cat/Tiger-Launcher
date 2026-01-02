@@ -1,6 +1,9 @@
+@file:Suppress("AssignedValueIsNeverRead")
+
 package org.elnix.dragonlauncher.ui.settings.customization
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -53,52 +57,66 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.MainActivity
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.helpers.WidgetInfo
+import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.data.helpers.FloatingAppObject
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
-import org.elnix.dragonlauncher.ui.components.WidgetHostView
+import org.elnix.dragonlauncher.ui.components.FloatingAppsHostView
+import org.elnix.dragonlauncher.ui.components.dialogs.AddPointDialog
 import org.elnix.dragonlauncher.ui.helpers.CircleIconButton
 import org.elnix.dragonlauncher.ui.helpers.UpDownButton
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.models.WidgetsViewModel
+import org.elnix.dragonlauncher.utils.models.AppsViewModel
+import org.elnix.dragonlauncher.utils.models.FloatingAppsViewModel
+import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 
 @Composable
-fun WidgetsTab(
-    widgetsViewModel: WidgetsViewModel,
+fun FloatingAppsTab(
+    appsViewModel: AppsViewModel,
+    workspaceViewModel: WorkspaceViewModel,
+    floatingAppsViewModel: FloatingAppsViewModel,
     onBack: () -> Unit,
     onLaunchSystemWidgetPicker: () -> Unit
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val icons by appsViewModel.icons.collectAsState()
+
     val widgetsDebugInfos by DebugSettingsStore.getWidgetsDebugInfos(ctx)
         .collectAsState(initial = false)
 
-    val widgets by widgetsViewModel.widgets.collectAsState()
 
-    val cellSizePx = widgetsViewModel.cellSizePx
+    val floatingApps by floatingAppsViewModel.floatingApps.collectAsState()
 
-    var selected by remember { mutableStateOf<WidgetInfo?>(null) }
+    val cellSizePx = floatingAppsViewModel.cellSizePx
+
+    var selected by remember { mutableStateOf<FloatingAppObject?>(null) }
 
     val isSelected = selected != null
 
     var snapMove by remember { mutableStateOf(false) }
     var snapResize by remember { mutableStateOf(false) }
 
-    fun removeWidget(widget: WidgetInfo) {
-        widgetsViewModel.removeWidget(widget.id) {
+    fun removeWidget(floatingApp: FloatingAppObject) {
+        floatingAppsViewModel.removeFloatingApp(floatingApp.id) {
             (ctx as MainActivity).deleteWidget(it)
         }
 
-        if (selected == widget) selected = null
+        if (selected == floatingApp) selected = null
     }
 
+    val widgetNumber = floatingApps.filter { it.action is SwipeActionSerializable.OpenWidget }.size
+    val floatingAppsNumber = floatingApps.filter { it.action is SwipeActionSerializable.LaunchApp }.size
+
+    var showAddDialog by remember { mutableStateOf(false) }
+
     SettingsLazyHeader(
-        title = "${stringResource(R.string.widgets)} (${widgets.size})",
+        title = "${stringResource(R.string.widgets_floating_apps)} (${widgetNumber}) (${floatingAppsNumber})",
         onBack = onBack,
-        helpText = stringResource(R.string.widgets_tab_help),
+        helpText = stringResource(R.string.floating_apps_tab_help),
         onReset = {
             scope.launch {
-                widgetsViewModel.resetAllWidgets()
+                floatingAppsViewModel.resetAllFloatingApps()
             }
         },
         content = {
@@ -153,26 +171,27 @@ fun WidgetsTab(
 
         /* ---------------- Widget canvas ---------------- */
 
-        widgets.forEach { widget ->
-            key(widget.id) {
-                DraggableWidget(
-                    widgetsViewModel = widgetsViewModel,
-                    widget = widget,
-                    selected = widget.id == selected?.id,
-                    onSelect = { selected = widget },
+        floatingApps.forEach { floatingApp ->
+            key(floatingApp.id) {
+                DraggableFloatingApp(
+                    floatingAppsViewModel = floatingAppsViewModel,
+                    app = floatingApp,
+                    icons = icons,
+                    selected = floatingApp.id == selected?.id,
+                    onSelect = { selected = floatingApp },
                     onMove = { dx, dy ->
-                        widgetsViewModel.offsetWidget(widget.id, dx, dy, false)
+                        floatingAppsViewModel.moveFloatingApp(floatingApp.id, dx, dy, false)
                     },
                     onMoveEnd = {
-                        widgetsViewModel.offsetWidget(widget.id, 0f, 0f, snapMove)
+                        floatingAppsViewModel.moveFloatingApp(floatingApp.id, 0f, 0f, snapMove)
                     },
                     onResize = { corner, dx, dy ->
-                        widgetsViewModel.resizeWidget(widget.id, corner, dx, dy, false)
+                        floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, dx, dy, false)
                     },
                     onResizeEnd = { corner ->
-                        widgetsViewModel.resizeWidget(widget.id, corner, 0f, 0f, snapResize)
+                        floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, 0f, 0f, snapResize)
                     },
-                    onRemove = { removeWidget(it) }
+                    onRemove = { removeWidget(it) },
                 )
             }
         }
@@ -188,14 +207,14 @@ fun WidgetsTab(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Launch system widget picker
+            // Open Add floating app dialog
             CircleIconButton(
                 icon = Icons.Default.Add,
                 contentDescription = stringResource(R.string.add_widget),
                 color = MaterialTheme.colorScheme.primary,
                 padding = 16.dp
             ) {
-                onLaunchSystemWidgetPicker()
+               showAddDialog = true
             }
 
 
@@ -213,11 +232,11 @@ fun WidgetsTab(
             // Center selected widget
             CircleIconButton(
                 icon = Icons.Default.CenterFocusStrong,
-                contentDescription = stringResource(R.string.center_selectded_widget),
+                contentDescription = stringResource(R.string.center_selected_floating_app),
                 color = MaterialTheme.colorScheme.secondary,
                 padding = 16.dp
             ) {
-                selected?.let { widgetsViewModel.centerWidget(it.id) }
+                selected?.let { floatingAppsViewModel.centerFloatingApp(it.id) }
             }
 
             UpDownButton(
@@ -230,16 +249,16 @@ fun WidgetsTab(
                 downClickable = true,
                 padding = 16.dp,
                 onClickUp = {
-                    if (widgets.isNotEmpty()) {
-                        val idx = widgets.indexOfFirst { it == selected }
-                        val next = if (idx <= 0) widgets.last() else widgets[idx - 1]
+                    if (floatingApps.isNotEmpty()) {
+                        val idx = floatingApps.indexOfFirst { it == selected }
+                        val next = if (idx <= 0) floatingApps.last() else floatingApps[idx - 1]
                         selected = next
                     }
                 },
                 onClickDown = {
-                    if (widgets.isNotEmpty()) {
-                        val idx = widgets.indexOfFirst { it == selected }
-                        val next = if (idx == -1 || idx == widgets.lastIndex) widgets.first() else widgets[idx + 1]
+                    if (floatingApps.isNotEmpty()) {
+                        val idx = floatingApps.indexOfFirst { it == selected }
+                        val next = if (idx == -1 || idx == floatingApps.lastIndex) floatingApps.first() else floatingApps[idx + 1]
                         selected = next
                     }
                 }
@@ -256,11 +275,11 @@ fun WidgetsTab(
                 downClickable = isSelected,
                 padding = 16.dp,
                 onClickUp = {
-                    selected?.let { widgetsViewModel.moveWidgetUp(it.id) }
+                    selected?.let { floatingAppsViewModel.moveFloatingAppUp(it.id) }
 
                 },
                 onClickDown = {
-                    selected?.let { widgetsViewModel.moveWidgetDown(it.id) }
+                    selected?.let { floatingAppsViewModel.moveFloatingAppDown(it.id) }
 
                 }
             )
@@ -287,10 +306,39 @@ fun WidgetsTab(
                 .padding(5.dp)
         ) {
             Column {
-                widgets.forEach {
+                floatingApps.forEach {
                     Text(it.toString())
                 }
             }
+        }
+    }
+
+    if (showAddDialog) {
+        AddPointDialog(
+            appsViewModel = appsViewModel,
+            workspaceViewModel = workspaceViewModel,
+            onDismiss = { showAddDialog = false },
+            actions =listOf(
+                SwipeActionSerializable.OpenWidget(0, ComponentName("", "")),
+                SwipeActionSerializable.OpenCircleNest(0),
+                SwipeActionSerializable.GoParentNest,
+                SwipeActionSerializable.LaunchApp(""),
+                SwipeActionSerializable.OpenUrl(""),
+                SwipeActionSerializable.OpenFile(""),
+                SwipeActionSerializable.NotificationShade,
+                SwipeActionSerializable.ControlPanel,
+                SwipeActionSerializable.OpenAppDrawer,
+                SwipeActionSerializable.Lock,
+                SwipeActionSerializable.ReloadApps,
+                SwipeActionSerializable.OpenRecentApps,
+                SwipeActionSerializable.OpenDragonLauncherSettings
+            ),
+        ) { action ->
+            when (action) {
+                is SwipeActionSerializable.OpenWidget -> onLaunchSystemWidgetPicker()
+                else -> floatingAppsViewModel.addFloatingApp(action)
+            }
+            showAddDialog = false
         }
     }
 }
@@ -304,8 +352,8 @@ fun WidgetsTab(
  * Handles all widget interactions: drag to move, resize handles, tap/long-press.
  * Resize handles provide visual-only resize feedback by compensating position changes internally.
  *
- * @param widgetsViewModel ViewModel for widget state management
- * @param widget Current widget data
+ * @param floatingAppsViewModel ViewModel for widget state management
+ * @param app Current widget data
  * @param selected True if this widget is currently selected
  * @param onSelect Callback when widget is tapped/selected
  * @param onMove Callback for position drag deltas (dx, dy in pixels)
@@ -314,23 +362,24 @@ fun WidgetsTab(
  */
 @SuppressLint("LocalContextResourcesRead")
 @Composable
-private fun DraggableWidget(
-    widgetsViewModel: WidgetsViewModel,
-    widget: WidgetInfo,
+private fun DraggableFloatingApp(
+    floatingAppsViewModel: FloatingAppsViewModel,
+    app: FloatingAppObject,
+    icons: Map<String, ImageBitmap>,
     selected: Boolean,
     onSelect: () -> Unit,
     onMove: (Float, Float) -> Unit,
     onMoveEnd: () -> Unit,
-    onResize: (WidgetsViewModel.ResizeCorner, Float, Float) -> Unit,
-    onResizeEnd: (WidgetsViewModel.ResizeCorner) -> Unit,
-    onRemove: (WidgetInfo) -> Unit
+    onResize: (FloatingAppsViewModel.ResizeCorner, Float, Float) -> Unit,
+    onResizeEnd: (FloatingAppsViewModel.ResizeCorner) -> Unit,
+    onRemove: (FloatingAppObject) -> Unit,
 ) {
     val ctx = LocalContext.current
     val dm = ctx.resources.displayMetrics
     val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
     val shape = RoundedCornerShape(12.dp)
 
-    val cellSizePx = widgetsViewModel.cellSizePx
+    val cellSizePx = floatingAppsViewModel.cellSizePx
 
 
     val density = LocalDensity.current
@@ -339,13 +388,13 @@ private fun DraggableWidget(
         modifier = Modifier
             .offset {
                 IntOffset(
-                    x = (widget.x * dm.widthPixels).toInt(),
-                    y = (widget.y * dm.heightPixels).toInt()
+                    x = (app.x * dm.widthPixels).toInt(),
+                    y = (app.y * dm.heightPixels).toInt()
                 )
             }
             .size(
-                width = with(density) { (widget.spanX * cellSizePx).toDp() },
-                height = with(density) { (widget.spanY * cellSizePx).toDp() }
+                width = with(density) { (app.spanX * cellSizePx).toDp() },
+                height = with(density) { (app.spanY * cellSizePx).toDp() }
             )
             .border(
                 width = if (selected) 2.dp else 0.dp,
@@ -353,23 +402,27 @@ private fun DraggableWidget(
                 shape = shape
             )
     ) {
-        // Widget content (touch blocked during editing)
-        WidgetHostView(
-            widgetInfo = widget,
-            blockTouches = true
-        )
+
+        // Widget / App content (touch blocked during editing)
+        FloatingAppsHostView(
+            floatingAppObject = app,
+            blockTouches = true,
+            icons = icons,
+            cellSizePx = cellSizePx
+        ) { }
+
 
         // Main interaction overlay (move + tap)
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .pointerInput(widget.id) {
+                .pointerInput(app.id) {
                     detectTapGestures(
                         onPress = { onSelect() },
-                        onLongPress = { onRemove(widget) }
+                        onLongPress = { onRemove(app) }
                     )
                 }
-                .pointerInput(widget.id) {
+                .pointerInput(app.id) {
                     detectDragGestures(
                         onDragStart = { onSelect() },
                         onDrag = { change, dragAmount ->
@@ -396,14 +449,14 @@ private fun DraggableWidget(
                     .size(dotSize + hitboxPadding * 2)
                     .clip(CircleShape)
                     .background(Color.Transparent)
-                    .pointerInput(WidgetsViewModel.ResizeCorner.Top) {
+                    .pointerInput(FloatingAppsViewModel.ResizeCorner.Top) {
                         detectDragGestures(
                             onDragEnd = {
-                                onResizeEnd(WidgetsViewModel.ResizeCorner.Top)
+                                onResizeEnd(FloatingAppsViewModel.ResizeCorner.Top)
                             }
                         ) { change, dragAmount ->
                             change.consume()
-                            onResize(WidgetsViewModel.ResizeCorner.Top, 0f, dragAmount.y)
+                            onResize(FloatingAppsViewModel.ResizeCorner.Top, 0f, dragAmount.y)
                         }
                     }
             ) {
@@ -423,14 +476,14 @@ private fun DraggableWidget(
                     .size(dotSize + hitboxPadding * 2)
                     .clip(CircleShape)
                     .background(Color.Transparent)
-                    .pointerInput(WidgetsViewModel.ResizeCorner.Bottom) {
+                    .pointerInput(FloatingAppsViewModel.ResizeCorner.Bottom) {
                         detectDragGestures(
                             onDragEnd = {
-                                onResizeEnd(WidgetsViewModel.ResizeCorner.Bottom)
+                                onResizeEnd(FloatingAppsViewModel.ResizeCorner.Bottom)
                             }
                         ) { change, dragAmount ->
                             change.consume()
-                            onResize(WidgetsViewModel.ResizeCorner.Bottom, 0f, dragAmount.y)
+                            onResize(FloatingAppsViewModel.ResizeCorner.Bottom, 0f, dragAmount.y)
                         }
                     }
             ) {
@@ -450,14 +503,14 @@ private fun DraggableWidget(
                     .size(dotSize + hitboxPadding * 2)
                     .clip(CircleShape)
                     .background(Color.Transparent)
-                    .pointerInput(WidgetsViewModel.ResizeCorner.Left) {
+                    .pointerInput(FloatingAppsViewModel.ResizeCorner.Left) {
                         detectDragGestures(
                             onDragEnd = {
-                                onResizeEnd(WidgetsViewModel.ResizeCorner.Left)
+                                onResizeEnd(FloatingAppsViewModel.ResizeCorner.Left)
                             }
                         ) { change, dragAmount ->
                             change.consume()
-                            onResize(WidgetsViewModel.ResizeCorner.Left, dragAmount.x, 0f)
+                            onResize(FloatingAppsViewModel.ResizeCorner.Left, dragAmount.x, 0f)
                         }
                     }
             ) {
@@ -477,14 +530,14 @@ private fun DraggableWidget(
                     .size(dotSize + hitboxPadding * 2)
                     .clip(CircleShape)
                     .background(Color.Transparent)
-                    .pointerInput(WidgetsViewModel.ResizeCorner.Right) {
+                    .pointerInput(FloatingAppsViewModel.ResizeCorner.Right) {
                         detectDragGestures(
                             onDragEnd = {
-                                onResizeEnd(WidgetsViewModel.ResizeCorner.Right)
+                                onResizeEnd(FloatingAppsViewModel.ResizeCorner.Right)
                             }
                         ) { change, dragAmount ->
                             change.consume()
-                            onResize(WidgetsViewModel.ResizeCorner.Right, dragAmount.x, 0f)
+                            onResize(FloatingAppsViewModel.ResizeCorner.Right, dragAmount.x, 0f)
                         }
                     }
             ) {

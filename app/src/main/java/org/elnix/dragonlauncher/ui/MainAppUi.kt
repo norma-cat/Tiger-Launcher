@@ -53,11 +53,11 @@ import org.elnix.dragonlauncher.ui.settings.customization.AppearanceTab
 import org.elnix.dragonlauncher.ui.settings.customization.BehaviorTab
 import org.elnix.dragonlauncher.ui.settings.customization.ColorSelectorTab
 import org.elnix.dragonlauncher.ui.settings.customization.DrawerTab
+import org.elnix.dragonlauncher.ui.settings.customization.FloatingAppsTab
 import org.elnix.dragonlauncher.ui.settings.customization.IconPackTab
 import org.elnix.dragonlauncher.ui.settings.customization.StatusBarTab
 import org.elnix.dragonlauncher.ui.settings.customization.ThemesTab
 import org.elnix.dragonlauncher.ui.settings.customization.WallpaperTab
-import org.elnix.dragonlauncher.ui.settings.customization.WidgetsTab
 import org.elnix.dragonlauncher.ui.settings.debug.DebugTab
 import org.elnix.dragonlauncher.ui.settings.language.LanguageTab
 import org.elnix.dragonlauncher.ui.settings.workspace.WorkspaceDetailScreen
@@ -71,7 +71,7 @@ import org.elnix.dragonlauncher.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.utils.loadChangelogs
 import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.BackupViewModel
-import org.elnix.dragonlauncher.utils.models.WidgetsViewModel
+import org.elnix.dragonlauncher.utils.models.FloatingAppsViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 
 // -------------------- SETTINGS --------------------
@@ -84,7 +84,7 @@ object SETTINGS {
     const val ICON_PACK = "settings/advanced/appearance/icon_pack"
     const val STATUS_BAR = "settings/advanced/appearance/status_bar"
     const val THEME = "settings/advanced/appearance/theme"
-    const val WIDGETS = "settings/advanced/appearance/widgets"
+    const val FLOATING_APPS = "settings/advanced/appearance/floating_apps"
     const val BEHAVIOR = "settings/advanced/behavior"
     const val COLORS = "settings/advanced/appearance/colors"
     const val DRAWER = "settings/advanced/drawer"
@@ -108,7 +108,7 @@ fun MainAppUi(
     backupViewModel: BackupViewModel,
     appsViewModel: AppsViewModel,
     workspaceViewModel: WorkspaceViewModel,
-    widgetsViewModel: WidgetsViewModel,
+    floatingAppsViewModel: FloatingAppsViewModel,
     navController: NavHostController,
     onLaunchSystemWidgetPicker: () -> Unit
 ) {
@@ -300,7 +300,7 @@ fun MainAppUi(
                     onAppDrawer = { goDrawer() },
                     onGoWelcome = { goWelcome() },
                     onLongPress3Sec = { goSettingsRoot() },
-                    widgetsViewModel = widgetsViewModel
+                    floatingAppsViewModel = floatingAppsViewModel
                 )
             }
 
@@ -343,19 +343,19 @@ fun MainAppUi(
             }
             composable(SETTINGS.ADVANCED_ROOT) { AdvancedSettingsScreen(appsViewModel, navController, onReset = { goMainScreen() } ) { goSettingsRoot() } }
 
-            composable(SETTINGS.APPEARANCE) { AppearanceTab(navController) { goAdvSettingsRoot() } }
-            composable(SETTINGS.WALLPAPER)  { WallpaperTab { goAppearance() } }
-            composable(SETTINGS.ICON_PACK)  { IconPackTab(appsViewModel) { goAppearance() } }
-            composable(SETTINGS.STATUS_BAR) { StatusBarTab { goAppearance() } }
-            composable(SETTINGS.THEME)      { ThemesTab { goAppearance() } }
-            composable(SETTINGS.WIDGETS)    { WidgetsTab(widgetsViewModel, { goAppearance() } ) { launchWidgetsPicker() } }
-            composable(SETTINGS.BEHAVIOR)   { BehaviorTab(appsViewModel, workspaceViewModel) { goAdvSettingsRoot() } }
-            composable(SETTINGS.DRAWER)     { DrawerTab(appsViewModel) { goAdvSettingsRoot() } }
-            composable(SETTINGS.COLORS)     { ColorSelectorTab { goAppearance() } }
-            composable(SETTINGS.DEBUG)      { DebugTab(navController, appsViewModel, onShowWelcome = { goWelcome() } ) { goAdvSettingsRoot() } }
-            composable(SETTINGS.LANGUAGE)   { LanguageTab { goAdvSettingsRoot() } }
-            composable(SETTINGS.BACKUP)     { BackupTab(backupViewModel) { goAdvSettingsRoot() } }
-            composable(SETTINGS.CHANGELOGS) { ChangelogsScreen { goAdvSettingsRoot() } }
+            composable(SETTINGS.APPEARANCE)    { AppearanceTab(navController) { goAdvSettingsRoot() } }
+            composable(SETTINGS.WALLPAPER)     { WallpaperTab { goAppearance() } }
+            composable(SETTINGS.ICON_PACK)     { IconPackTab(appsViewModel) { goAppearance() } }
+            composable(SETTINGS.STATUS_BAR)    { StatusBarTab { goAppearance() } }
+            composable(SETTINGS.THEME)         { ThemesTab { goAppearance() } }
+            composable(SETTINGS.FLOATING_APPS) { FloatingAppsTab(appsViewModel, workspaceViewModel, floatingAppsViewModel, ::goAppearance ) { launchWidgetsPicker() } }
+            composable(SETTINGS.BEHAVIOR)      { BehaviorTab(appsViewModel, workspaceViewModel) { goAdvSettingsRoot() } }
+            composable(SETTINGS.DRAWER)        { DrawerTab(appsViewModel) { goAdvSettingsRoot() } }
+            composable(SETTINGS.COLORS)        { ColorSelectorTab { goAppearance() } }
+            composable(SETTINGS.DEBUG)         { DebugTab(navController, appsViewModel, onShowWelcome = { goWelcome() } ) { goAdvSettingsRoot() } }
+            composable(SETTINGS.LANGUAGE)      { LanguageTab { goAdvSettingsRoot() } }
+            composable(SETTINGS.BACKUP)        { BackupTab(backupViewModel) { goAdvSettingsRoot() } }
+            composable(SETTINGS.CHANGELOGS)    { ChangelogsScreen { goAdvSettingsRoot() } }
 
             composable(SETTINGS.WORKSPACE) {
                 WorkspaceListScreen(
@@ -396,7 +396,7 @@ fun MainAppUi(
     }
 
     if (showWidgetPicker) {
-        WidgetPickerDialog(widgetsViewModel) { showWidgetPicker = false }
+        WidgetPickerDialog(floatingAppsViewModel) { showWidgetPicker = false }
     }
 
     // ------------------------------------------------------------

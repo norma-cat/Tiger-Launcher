@@ -9,7 +9,7 @@ fun actionColor(
     extra: ExtraColors
 ): Color =
     when (action) {
-        is SwipeActionSerializable.LaunchApp, is SwipeActionSerializable.LaunchShortcut -> extra.launchApp
+        is SwipeActionSerializable.LaunchApp, is SwipeActionSerializable.LaunchShortcut, is SwipeActionSerializable.OpenWidget -> extra.launchApp
         is SwipeActionSerializable.OpenUrl -> extra.openUrl
         SwipeActionSerializable.NotificationShade -> extra.notificationShade
         SwipeActionSerializable.ControlPanel -> extra.controlPanel

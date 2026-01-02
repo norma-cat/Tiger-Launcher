@@ -100,7 +100,7 @@ fun CustomActionSelector(
                     bitmap = actionIconBitmap(
                         icons = icons,
                         action = currentAction,
-                        context = ctx,
+                        ctx = ctx,
                         tintColor = actionColor(currentAction, extraColors)
                     ),
                     contentDescription = actionLabel(currentAction),

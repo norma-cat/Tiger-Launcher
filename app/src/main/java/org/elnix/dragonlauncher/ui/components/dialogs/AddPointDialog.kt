@@ -45,6 +45,7 @@ import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import org.elnix.dragonlauncher.utils.actions.loadDrawableResAsBitmap
+import org.elnix.dragonlauncher.utils.defaultChoosableActions
 import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 
@@ -53,6 +54,7 @@ import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 fun AddPointDialog(
     appsViewModel: AppsViewModel,
     workspaceViewModel: WorkspaceViewModel,
+    actions: List<SwipeActionSerializable> = defaultChoosableActions,
     onDismiss: () -> Unit,
     onActionSelected: (SwipeActionSerializable) -> Unit
 ) {
@@ -65,20 +67,6 @@ fun AddPointDialog(
     var showUrlInput by remember { mutableStateOf(false) }
     var showFilePicker by remember { mutableStateOf(false) }
 
-    val actions = listOf(
-        SwipeActionSerializable.OpenCircleNest(0),
-        SwipeActionSerializable.GoParentNest,
-        SwipeActionSerializable.LaunchApp(""),
-        SwipeActionSerializable.OpenUrl(""),
-        SwipeActionSerializable.OpenFile(""),
-        SwipeActionSerializable.NotificationShade,
-        SwipeActionSerializable.ControlPanel,
-        SwipeActionSerializable.OpenAppDrawer,
-        SwipeActionSerializable.Lock,
-        SwipeActionSerializable.ReloadApps,
-        SwipeActionSerializable.OpenRecentApps,
-        SwipeActionSerializable.OpenDragonLauncherSettings
-    )
 
     val icons by appsViewModel.icons.collectAsState()
 
@@ -142,17 +130,6 @@ fun AddPointDialog(
                             Spacer(Modifier.height(8.dp))
                         }
 
-//                        is SwipeActionSerializable.OpenCircleNest -> {
-//                            AddPointColumn(
-//                                action = action,
-//                                icons = icons,
-//                                onSelected = {
-//                                    onActionSelected(action)
-//                                    TODO("CREATE NEW NEST")
-//                                }
-//                            )
-//                            Spacer(Modifier.height(8.dp))
-//                        }
                         // Direct actions
                         else -> {
                             AddPointColumn(
@@ -247,7 +224,7 @@ fun AddPointColumn(
 
 
     val icon = when(action) {
-        is SwipeActionSerializable.LaunchApp -> loadDrawableResAsBitmap(ctx, R.drawable.ic_app_grid)
+        is SwipeActionSerializable.LaunchApp -> loadDrawableResAsBitmap(ctx, R.drawable.ic_app_grid, 48, 48)
         else -> actionIconBitmap(
             icons,
             action,
