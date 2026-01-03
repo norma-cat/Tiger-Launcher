@@ -61,7 +61,6 @@ fun FloatingAppsHostView(
             modifier = modifier
                 .fillMaxSize()
                 .pointerInteropFilter { blockTouches },
-
             factory = {
                 FrameLayout(it).apply {
                     addView(
@@ -96,7 +95,9 @@ fun FloatingAppsHostView(
             modifier = modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(12.dp))
-                .clickable(!blockTouches) { onLaunchAction() }
+                .let { mod ->
+                    if (blockTouches) { mod } else { mod.clickable{ onLaunchAction() } }
+                }
         )
     }
 }

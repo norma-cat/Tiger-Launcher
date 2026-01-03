@@ -1,6 +1,7 @@
 package org.elnix.dragonlauncher.utils
 
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.ui.ROUTES
 import org.elnix.dragonlauncher.ui.SETTINGS
 
 const val obtainiumPackageName = "dev.imranr.obtainium.fdroid"
@@ -63,6 +64,7 @@ val systemLaunchers = listOf(
 
 /** List of routes that the routes killer ignores when the user leave the app for too long, usually files pickers */
 val ignoredReturnRoutes = listOf(
+    ROUTES.WELCOME,
     SETTINGS.BACKUP,
     SETTINGS.WALLPAPER,
     SETTINGS.FLOATING_APPS

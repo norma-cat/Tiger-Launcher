@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.MoveDown
 import androidx.compose.material.icons.filled.MoveUp
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,6 +56,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.MainActivity
 import org.elnix.dragonlauncher.R
@@ -193,7 +195,10 @@ fun FloatingAppsTab(
                     onResizeEnd = { corner ->
                         floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, 0f, 0f, snapResize)
                     },
-                    onRemove = { removeWidget(it) },
+                    onRemove = { removeWidget(floatingApp) },
+                    onGhost = { ghosted ->
+                        floatingAppsViewModel.setGhostedFloatingApp(floatingApp.id, ghosted)
+                    }
                 )
             }
         }
@@ -396,10 +401,10 @@ private fun DraggableFloatingApp(
     onMoveEnd: () -> Unit,
     onResize: (FloatingAppsViewModel.ResizeCorner, Float, Float) -> Unit,
     onResizeEnd: (FloatingAppsViewModel.ResizeCorner) -> Unit,
-    onRemove: (FloatingAppObject) -> Unit,
+    onRemove: () -> Unit,
+    onGhost: (ghosted: Boolean) -> Unit
 ) {
     val ctx = LocalContext.current
-    val dm = ctx.resources.displayMetrics
     val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
     val shape = RoundedCornerShape(12.dp)
 
@@ -408,17 +413,29 @@ private fun DraggableFloatingApp(
 
     val density = LocalDensity.current
 
+
+    val dm = ctx.resources.displayMetrics
+
+    val widthPixels = dm.widthPixels
+    val heightPixels = dm.heightPixels
+
+    val x = (app.x * widthPixels).toInt()
+    val y = (app.y * heightPixels).toInt()
+
+    val width =  app.spanX * cellSizePx
+    val height = app.spanY * cellSizePx
+
     Box(
         modifier = Modifier
             .offset {
                 IntOffset(
-                    x = (app.x * dm.widthPixels).toInt(),
-                    y = (app.y * dm.heightPixels).toInt()
+                    x = x,
+                    y = y
                 )
             }
             .size(
-                width = with(density) { (app.spanX * cellSizePx).toDp() },
-                height = with(density) { (app.spanY * cellSizePx).toDp() }
+                width = with(density) { width.toDp() },
+                height = with(density) { height.toDp() }
             )
             .border(
                 width = if (selected) 2.dp else 0.dp,
@@ -443,7 +460,7 @@ private fun DraggableFloatingApp(
                 .pointerInput(app.id) {
                     detectTapGestures(
                         onPress = { onSelect() },
-                        onLongPress = { onRemove(app) }
+                        onLongPress = { onRemove() }
                     )
                 }
                 .pointerInput(app.id) {
@@ -460,8 +477,12 @@ private fun DraggableFloatingApp(
                 }
         )
 
-        // Resize handles - only visible when selected
         if (selected) {
+
+            // ------------------------------------------
+            // Resize handles - only visible when selected
+            // ------------------------------------------
+
             val dotSize = 12.dp
             val hitboxPadding = 20.dp
 
@@ -570,6 +591,43 @@ private fun DraggableFloatingApp(
                         .size(dotSize)
                         .align(Alignment.Center)
                         .background(MaterialTheme.colorScheme.primary, CircleShape)
+                )
+            }
+        }
+    }
+
+    // ------------------------------------------
+    // Ghost Toggle, to prevent clicks
+    // ------------------------------------------
+
+
+    // If close to top
+    val offsetY = if (app.y < 0.05f) y + height.toInt()
+    else y - 100
+
+    if (selected) {
+        Box(
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        x = x,
+                        y = offsetY
+                    )
+                }
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = app.ghosted == true,
+                    onCheckedChange = { onGhost(it) }
+                )
+
+                Text(
+                    text = stringResource(R.string.ghosted),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 12.sp
                 )
             }
         }

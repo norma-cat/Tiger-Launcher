@@ -39,7 +39,8 @@ object FloatingAppsSettingsStore : BaseSettingsStore<JSONObject>() {
                     spanY = obj.optDouble("spanY", 1.0).toFloat(),
                     x = obj.optDouble("x", 0.0).toFloat(),
                     y = obj.optDouble("y", 0.0).toFloat(),
-                    angle = obj.optDouble("angle", 0.0)
+                    angle = obj.optDouble("angle", 0.0),
+                    ghosted = obj.optBoolean("ghosted", false)
                 ))
             }
             Log.d(FLOATING_APPS_TAG, "Loaded ${floatingApps.size} floatingApps")
@@ -68,6 +69,7 @@ object FloatingAppsSettingsStore : BaseSettingsStore<JSONObject>() {
                     put("x", floatingApp.x)
                     put("y", floatingApp.y)
                     put("angle", floatingApp.angle)
+                    put("ghosted", floatingApp.ghosted)
                 })
             }
         }
@@ -93,6 +95,7 @@ object FloatingAppsSettingsStore : BaseSettingsStore<JSONObject>() {
                     put("x", floatingApp.x)
                     put("y", floatingApp.y)
                     put("angle", floatingApp.angle)
+                    put("ghosted", floatingApp.ghosted)
                 })
             }
         }

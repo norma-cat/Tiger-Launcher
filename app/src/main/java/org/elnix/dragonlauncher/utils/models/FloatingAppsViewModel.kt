@@ -261,6 +261,27 @@ class FloatingAppsViewModel(
         }
     }
 
+
+    fun setGhostedFloatingApp(appId: Int, ghostedState: Boolean) {
+        val updated = _floatingApps.value.map { floatingApp ->
+            if (floatingApp.id == appId) {
+
+                floatingApp.copy(
+                   ghosted = ghostedState
+                )
+            } else floatingApp
+        }
+
+        _floatingApps.value = updated
+
+        viewModelScope.launch {
+            updated.find { it.id == appId }?.let {
+                FloatingAppsSettingsStore.saveFloatingApp(ctx, it)
+            }
+        }
+    }
+
+
     enum class ResizeCorner {
         Top, Right, Left, Bottom
     }

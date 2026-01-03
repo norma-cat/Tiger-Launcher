@@ -9,5 +9,6 @@ data class FloatingAppObject(
     val spanY: Float = 1f,
     val x: Float = 0f,
     val y: Float = 0f,
-    val angle: Double = 0.0
+    val angle: Double = 0.0,
+    val ghosted: Boolean? = false
 )

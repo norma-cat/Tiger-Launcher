@@ -6,8 +6,6 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -29,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.BehaviorSettingsStore
+import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore
 import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
@@ -125,7 +126,7 @@ fun MainScreen(
     val hasSeenWelcome by PrivateSettingsStore.getHasSeenWelcome(ctx)
         .collectAsState(initial = true)
 
-    val useAccessibilityInsteadOfContextToExpandActionPanel by PrivateSettingsStore
+    val useAccessibilityInsteadOfContextToExpandActionPanel by DebugSettingsStore
         .getUseAccessibilityInsteadOfContextToExpandActionPanel(ctx)
         .collectAsState(initial = true)
 
@@ -267,67 +268,70 @@ fun MainScreen(
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-                awaitEachGesture {
-                    val down = awaitFirstDown()
-
-
-                    // Detects if the drag is inside the padded zone or not
-                    val allowed = isInsideActiveZone(
-                        pos = down.position,
-                        size = size,
-                        left = leftPadding,
-                        right = rightPadding,
-                        top = upPadding,
-                        bottom = downPadding
-                    )
-
-                    if (!allowed) {
-                        down.consume()
-                        return@awaitEachGesture
-                    }
-
-                    start = down.position
-                    current = down.position
-                    isDragging = true
-
-                    val pointerId = down.id
-
-                    val currentTime = System.currentTimeMillis()
-                    val diff = currentTime - lastClickTime
-                    if (diff < 500) {
-                        doubleClickAction?.let { action ->
-                            launchAction(
-                                SwipePointSerializable(
-                                    circleNumber = 0,
-                                    angleDeg = 0.toDouble(),
-                                    action = action
-                                )
-                            )
-                            isDragging = false
-                            return@awaitEachGesture
-                        }
-                    }
-                    lastClickTime = currentTime
-
+                awaitPointerEventScope {
                     while (true) {
-                        val event = awaitPointerEvent()
-                        val change = event.changes.firstOrNull { it.id == pointerId }
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
 
-                        if (change != null) {
-                            if (change.pressed) {
-                                change.consume()
-                                current = change.position
+                        val down = event.changes.firstOrNull { it.changedToDown() } ?: continue
+                        val pos = down.position
+
+                        val allowed = isInsideActiveZone(
+                            pos = pos,
+                            size = size,
+                            left = leftPadding,
+                            right = rightPadding,
+                            top = upPadding,
+                            bottom = downPadding
+                        )
+
+                        if (!allowed) {
+                            down.consume()
+                            continue
+                        }
+
+                        start = down.position
+                        current = down.position
+                        isDragging = true
+
+                        val pointerId = down.id
+
+                        val currentTime = System.currentTimeMillis()
+                        val diff = currentTime - lastClickTime
+                        if (diff < 500) {
+                            doubleClickAction?.let { action ->
+                                launchAction(
+                                    SwipePointSerializable(
+                                        circleNumber = 0,
+                                        angleDeg = 0.toDouble(),
+                                        action = action
+                                    )
+                                )
+                                isDragging = false
+                                continue
+                            }
+                        }
+                        lastClickTime = currentTime
+
+                        while (true) {
+                            val event = awaitPointerEvent(PointerEventPass.Initial)
+                            val change = event.changes.firstOrNull { it.id == pointerId }
+
+                            if (change != null) {
+                                if (change.pressed) {
+                                    change.consume()
+                                    current = change.position
+                                } else {
+                                    isDragging = false
+                                    start = null
+                                    current = null
+                                    break
+                                }
                             } else {
                                 isDragging = false
                                 start = null
                                 current = null
                                 break
                             }
-                        } else {
-                            isDragging = false
-                            start = null
-                            current = null
-                            break
                         }
                     }
                 }
@@ -360,7 +364,8 @@ fun MainScreen(
                             action = floatingAppObject.action
                         )
                     )
-                }
+                },
+                blockTouches = floatingAppObject.ghosted == true
             )
         }
 
@@ -444,14 +449,14 @@ fun MainScreen(
             onCancel = {
                 // The simple ctx method didn't work, so forced to use the accessibility method, that doesn't work well on my phone
                 scope.launch {
-                    PrivateSettingsStore.setUseAccessibilityInsteadOfContextToExpandActionPanel(ctx, false)
+                    DebugSettingsStore.setUseAccessibilityInsteadOfContextToExpandActionPanel(ctx, false)
                 }
                 showMethodDialog = false
             },
             onAgree = {
                 // The simple ctx method worked, keep it
                 scope.launch {
-                    PrivateSettingsStore.setUseAccessibilityInsteadOfContextToExpandActionPanel(ctx, true)
+                    DebugSettingsStore.setUseAccessibilityInsteadOfContextToExpandActionPanel(ctx, true)
                 }
                 showMethodDialog = false
             }

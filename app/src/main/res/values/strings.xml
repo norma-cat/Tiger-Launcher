@@ -254,4 +254,5 @@
     <string name="center_selected_floating_app">Center selected floating app / widget</string>
     <string name="device_admin_description">Used to prevent Xiaomi to kill the app</string>
     <string name="device_admin_label">Dragon Launcher</string>
+    <string name="ghosted">Ghosted</string>
 </resources>

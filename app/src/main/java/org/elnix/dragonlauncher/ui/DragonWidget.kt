@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.BehaviorSettingsStore
+import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
@@ -82,7 +83,7 @@ fun DragonWidget(
     val hasSeenWelcome by PrivateSettingsStore.getHasSeenWelcome(ctx)
         .collectAsState(initial = true)
 
-    val useAccessibilityInsteadOfContextToExpandActionPanel by PrivateSettingsStore
+    val useAccessibilityInsteadOfContextToExpandActionPanel by DebugSettingsStore
         .getUseAccessibilityInsteadOfContextToExpandActionPanel(ctx)
         .collectAsState(initial = true)
 
