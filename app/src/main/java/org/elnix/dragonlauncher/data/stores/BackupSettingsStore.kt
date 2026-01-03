@@ -2,6 +2,7 @@ package org.elnix.dragonlauncher.data.stores
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -19,6 +20,7 @@ import org.elnix.dragonlauncher.data.putIfNonDefault
 import org.elnix.dragonlauncher.data.stores.BackupSettingsStore.Keys.AUTO_BACKUP_ENABLED
 import org.elnix.dragonlauncher.data.stores.BackupSettingsStore.Keys.AUTO_BACKUP_URI
 import org.elnix.dragonlauncher.data.stores.BackupSettingsStore.Keys.BACKUP_STORES
+import org.elnix.dragonlauncher.utils.BACKUP_TAG
 
 object BackupSettingsStore : BaseSettingsStore<Map<String, Any>>() {
 
@@ -97,6 +99,8 @@ object BackupSettingsStore : BaseSettingsStore<Map<String, Any>>() {
     override suspend fun getAll(ctx: Context): Map<String, Any> {
         val prefs = ctx.backupDatastore.data.first()
 
+        Log.w(BACKUP_TAG, "getAll stores: ${prefs[BACKUP_STORES]} (type=${prefs[BACKUP_STORES]?.javaClass?.name})")
+
         return buildMap {
 
             putIfNonDefault(
@@ -120,6 +124,7 @@ object BackupSettingsStore : BaseSettingsStore<Map<String, Any>>() {
     }
 
     override suspend fun setAll(ctx: Context, value: Map<String, Any>) {
+        Log.e(BACKUP_TAG, value.toString())
         ctx.backupDatastore.edit { prefs ->
 
             prefs[AUTO_BACKUP_ENABLED] =
@@ -128,8 +133,9 @@ object BackupSettingsStore : BaseSettingsStore<Map<String, Any>>() {
             prefs[AUTO_BACKUP_URI] =
                 getStringStrict(value, AUTO_BACKUP_URI, "")
 
-            prefs[BACKUP_STORES] =
-                getStringSetStrict(value, BACKUP_STORES, defaultBackupStores)
+            val stores =                 getStringSetStrict(value, BACKUP_STORES, defaultBackupStores)
+            Log.e(BACKUP_TAG, stores.toString())
+            prefs[BACKUP_STORES] = stores
         }
     }
 }

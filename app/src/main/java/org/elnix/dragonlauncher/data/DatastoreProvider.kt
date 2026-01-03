@@ -38,7 +38,6 @@ enum class DataStoreName(
     BACKUP("backupDatastore", "backup", BackupSettingsStore),
     WALLPAPER("wallpaperDatastore", "wallpaper", WallpaperSettingsStore),
     STATUS_BAR("statusDatastore", "status_bar", StatusBarSettingsStore),
-    WIDGETS("floatingAppsDatastore", "floating_apps", FloatingAppsSettingsStore),
     FLOATING_APPS("floatingAppsDatastore", "floating_apps", FloatingAppsSettingsStore)
 }
 

@@ -1,6 +1,8 @@
 package org.elnix.dragonlauncher.data
 
+import android.util.Log
 import androidx.datastore.preferences.core.Preferences
+import org.elnix.dragonlauncher.utils.BACKUP_TAG
 
 
 fun getBooleanStrict(
@@ -68,13 +70,42 @@ fun getStringSetStrict(
     def: Set<String>
 ): Set<String> {
     val v = raw[key.name] ?: return def
+    Log.w(BACKUP_TAG, "Raw value: $v (type=${v.javaClass.name})")
+
     return when (v) {
-        is Set<*> -> v.filterIsInstance<String>().toSet()
-        is List<*> -> v.filterIsInstance<String>().toSet()
-        is String -> listOf(v).toSet()
-        else -> throw BackupTypeException(key.name, "String Set", v::class.simpleName, v)
+        is Set<*> -> v.flattenStrings().toSet()
+        is List<*> -> v.flattenStrings().toSet()
+        is String -> {
+            Log.w(BACKUP_TAG, "Processing String - parsing JSON list")
+            // Parse "[a,b,c]" → ["a","b","c"]
+            try {
+                // Extract content between [ ] and split by comma
+                val clean = v.trim().removeSurrounding("[", "]")
+                if (clean.isBlank()) return emptySet()
+
+                clean.split(",")
+                    .map { it.trim().trim('"').trim('\'') }
+                    .filter { it.isNotBlank() }
+                    .toSet()
+            } catch (e: Exception) {
+                Log.w(BACKUP_TAG, "Failed to parse string set: $v", e)
+                setOf(v)
+            }
+        }
+        else -> throw BackupTypeException(key.name, "String Set", v.javaClass.name, v)
     }
 }
+
+
+
+private fun Collection<*>.flattenStrings(): List<String> = flatMap { item ->
+    when (item) {
+        is String -> listOf(item)
+        is Collection<*> -> item.flattenStrings()
+        else -> emptyList()
+    }
+}.filter { it.isNotBlank() }
+
 
 inline fun <reified E : Enum<E>> getEnumStrict(
     raw: Map<String, Any?>,
@@ -107,7 +138,7 @@ fun MutableMap<String, Any>.putIfNonDefault(
     value: Any?,
     def: Any?
 ) {
-    if (value != null /*&& value != def*/) {
+    if (value != null && value != def) {
         put(key.name, value.toString())
     }
 }
