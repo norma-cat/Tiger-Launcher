@@ -391,6 +391,7 @@ object ColorSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
         ctx.uiDatastore.edit { prefs ->
             ALL.forEach { prefs.remove(it) }
         }
+        resetColors(ctx, ColorCustomisationMode.DEFAULT, DefaultThemes.AMOLED)
     }
 
     override suspend fun getAll(ctx: Context): Map<String, Any> {
