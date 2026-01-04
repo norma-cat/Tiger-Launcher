@@ -88,7 +88,10 @@ fun DebugTab(
     val showSetDefaultLauncherBanner by PrivateSettingsStore.getShowSetDefaultLauncherBanner(ctx)
         .collectAsState(initial = true)
 
-    val isForceSwitchToggled by DebugSettingsStore.getForceAppLanguageSelector(ctx)
+    val forceAppLanguageSelector by DebugSettingsStore.getForceAppLanguageSelector(ctx)
+        .collectAsState(initial = false)
+
+    val forceAppWidgetsSelector by DebugSettingsStore.getForceAppWidgetsSelector(ctx)
         .collectAsState(initial = false)
 
     val doNotRemindMeAgainNotificationsBehavior by PrivateSettingsStore.getShowMethodAsking(ctx)
@@ -255,10 +258,24 @@ fun DebugTab(
             }
 
             SwitchRow(
-                state = isForceSwitchToggled,
+                state = forceAppLanguageSelector,
                 text = "Force app language selector",
                 enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
             ) { scope.launch { DebugSettingsStore.setForceAppLanguageSelector(ctx, it) } }
+        }
+
+        item {
+            SwitchRow(
+                state = forceAppWidgetsSelector,
+                text = "Force app widgets selector"
+            ) {
+                scope.launch {
+                    DebugSettingsStore.setForceAppWidgetsSelector(
+                        ctx,
+                        it
+                    )
+                }
+            }
         }
 
         item {

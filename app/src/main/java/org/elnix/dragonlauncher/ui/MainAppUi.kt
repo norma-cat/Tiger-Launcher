@@ -1,6 +1,7 @@
 package org.elnix.dragonlauncher.ui
 
 import android.R.attr.versionCode
+import android.content.ComponentName
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,6 +41,7 @@ import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.helpers.DrawerActions
 import org.elnix.dragonlauncher.data.stores.BackupSettingsStore
+import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.data.stores.WallpaperSettingsStore
@@ -110,6 +112,8 @@ fun MainAppUi(
     workspaceViewModel: WorkspaceViewModel,
     floatingAppsViewModel: FloatingAppsViewModel,
     navController: NavHostController,
+//    onLaunchWidgetPicker: (Intent) -> Unit,
+    onBindCustomWidget: (Int, ComponentName) -> Unit,
     onLaunchSystemWidgetPicker: () -> Unit,
     onResetWidgetSize: (id: Int, widgetId: Int) -> Unit
 ) {
@@ -159,6 +163,9 @@ fun MainAppUi(
         .collectAsState(initial = 0.1f)
     val rightDrawerWidth  by DrawerSettingsStore.getRightDrawerWidth(ctx)
         .collectAsState(initial = 0.1f)
+
+    val forceAppWidgetsSelector by DebugSettingsStore.getForceAppWidgetsSelector(ctx)
+        .collectAsState(initial = false)
 
 
     val showSetDefaultLauncherBanner by PrivateSettingsStore.getShowSetDefaultLauncherBanner(ctx)
@@ -221,8 +228,8 @@ fun MainAppUi(
 
 
 
-    fun launchWidgetsPicker(system: Boolean = true) {
-        if (system) onLaunchSystemWidgetPicker()
+    fun launchWidgetsPicker() {
+        if (!forceAppWidgetsSelector) onLaunchSystemWidgetPicker()
         else showWidgetPicker = true
     }
 
@@ -406,7 +413,7 @@ fun MainAppUi(
     }
 
     if (showWidgetPicker) {
-        WidgetPickerDialog(floatingAppsViewModel) { showWidgetPicker = false }
+        WidgetPickerDialog(onBindCustomWidget) { showWidgetPicker = false }
     }
 
     // ------------------------------------------------------------

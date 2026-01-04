@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
+import android.content.ComponentName
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,12 +46,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.res.ResourcesCompat
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.utils.models.FloatingAppsViewModel
 
 @Composable
 fun WidgetPickerDialog(
-    floatingAppsViewModel: FloatingAppsViewModel,
+    onBindCustomWidget: (Int, ComponentName) -> Unit,
     onDismiss: () -> Unit
 ) {
     val ctx = LocalContext.current
@@ -85,10 +84,8 @@ fun WidgetPickerDialog(
                         WidgetItem(
                             provider = provider,
                             appWidgetHost = appWidgetHost,
-                            onAddWidget = {
-                                floatingAppsViewModel.addFloatingApp(SwipeActionSerializable.OpenWidget(0,provider.provider))
-                                onDismiss()
-                            }
+                            onBindCustomWidget = onBindCustomWidget,
+                            onDismiss = onDismiss
                         )
                     }
                 }
@@ -101,7 +98,8 @@ fun WidgetPickerDialog(
 private fun WidgetItem(
     provider: AppWidgetProviderInfo,
     appWidgetHost: AppWidgetHost,
-    onAddWidget: (appWidgetId: Int) -> Unit
+    onBindCustomWidget: (Int, ComponentName) -> Unit,
+    onDismiss: () -> Unit
 ) {
     val ctx = LocalContext.current
     val density = LocalDensity.current
@@ -110,11 +108,13 @@ private fun WidgetItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .clickable{
-                val appWidgetId = appWidgetHost.allocateAppWidgetId()
-                onAddWidget(appWidgetId)
+            .clickable {
+                val widgetId = appWidgetHost.allocateAppWidgetId()
+
+                onBindCustomWidget(widgetId, provider.provider)
+                onDismiss()
             },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
             modifier = Modifier

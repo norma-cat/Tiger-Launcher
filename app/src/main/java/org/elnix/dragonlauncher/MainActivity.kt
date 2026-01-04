@@ -39,6 +39,7 @@ import org.elnix.dragonlauncher.ui.MainAppUi
 import org.elnix.dragonlauncher.ui.ROUTES
 import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
+import org.elnix.dragonlauncher.utils.WIDGET_TAG
 import org.elnix.dragonlauncher.utils.ignoredReturnRoutes
 import org.elnix.dragonlauncher.utils.models.AppLifecycleViewModel
 import org.elnix.dragonlauncher.utils.models.AppsViewModel
@@ -82,35 +83,61 @@ class MainActivity : ComponentActivity() {
 
     private val widgetPickerLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            Log.d("WIDGET", "widgetPickerLauncher resultCode=${result.resultCode}")
+            Log.d(WIDGET_TAG, "widgetPickerLauncher resultCode=${result.resultCode}")
             val widgetId = result.data?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
                 ?: return@registerForActivityResult
 
-            Log.d("WIDGET", "Picked widgetId=$widgetId")
-            val info = appWidgetManager.getAppWidgetInfo(widgetId)
-            if (info == null) {
-                Log.w("WIDGET", "No AppWidgetInfo for widgetId=$widgetId, deleting...")
-                appWidgetHost.deleteAppWidgetId(widgetId)
-                return@registerForActivityResult
-            }
+            addWidgetsWithId(widgetId)
 
-            // Try to bind silently
-            if (appWidgetManager.bindAppWidgetIdIfAllowed(widgetId, info.provider)) {
-                Log.d("WIDGET", "bindAppWidgetIdIfAllowed=true, proceeding")
-                proceedAfterBind(widgetId, info)
-            } else {
-                Log.d("WIDGET", "bindAppWidgetIdIfAllowed=false, launching bind consent")
-                pendingBindWidgetId = widgetId
-                pendingBindProvider = info.provider
-
-                val bindIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_BIND).apply {
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, info.provider)
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_OPTIONS, Bundle())
-                }
-                widgetBindLauncher.launch(bindIntent)
-            }
         }
+
+
+    private fun addWidgetsWithId(widgetId: Int) {
+        Log.d(WIDGET_TAG, "Picked widgetId=$widgetId")
+        val info = appWidgetManager.getAppWidgetInfo(widgetId)
+        if (info == null) {
+            Log.w(WIDGET_TAG, "No AppWidgetInfo for widgetId=$widgetId, deleting...")
+            appWidgetHost.deleteAppWidgetId(widgetId)
+            return
+        }
+
+        // Try to bind silently
+        if (appWidgetManager.bindAppWidgetIdIfAllowed(widgetId, info.provider)) {
+            Log.d(WIDGET_TAG, "bindAppWidgetIdIfAllowed=true, proceeding")
+            proceedAfterBind(widgetId, info)
+        } else {
+            Log.d(WIDGET_TAG, "bindAppWidgetIdIfAllowed=false, launching bind consent")
+            pendingBindWidgetId = widgetId
+            pendingBindProvider = info.provider
+
+            val bindIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_BIND).apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, info.provider)
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_OPTIONS, Bundle())
+            }
+            widgetBindLauncher.launch(bindIntent)
+        }
+    }
+
+    fun bindWidgetFromCustomPicker(
+        widgetId: Int,
+        provider: ComponentName
+    ) {
+        val bound = appWidgetManager.bindAppWidgetIdIfAllowed(widgetId, provider)
+
+        if (bound) {
+            val info = appWidgetManager.getAppWidgetInfo(widgetId)
+
+            proceedAfterBind(widgetId, info)
+        } else {
+            val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_BIND).apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, provider)
+            }
+            widgetBindLauncher.launch(intent)
+        }
+    }
+
 
     private val widgetBindLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
@@ -129,7 +156,7 @@ class MainActivity : ComponentActivity() {
                     val info = try {
                         appWidgetManager.getAppWidgetInfo(widgetId)
                     } catch (e: SecurityException) {
-                        Log.w("WIDGET", "Cannot get AppWidgetInfo for widgetId=$widgetId: ${e.message}")
+                        Log.w(WIDGET_TAG, "Cannot get AppWidgetInfo for widgetId=$widgetId: ${e.message}")
                         null
                     }
 
@@ -142,15 +169,15 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (bound) {
-                    Log.d("WIDGET", "Widget successfully bound after consent: $widgetId")
+                    Log.d(WIDGET_TAG, "Widget successfully bound after consent: $widgetId")
                     appWidgetManager.getAppWidgetInfo(widgetId)?.let { info ->
                         proceedAfterBind(widgetId, info)
                     } ?: run {
-                        Log.w("WIDGET", "No AppWidgetInfo after bind, deleting $widgetId")
+                        Log.w(WIDGET_TAG, "No AppWidgetInfo after bind, deleting $widgetId")
                         appWidgetHost.deleteAppWidgetId(widgetId)
                     }
                 } else {
-                    Log.w("WIDGET", "Widget bind failed or dismissed: $widgetId")
+                    Log.w(WIDGET_TAG, "Widget bind failed or dismissed: $widgetId")
                     appWidgetHost.deleteAppWidgetId(widgetId)
                 }
             }
@@ -161,10 +188,10 @@ class MainActivity : ComponentActivity() {
      * I struggled so much to achieve to something that works in most cases I don't want to change that
      */
     private fun proceedAfterBind(widgetId: Int, info: AppWidgetProviderInfo) {
-        Log.d("WIDGET", "proceedAfterBind for widgetId=$widgetId, provider=${info.provider}")
+        Log.d(WIDGET_TAG, "proceedAfterBind for widgetId=$widgetId, provider=${info.provider}")
         if (info.configure != null) {
 
-            Log.d("WIDGET", "Widget requires configuration, launching configure activity")
+            Log.d(WIDGET_TAG, "Widget requires configuration, launching configure activity")
             val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE).apply {
                 component = info.configure
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
@@ -174,13 +201,13 @@ class MainActivity : ComponentActivity() {
             try {
                 widgetConfigureLauncher.launch(intent)
             } catch (e: Exception) {
-                Log.w("WIDGET", "Failed to launch configure activity: ${e.message}")
+                Log.w(WIDGET_TAG, "Failed to launch configure activity: ${e.message}")
                 this.showToast("Failed to launch configure activity: ${e.message}")
                 floatingAppsViewModel.addFloatingApp(SwipeActionSerializable.OpenWidget(widgetId,info.provider), info)
             }
 
         } else {
-            Log.d("WIDGET", "No configuration needed, adding widget")
+            Log.d(WIDGET_TAG, "No configuration needed, adding widget")
             floatingAppsViewModel.addFloatingApp(SwipeActionSerializable.OpenWidget(widgetId,info.provider), info)
         }
     }
@@ -200,7 +227,7 @@ class MainActivity : ComponentActivity() {
             if (result.resultCode == RESULT_OK) {
                 floatingAppsViewModel.addFloatingApp(SwipeActionSerializable.OpenWidget(widgetId,info.provider), info)
             } else {
-                Log.w("WIDGET", "Widget configure canceled, deleting $widgetId")
+                Log.w(WIDGET_TAG, "Widget configure canceled, deleting $widgetId")
                 appWidgetHost.deleteAppWidgetId(widgetId)
             }
         }
@@ -393,6 +420,12 @@ class MainActivity : ComponentActivity() {
                     workspaceViewModel = workspaceViewModel,
                     floatingAppsViewModel = floatingAppsViewModel,
                     navController = navController,
+                    onBindCustomWidget = { widgetId, provider ->
+                        (ctx as MainActivity).bindWidgetFromCustomPicker(widgetId, provider)
+                    },
+//                    onLaunchWidgetPicker = { intent ->
+//                        widgetPickerLauncher.launch(intent)
+//                    },
                     onLaunchSystemWidgetPicker = { (ctx as MainActivity).launchWidgetPicker() },
                     onResetWidgetSize = { id, widgetId ->
                         val info = appWidgetManager.getAppWidgetInfo(widgetId)

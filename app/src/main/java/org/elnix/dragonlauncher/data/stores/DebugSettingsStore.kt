@@ -17,6 +17,7 @@ import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.AUTO_RAISE_D
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.DEBUG_ENABLED
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.DEBUG_INFOS
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.FORCE_APP_LANGUAGE_SELECTOR
+import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.FORCE_APP_WIDGETS_SELECTOR
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.SETTINGS_DEBUG_INFOS
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.SYSTEM_LAUNCHER_PACKAGE_NAME
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.USE_ACCESSIBILITY_INSTEAD_OF_CONTEXT
@@ -37,6 +38,7 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
         val widgetsDebugInfo: Boolean = false,
         val workspacesDebugInfo: Boolean = false,
         val forceAppLanguageSelector: Boolean = false,
+        val forceAppWidgetsSelector: Boolean = false,
         val autoRaiseDragonOnSystemLauncher: Boolean = false,
         val systemLauncherPackageName: String = "",
         val useAccessibilityInsteadOfContextToExpandActionPanel: Boolean = true,
@@ -54,6 +56,7 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
         val WIDGETS_DEBUG_INFOS = booleanPreferencesKey(DebugSettingsBackup::widgetsDebugInfo.name)
         val WORKSPACES_DEBUG_INFO = booleanPreferencesKey(DebugSettingsBackup::workspacesDebugInfo.name)
         val FORCE_APP_LANGUAGE_SELECTOR = booleanPreferencesKey(DebugSettingsBackup::forceAppLanguageSelector.name)
+        val FORCE_APP_WIDGETS_SELECTOR = booleanPreferencesKey(DebugSettingsBackup::forceAppWidgetsSelector.name)
         val AUTO_RAISE_DRAGON_ON_SYSTEM_LAUNCHER = booleanPreferencesKey(DebugSettingsBackup::autoRaiseDragonOnSystemLauncher.name)
         val SYSTEM_LAUNCHER_PACKAGE_NAME = stringPreferencesKey(DebugSettingsBackup::systemLauncherPackageName.name)
         val USE_ACCESSIBILITY_INSTEAD_OF_CONTEXT =
@@ -66,6 +69,7 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
             WIDGETS_DEBUG_INFOS,
             WORKSPACES_DEBUG_INFO,
             FORCE_APP_LANGUAGE_SELECTOR,
+            FORCE_APP_WIDGETS_SELECTOR,
             AUTO_RAISE_DRAGON_ON_SYSTEM_LAUNCHER,
             SYSTEM_LAUNCHER_PACKAGE_NAME,
             USE_ACCESSIBILITY_INSTEAD_OF_CONTEXT
@@ -129,6 +133,15 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
         ctx.debugDatastore.edit { it[FORCE_APP_LANGUAGE_SELECTOR] = enabled }
     }
 
+    fun getForceAppWidgetsSelector(ctx: Context): Flow<Boolean> =
+        ctx.debugDatastore.data.map { prefs ->
+            prefs[FORCE_APP_WIDGETS_SELECTOR] ?: defaults.forceAppWidgetsSelector
+        }
+
+    suspend fun setForceAppWidgetsSelector(ctx: Context, enabled: Boolean) {
+        ctx.debugDatastore.edit { it[FORCE_APP_WIDGETS_SELECTOR] = enabled }
+    }
+
     fun getAutoRaiseDragonOnSystemLauncher(ctx: Context): Flow<Boolean> =
         ctx.debugDatastore.data.map { prefs ->
             prefs[AUTO_RAISE_DRAGON_ON_SYSTEM_LAUNCHER] ?: defaults.autoRaiseDragonOnSystemLauncher
@@ -185,7 +198,7 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
             putIfNonDefault(SETTINGS_DEBUG_INFOS, prefs[SETTINGS_DEBUG_INFOS], defaults.settingsDebugInfo)
             putIfNonDefault(WIDGETS_DEBUG_INFOS, prefs[WIDGETS_DEBUG_INFOS], defaults.widgetsDebugInfo)
             putIfNonDefault(WORKSPACES_DEBUG_INFO, prefs[WORKSPACES_DEBUG_INFO], defaults.workspacesDebugInfo)
-            putIfNonDefault(FORCE_APP_LANGUAGE_SELECTOR, prefs[FORCE_APP_LANGUAGE_SELECTOR], defaults.forceAppLanguageSelector)
+            putIfNonDefault(FORCE_APP_LANGUAGE_SELECTOR, prefs[FORCE_APP_LANGUAGE_SELECTOR], defaults.forceAppWidgetsSelector)
             putIfNonDefault(AUTO_RAISE_DRAGON_ON_SYSTEM_LAUNCHER, prefs[AUTO_RAISE_DRAGON_ON_SYSTEM_LAUNCHER], defaults.autoRaiseDragonOnSystemLauncher)
             putIfNonDefault(SYSTEM_LAUNCHER_PACKAGE_NAME, prefs[SYSTEM_LAUNCHER_PACKAGE_NAME], defaults.systemLauncherPackageName)
             putIfNonDefault(
@@ -220,6 +233,9 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
 
             prefs[FORCE_APP_LANGUAGE_SELECTOR] =
                 getBooleanStrict(value,FORCE_APP_LANGUAGE_SELECTOR, defaults.forceAppLanguageSelector)
+
+            prefs[FORCE_APP_WIDGETS_SELECTOR] =
+                getBooleanStrict(value,FORCE_APP_WIDGETS_SELECTOR, defaults.forceAppWidgetsSelector)
 
             prefs[AUTO_RAISE_DRAGON_ON_SYSTEM_LAUNCHER] =
                 getBooleanStrict(value,AUTO_RAISE_DRAGON_ON_SYSTEM_LAUNCHER, defaults.autoRaiseDragonOnSystemLauncher)
