@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import org.elnix.dragonlauncher.utils.logs.logD
 
 @Composable
 fun StatusBarConnectivity(
@@ -91,10 +90,10 @@ data class ConnectivityState(
 private fun readConnectivityState(ctx: Context): ConnectivityState {
     val resolver = ctx.contentResolver
 
-    ctx.logD("StatusBar", "AIRPLANE: ${Settings.Global.getInt(resolver, Settings.Global.AIRPLANE_MODE_ON, 0)}")
-    ctx.logD("StatusBar", "WIFI_ON: ${Settings.Global.getInt(resolver, Settings.Global.WIFI_ON, 0)}")
+//    ctx.logD("StatusBar", "AIRPLANE: ${Settings.Global.getInt(resolver, Settings.Global.AIRPLANE_MODE_ON, 0)}")
+//    ctx.logD("StatusBar", "WIFI_ON: ${Settings.Global.getInt(resolver, Settings.Global.WIFI_ON, 0)}")
 //    ctx.logD("StatusBar", "VPN_ALWAYS_ON: ${Settings.Global.getInt(resolver, Settings.Global.VPN_ALWAYS_ON_GENERIC, 0)}")
-    ctx.logD("StatusBar", "BLUETOOTH_ON: ${Settings.Global.getInt(resolver, Settings.Global.BLUETOOTH_ON, 0)}")
+//    ctx.logD("StatusBar", "BLUETOOTH_ON: ${Settings.Global.getInt(resolver, Settings.Global.BLUETOOTH_ON, 0)}")
 
     return ConnectivityState(
         isAirplaneMode = Settings.Global.getInt(resolver, Settings.Global.AIRPLANE_MODE_ON, 0) == 1,
