@@ -61,6 +61,7 @@ import org.elnix.dragonlauncher.ui.settings.customization.StatusBarTab
 import org.elnix.dragonlauncher.ui.settings.customization.ThemesTab
 import org.elnix.dragonlauncher.ui.settings.customization.WallpaperTab
 import org.elnix.dragonlauncher.ui.settings.debug.DebugTab
+import org.elnix.dragonlauncher.ui.settings.debug.LogsTab
 import org.elnix.dragonlauncher.ui.settings.language.LanguageTab
 import org.elnix.dragonlauncher.ui.settings.workspace.WorkspaceDetailScreen
 import org.elnix.dragonlauncher.ui.settings.workspace.WorkspaceListScreen
@@ -93,7 +94,8 @@ object SETTINGS {
     const val WORKSPACE = "settings/advanced/workspace"
     const val WORKSPACE_DETAIL = "settings/advanced/workspace/{id}"
     const val BACKUP = "settings/advanced/backup"
-    const val DEBUG = "/advanced/debug"
+    const val DEBUG = "settings//advanced/debug"
+    const val LOGS = "settings/advanced/debug/logs"
     const val LANGUAGE = "settings/advanced/language"
     const val CHANGELOGS = "settings/advanced/changelogs"
 }
@@ -225,6 +227,7 @@ fun MainAppUi(
     fun goDrawer() = navController.navigate(ROUTES.DRAWER)
     fun goWelcome() = navController.navigate(ROUTES.WELCOME)
     fun goAppearance() = navController.navigate(SETTINGS.APPEARANCE)
+    fun goDebug() = navController.navigate(SETTINGS.DEBUG)
 
 
 
@@ -370,6 +373,7 @@ fun MainAppUi(
             composable(SETTINGS.DRAWER)        { DrawerTab(appsViewModel) { goAdvSettingsRoot() } }
             composable(SETTINGS.COLORS)        { ColorSelectorTab { goAppearance() } }
             composable(SETTINGS.DEBUG)         { DebugTab(navController, appsViewModel, onShowWelcome = { goWelcome() } ) { goAdvSettingsRoot() } }
+            composable(SETTINGS.LOGS)          { LogsTab { goDebug() } }
             composable(SETTINGS.LANGUAGE)      { LanguageTab { goAdvSettingsRoot() } }
             composable(SETTINGS.BACKUP)        { BackupTab(backupViewModel) { goAdvSettingsRoot() } }
             composable(SETTINGS.CHANGELOGS)    { ChangelogsScreen { goAdvSettingsRoot() } }

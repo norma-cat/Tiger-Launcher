@@ -1,7 +1,6 @@
 package org.elnix.dragonlauncher.data.stores
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
@@ -11,6 +10,8 @@ import org.elnix.dragonlauncher.data.SwipeJson
 import org.elnix.dragonlauncher.data.floatingAppsDatastore
 import org.elnix.dragonlauncher.data.helpers.FloatingAppObject
 import org.elnix.dragonlauncher.utils.FLOATING_APPS_TAG
+import org.elnix.dragonlauncher.utils.logs.logD
+import org.elnix.dragonlauncher.utils.logs.logE
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Collections.emptyList
@@ -26,7 +27,7 @@ object FloatingAppsSettingsStore : BaseSettingsStore<JSONObject>() {
     suspend fun loadFloatingApps(ctx: Context): List<FloatingAppObject> {
         return try {
             val allJson = getAll(ctx)
-            Log.d(FLOATING_APPS_TAG, "Raw: $allJson")
+            logD(FLOATING_APPS_TAG, "Raw: $allJson")
             val floatingAppArray = allJson.optJSONArray("floating_apps") ?: return emptyList()
 
             val floatingApps = mutableListOf<FloatingAppObject>()
@@ -46,16 +47,16 @@ object FloatingAppsSettingsStore : BaseSettingsStore<JSONObject>() {
 
                 ))
             }
-            Log.d(FLOATING_APPS_TAG, "Loaded ${floatingApps.size} floatingApps")
+            logD(FLOATING_APPS_TAG, "Loaded ${floatingApps.size} floatingApps")
             floatingApps
         } catch (e: Exception) {
-            Log.e(FLOATING_APPS_TAG, "Load failed", e)
+            logE(FLOATING_APPS_TAG, "Load failed", e)
             emptyList()
         }
     }
 
     suspend fun saveFloatingApp(ctx: Context, floatingApp: FloatingAppObject) {
-        Log.d(FLOATING_APPS_TAG, "Saving floatingApps ${floatingApp.id}")
+        logD(FLOATING_APPS_TAG, "Saving floatingApps ${floatingApp.id}")
 
         val floatingApps = loadFloatingApps(ctx).toMutableList().apply {
             removeAll { it.id == floatingApp.id }
@@ -82,7 +83,7 @@ object FloatingAppsSettingsStore : BaseSettingsStore<JSONObject>() {
             put("floating_apps", floatingAppsArray)
         }
 
-        Log.d(FLOATING_APPS_TAG, "Saved: $json")
+        logD(FLOATING_APPS_TAG, "Saved: $json")
         setAll(ctx, json)
     }
 

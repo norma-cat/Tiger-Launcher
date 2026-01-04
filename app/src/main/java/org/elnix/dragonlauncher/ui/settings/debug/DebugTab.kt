@@ -1,7 +1,6 @@
 package org.elnix.dragonlauncher.ui.settings.debug
 
 import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -50,11 +50,14 @@ import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.services.SystemControl
 import org.elnix.dragonlauncher.services.SystemControl.activateDeviceAdmin
 import org.elnix.dragonlauncher.services.SystemControl.isDeviceAdminActive
+import org.elnix.dragonlauncher.ui.SETTINGS
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.elnix.dragonlauncher.utils.detectSystemLauncher
+import org.elnix.dragonlauncher.utils.logs.logD
 import org.elnix.dragonlauncher.utils.models.AppsViewModel
 
 @Composable
@@ -97,11 +100,11 @@ fun DebugTab(
     val doNotRemindMeAgainNotificationsBehavior by PrivateSettingsStore.getShowMethodAsking(ctx)
         .collectAsState(initial = true)
 
-
     val systemLauncherPackageName by DebugSettingsStore.getSystemLauncherPackageName(ctx)
         .collectAsState("")
     val autoRaiseDragonOnSystemLauncher by DebugSettingsStore.getAutoRaiseDragonOnSystemLauncher(ctx)
         .collectAsState(false)
+
     var pendingSystemLauncher by remember { mutableStateOf<String?>(null) }
 
     val settingsStores = DataStoreName.entries.map { it.store }
@@ -116,8 +119,9 @@ fun DebugTab(
         scope.launch {
             appCacheJson = AppsSettingsStore.getCachedApps(ctx) ?: ""
         }
-
     }
+
+
     LaunchedEffect(Unit) {
         reloadAppCacheJson()
     }
@@ -144,6 +148,15 @@ fun DebugTab(
         }
 
         item { TextDivider("Debug things") }
+
+        item {
+            SettingsItem(
+                title = "Logs",
+                icon = Icons.AutoMirrored.Filled.Notes
+            ) {
+                navController.navigate(SETTINGS.LOGS)
+            }
+        }
 
         item {
             SwitchRow(
@@ -220,6 +233,7 @@ fun DebugTab(
                 )
             }
         }
+
         item {
             SwitchRow(
                 state = hasInitialized,
@@ -470,14 +484,14 @@ fun DebugTab(
 
 @Composable
 fun ActivateDeviceAdminButton() {
-    val context = LocalContext.current
-    val isActive = remember { mutableStateOf(isDeviceAdminActive(context)) }
+    val ctx = LocalContext.current
+    val isActive = remember { mutableStateOf(isDeviceAdminActive(ctx)) }
 
     TextButton(
         onClick = {
-            Log.d("Compose", "Button clicked - context: ${context.packageName}")
-            activateDeviceAdmin(context)
-            isActive.value = isDeviceAdminActive(context)
+            ctx.logD("Compose", "Button clicked - context: ${ctx.packageName}")
+            activateDeviceAdmin(ctx)
+            isActive.value = isDeviceAdminActive(ctx)
         }
     ) {
         Text(

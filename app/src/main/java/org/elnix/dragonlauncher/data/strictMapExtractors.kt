@@ -1,8 +1,6 @@
 package org.elnix.dragonlauncher.data
 
-import android.util.Log
 import androidx.datastore.preferences.core.Preferences
-import org.elnix.dragonlauncher.utils.BACKUP_TAG
 
 
 fun getBooleanStrict(
@@ -70,13 +68,11 @@ fun getStringSetStrict(
     def: Set<String>
 ): Set<String> {
     val v = raw[key.name] ?: return def
-    Log.w(BACKUP_TAG, "Raw value: $v (type=${v.javaClass.name})")
 
     return when (v) {
         is Set<*> -> v.flattenStrings().toSet()
         is List<*> -> v.flattenStrings().toSet()
         is String -> {
-            Log.w(BACKUP_TAG, "Processing String - parsing JSON list")
             // Parse "[a,b,c]" → ["a","b","c"]
             try {
                 // Extract content between [ ] and split by comma
@@ -87,8 +83,7 @@ fun getStringSetStrict(
                     .map { it.trim().trim('"').trim('\'') }
                     .filter { it.isNotBlank() }
                     .toSet()
-            } catch (e: Exception) {
-                Log.w(BACKUP_TAG, "Failed to parse string set: $v", e)
+            } catch (_: Exception) {
                 setOf(v)
             }
         }

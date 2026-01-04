@@ -2,7 +2,6 @@ package org.elnix.dragonlauncher.ui
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -57,6 +56,7 @@ import org.elnix.dragonlauncher.ui.statusbar.StatusBar
 import org.elnix.dragonlauncher.utils.WIDGET_TAG
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
 import org.elnix.dragonlauncher.utils.circles.rememberNestNavigation
+import org.elnix.dragonlauncher.utils.logs.logE
 import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.FloatingAppsViewModel
 
@@ -82,7 +82,7 @@ fun MainScreen(
     val floatingAppObjects by floatingAppsViewModel.floatingApps.collectAsState()
 
     LaunchedEffect(floatingAppObjects) {
-        Log.e(WIDGET_TAG, floatingAppObjects.toString())
+        logE(WIDGET_TAG, floatingAppObjects.toString())
     }
 
 //    val showMethodAsking by PrivateSettingsStore.getShowMethodAsking(ctx)

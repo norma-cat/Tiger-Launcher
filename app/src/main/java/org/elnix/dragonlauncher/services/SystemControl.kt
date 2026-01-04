@@ -7,9 +7,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
-import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import org.elnix.dragonlauncher.utils.ACCESSIBILITY_TAG
+import org.elnix.dragonlauncher.utils.logs.logD
+import org.elnix.dragonlauncher.utils.logs.logE
 import org.elnix.dragonlauncher.utils.showToast
 
 object SystemControl {
@@ -60,7 +61,7 @@ object SystemControl {
 //                return
 //            }
 //        } catch (e: Exception) {
-//            Log.e(ACCESSIBILITY_TAG, "Reflection failed", e)
+//            this.logE(ACCESSIBILITY_TAG, "Reflection failed", e)
 //        }
 
         // Fallback: Accessibility intent (no permissions needed)
@@ -70,7 +71,7 @@ object SystemControl {
 //            }
 //            ctx.startActivity(intent)
 //        } catch (e: Exception) {
-//            Log.e(ACCESSIBILITY_TAG, "Intent fallback failed", e)
+//            this.logE(ACCESSIBILITY_TAG, "Intent fallback failed", e)
 //        }
         SystemControlService.INSTANCE?.openNotificationShade()
     }
@@ -84,7 +85,7 @@ object SystemControl {
             val method = statusBarManagerClass.getMethod("expandSettingsPanel")
             method.invoke(statusBarService)
         } catch (e: Exception) {
-            Log.e(ACCESSIBILITY_TAG, "Reflection failed", e)
+            this.logE(ACCESSIBILITY_TAG, "Reflection failed", e)
             // Fallback to notifications if quick settings fails
             expandNotifications(ctx)
         }
@@ -133,7 +134,7 @@ object SystemControl {
         }
 
         val componentName = ComponentName(ctx, org.elnix.dragonlauncher.services.DeviceAdminReceiver::class.java)
-        Log.d(ACCESSIBILITY_TAG, "component name: $componentName")
+        logD(ACCESSIBILITY_TAG, "component name: $componentName")
 
 
         val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
@@ -143,17 +144,17 @@ object SystemControl {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
-        Log.d(ACCESSIBILITY_TAG, "intent: $intent")
+        logD(ACCESSIBILITY_TAG, "intent: $intent")
 
 
         // Verify component exists (common APK issue)
         val adminReceiver = ctx.packageManager.getReceiverInfo(componentName, 0)
-        Log.d(ACCESSIBILITY_TAG, "Admin receiver found: ${adminReceiver.packageName}")
+        logD(ACCESSIBILITY_TAG, "Admin receiver found: ${adminReceiver.packageName}")
 
         try {
             ctx.startActivity(intent)
         } catch (e: Exception) {
-            Log.e(ACCESSIBILITY_TAG, "Admin activation failed", e)
+            this.logE(ACCESSIBILITY_TAG, "Admin activation failed", e)
             ctx.showToast("Failed to open admin settings - check manifest")
         }
     }
@@ -167,7 +168,7 @@ object SystemControl {
         try {
             ctx.startActivity(intent)
         } catch (e: Exception) {
-            Log.e(ACCESSIBILITY_TAG, "Launch failed", e)
+            this.logE(ACCESSIBILITY_TAG, "Launch failed", e)
             ctx.showToast("Failed to launch Dragon Launcher")
         }
     }

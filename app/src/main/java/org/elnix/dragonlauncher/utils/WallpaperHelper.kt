@@ -45,7 +45,7 @@ class WallpaperHelper(private val context: Context) {
 //            val wallpaperManager = WallpaperManager.getInstance(context)
 //            wallpaperManager.drawable
 //        } catch (e: Exception) {
-//            Log.e("Wallpaper", "Failed to get wallpaper", e)
+//            logE("Wallpaper", "Failed to get wallpaper", e)
 //            null
 //        }
 //    }

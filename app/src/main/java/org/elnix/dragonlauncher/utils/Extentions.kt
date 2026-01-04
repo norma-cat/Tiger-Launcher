@@ -177,7 +177,7 @@ fun expandQuickActionsDrawer(context: Context) {
 //        val intent = Intent(AlarmClock.ACTION_SHOW_ALARMS)
 //        context.startActivity(intent)
 //    } catch (e: Exception) {
-//        Log.d("TAG", e.toString())
+//        logD("TAG", e.toString())
 //    }
 //}
 //

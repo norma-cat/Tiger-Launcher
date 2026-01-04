@@ -1,10 +1,10 @@
 package org.elnix.dragonlauncher.utils
 
 import android.content.Context
-import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.ui.whatsnew.Update
+import org.elnix.dragonlauncher.utils.logs.logE
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -79,7 +79,7 @@ suspend fun loadChangelogs(
             )
 
         } catch (e: Exception) {
-            Log.e("Changelogs", "Failed to parse $filename", e)
+            logE("Changelogs", "Failed to parse $filename", e)
             null
         }
     }

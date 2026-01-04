@@ -5,7 +5,6 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.CoroutineScope
@@ -15,6 +14,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.utils.ACCESSIBILITY_TAG
+import org.elnix.dragonlauncher.utils.logs.logD
+import org.elnix.dragonlauncher.utils.logs.logW
 
 @SuppressLint("AccessibilityPolicy")
 class SystemControlService : AccessibilityService() {
@@ -28,10 +29,6 @@ class SystemControlService : AccessibilityService() {
 
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        Log.d(ACCESSIBILITY_TAG, "Detected accessibility event! $event")
-
-        Log.d(ACCESSIBILITY_TAG, "$autoRaiseEnabled, $systemLauncher")
-
 
         if (!autoRaiseEnabled || systemLauncher == null) return
 
@@ -45,14 +42,46 @@ class SystemControlService : AccessibilityService() {
         if (isSwitching.value) return  // Prevent recursive launch
 
         val className = event.className?.toString() ?: ""
-        if (!className.contains("Launcher") && !className.contains("Home")) return
+        logW(ACCESSIBILITY_TAG, "--------------------------")
+        logW(ACCESSIBILITY_TAG, event.toString())
+        logW(ACCESSIBILITY_TAG, "className: $className")
 
-        Log.d(ACCESSIBILITY_TAG, "Confirmed system launcher: $pkg ($className)")
-        launchDragon()
+        val isRecentsScreen = className.contains("Recents") ||
+                className.contains("Overview") ||
+                className.contains("Task") ||
+                className.contains("RecentApps") ||
+                className.contains("MultiWindow") ||
+                className.contains("SplitScreen") ||
+                className.contains("ListView")
+
+
+        if (isRecentsScreen) {
+            logD(ACCESSIBILITY_TAG, "Blocked recents screen: $className")
+            return
+        }
+
+        val isMainHome = when {
+            className.contains("Launcher") -> true
+            className.contains("Home") && !className.contains("Screen") -> true
+            className.contains("Desktop") -> true
+            className.contains("Workspace") -> true
+            else -> {
+                val eventText = event.text.joinToString()
+                eventText.contains("Home", ignoreCase = true) ||
+                        eventText.contains("Desktop", ignoreCase = true)
+            }
+        }
+
+        if (isMainHome) {
+            logD(ACCESSIBILITY_TAG, "MAIN HOME SCREEN DETECTED: $className")
+            launchDragon()
+        } else {
+            logD(ACCESSIBILITY_TAG, "Skipped (not home): $className")
+        }
     }
 
     override fun onInterrupt() {
-        Log.w(ACCESSIBILITY_TAG, "Accessibility service interrupted")
+        logW(ACCESSIBILITY_TAG, "Accessibility service interrupted")
     }
 
     override fun onServiceConnected() {
@@ -75,7 +104,7 @@ class SystemControlService : AccessibilityService() {
         serviceInfo = info
 
         SystemControl.attachInstance(this)
-        Log.d(ACCESSIBILITY_TAG, "Service ready - Gestures & window monitoring enabled")
+        logD(ACCESSIBILITY_TAG, "Service ready - Gestures & window monitoring enabled")
     }
 
     fun openNotificationShade() {
@@ -96,7 +125,7 @@ class SystemControlService : AccessibilityService() {
         lastLaunchTime = System.currentTimeMillis()
 
         SystemControl.launchDragon(this)
-        Log.d(ACCESSIBILITY_TAG, "Dragon Launcher launched")
+        logD(ACCESSIBILITY_TAG, "Dragon Launcher launched")
 
         // Post to handler for debounce; after launching Dragon, for faster visual effect
         Handler(Looper.getMainLooper()).postDelayed({
@@ -109,7 +138,7 @@ class SystemControlService : AccessibilityService() {
             DebugSettingsStore.getSystemLauncherPackageName(this@SystemControlService)
                 .collect { pkg ->
                     systemLauncher = pkg.ifBlank { null }
-                    Log.d(ACCESSIBILITY_TAG, "Launcher setting updated: $pkg")
+                    logD(ACCESSIBILITY_TAG, "Launcher setting updated: $pkg")
                 }
         }
 
@@ -117,14 +146,14 @@ class SystemControlService : AccessibilityService() {
             DebugSettingsStore.getAutoRaiseDragonOnSystemLauncher(this@SystemControlService)
                 .collect { enabled ->
                     autoRaiseEnabled = enabled
-                    Log.d(ACCESSIBILITY_TAG, "Auto-raise toggled: $enabled")
+                    logD(ACCESSIBILITY_TAG, "Auto-raise toggled: $enabled")
                 }
         }
     }
 
     companion object {
         var INSTANCE: SystemControlService? = null
-        private const val DEBOUNCE_DELAY_MS = 100L
+        private const val DEBOUNCE_DELAY_MS = 500L
         private var lastLaunchTime = 0L
         private val isSwitching = mutableStateOf(false)
     }

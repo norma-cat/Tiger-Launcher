@@ -8,6 +8,7 @@ import org.elnix.dragonlauncher.services.SystemControl
 import org.elnix.dragonlauncher.utils.expandQuickActionsDrawer
 import org.elnix.dragonlauncher.utils.hasUriReadPermission
 import org.elnix.dragonlauncher.utils.launchShortcut
+import org.elnix.dragonlauncher.utils.logs.logE
 import org.elnix.dragonlauncher.utils.showToast
 
 
@@ -117,7 +118,7 @@ fun launchSwipeAction(
 
             } catch (e: Exception) {
                 ctx.showToast("Unable to open file: ${e.message}")
-//                Log.e("OpenFile", e.toString())
+                ctx.logE("OpenFile", e.toString())
             }
         }
 

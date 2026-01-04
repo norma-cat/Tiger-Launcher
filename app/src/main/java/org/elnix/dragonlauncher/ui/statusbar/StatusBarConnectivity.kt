@@ -2,7 +2,6 @@ package org.elnix.dragonlauncher.ui.statusbar
 
 import android.content.Context
 import android.provider.Settings
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -23,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import org.elnix.dragonlauncher.utils.logs.logD
 
 @Composable
 fun StatusBarConnectivity(
@@ -91,23 +91,20 @@ data class ConnectivityState(
 private fun readConnectivityState(ctx: Context): ConnectivityState {
     val resolver = ctx.contentResolver
 
-    // ✅ DEBUG: Log all values
-    Log.d("StatusBar", "AIRPLANE: ${Settings.Global.getInt(resolver, Settings.Global.AIRPLANE_MODE_ON, 0)}")
-    Log.d("StatusBar", "WIFI_ON: ${Settings.Global.getInt(resolver, Settings.Global.WIFI_ON, 0)}")
-//    Log.d("StatusBar", "VPN_ALWAYS_ON: ${Settings.Global.getInt(resolver, Settings.Global.VPN_ALWAYS_ON_GENERIC, 0)}")
-    Log.d("StatusBar", "BLUETOOTH_ON: ${Settings.Global.getInt(resolver, Settings.Global.BLUETOOTH_ON, 0)}")
+    ctx.logD("StatusBar", "AIRPLANE: ${Settings.Global.getInt(resolver, Settings.Global.AIRPLANE_MODE_ON, 0)}")
+    ctx.logD("StatusBar", "WIFI_ON: ${Settings.Global.getInt(resolver, Settings.Global.WIFI_ON, 0)}")
+//    ctx.logD("StatusBar", "VPN_ALWAYS_ON: ${Settings.Global.getInt(resolver, Settings.Global.VPN_ALWAYS_ON_GENERIC, 0)}")
+    ctx.logD("StatusBar", "BLUETOOTH_ON: ${Settings.Global.getInt(resolver, Settings.Global.BLUETOOTH_ON, 0)}")
 
     return ConnectivityState(
         isAirplaneMode = Settings.Global.getInt(resolver, Settings.Global.AIRPLANE_MODE_ON, 0) == 1,
 
-        // ✅ TRY MULTIPLE WIFI KEYS (Android version differences)
         isWifiEnabled = when {
             Settings.Global.getInt(resolver, Settings.Global.WIFI_ON, 0) == 1 -> true
             Settings.Global.getInt(resolver, "wifi_on", 0) == 1 -> true
             else -> false
         },
 
-        // ✅ VPN (new!)
 //        isVpnEnabled = Settings.Global.getInt(
 //            resolver,
 //            Settings.Global.VPN_ALWAYS_ON_GENERIC,

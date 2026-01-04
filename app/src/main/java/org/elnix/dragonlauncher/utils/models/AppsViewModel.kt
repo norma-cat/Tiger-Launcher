@@ -5,7 +5,6 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.XmlResourceParser
-import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.AndroidViewModel
@@ -35,6 +34,8 @@ import org.elnix.dragonlauncher.ui.drawer.resolveApp
 import org.elnix.dragonlauncher.utils.PackageManagerCompat
 import org.elnix.dragonlauncher.utils.TAG
 import org.elnix.dragonlauncher.utils.actions.loadDrawableAsBitmap
+import org.elnix.dragonlauncher.utils.logs.logD
+import org.elnix.dragonlauncher.utils.logs.logE
 import org.xmlpull.v1.XmlPullParser
 
 
@@ -148,7 +149,7 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
                     val type = object : TypeToken<List<AppModel>>() {}.type
                     _apps.value = gson.fromJson(cachedJson, type) ?: emptyList()
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to parse cached apps, clearing: ${e.message}")
+                    logE(TAG, "Failed to parse cached apps, clearing: ${e.message}")
                     AppsSettingsStore.saveCachedApps(ctx, "") // Clear bad cache
                     _apps.value = emptyList()
                 }
@@ -175,7 +176,7 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
         withContext(Dispatchers.IO) {
             AppsSettingsStore.saveCachedApps(ctx, gson.toJson(apps))
         }
-        Log.e("AppsVm", "Reloaded packages.")
+        logE("AppsVm", "Reloaded packages.")
     }
 
 
@@ -200,7 +201,7 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
                 ResourcesCompat.getDrawable(packResources, resId, null)
             } else null
         } catch (_: Exception) {
-            Log.e("icon_pack", "Failed to load icon $iconName from $packPkg")
+            logE("icon_pack", "Failed to load icon $iconName from $packPkg")
             null
         }
     }
@@ -249,7 +250,7 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
         val packs = mutableListOf<IconPackInfo>()
         val allPackages = pmCompat.getInstalledPackages()
 
-        Log.d("icon_pack", "Scanning ${allPackages.size} packages...")
+        logD("icon_pack", "Scanning ${allPackages.size} packages...")
 
         allPackages.forEach { pkgInfo ->
             try {
@@ -258,14 +259,14 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
 
                 if (hasAppfilter && pkgInfo.packageName != ctx.packageName) {
                     val label = pkgInfo.applicationInfo?.loadLabel(pm).toString()
-                    Log.d("icon_pack", "FOUND icon pack: $label (${pkgInfo.packageName})")
+                    logD("icon_pack", "FOUND icon pack: $label (${pkgInfo.packageName})")
                     packs.add(IconPackInfo(pkgInfo.packageName, label))
                 }
             } catch (_: Exception) { }
         }
 
         val uniquePacks = packs.distinctBy { it.packageName }
-        Log.d("icon_pack", "Total icon packs found: ${uniquePacks.size}")
+        logD("icon_pack", "Total icon packs found: ${uniquePacks.size}")
         return uniquePacks
     }
 
@@ -290,7 +291,7 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
                 pkg to it.drawable
             } ?: emptyMap()
         } catch (e: Exception) {
-            Log.e("icon_pack", "Failed to load mappings for $packPkg: ${e.message}")
+            logE("icon_pack", "Failed to load mappings for $packPkg: ${e.message}")
             emptyMap()
         }
     }
@@ -320,7 +321,7 @@ private fun parseAppFilterXml(ctx: Context, packPkg: String): List<IconMapping>?
         parser.close()
         mappings
     } catch (e: Exception) {
-        Log.e("icon_pack", "XML parse failed: ${e.message}")
+        ctx.logE("icon_pack", "XML parse failed: ${e.message}")
         null
     }
 }

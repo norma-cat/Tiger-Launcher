@@ -4,7 +4,6 @@ package org.elnix.dragonlauncher.ui.welcome
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,6 +44,7 @@ import org.elnix.dragonlauncher.data.DataStoreName
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.settings.backup.ImportSettingsDialog
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
+import org.elnix.dragonlauncher.utils.logs.logD
 import org.elnix.dragonlauncher.utils.models.BackupResult
 import org.elnix.dragonlauncher.utils.models.BackupViewModel
 import org.json.JSONObject
@@ -70,7 +70,7 @@ fun WelcomeScreen(
     // ------------------------------------------------------------
     val settingsImportLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            Log.d("BackupManager", "File picked: $uri")
+            ctx.logD("BackupManager", "File picked: $uri")
 
             if (uri == null) {
                 backupVm.setResult(

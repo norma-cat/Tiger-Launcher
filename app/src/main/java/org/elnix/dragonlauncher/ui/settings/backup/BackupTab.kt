@@ -3,7 +3,6 @@ package org.elnix.dragonlauncher.ui.settings.backup
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -60,6 +59,8 @@ import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
 import org.elnix.dragonlauncher.utils.formatDateTime
 import org.elnix.dragonlauncher.utils.getFilePathFromUri
+import org.elnix.dragonlauncher.utils.logs.logD
+import org.elnix.dragonlauncher.utils.logs.logE
 import org.elnix.dragonlauncher.utils.models.BackupResult
 import org.elnix.dragonlauncher.utils.models.BackupViewModel
 import org.elnix.dragonlauncher.utils.showToast
@@ -142,7 +143,7 @@ fun BackupTab(
     // ------------------------------------------------------------
     val settingsImportLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            Log.d("BackupManager", "File picked: $uri")
+            ctx.logD("BackupManager", "File picked: $uri")
 
             if (uri == null) {
                 backupViewModel.setResult(
@@ -213,7 +214,7 @@ fun BackupTab(
             } catch (e: SecurityException) {
                 // Fallback: Store non-persistable URI or notify user
                 backupViewModel.setResult(BackupResult(export = true, error = true, title = "Backup saved (limited persistence)"))
-                Log.e("Backup", "Persistable permission not available for URI: $uri", e)
+                ctx.logE("Backup", "Persistable permission not available for URI: $uri", e)
             }
         }
     }

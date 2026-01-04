@@ -1,7 +1,6 @@
 package org.elnix.dragonlauncher.data
 
 import android.content.ComponentName
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
@@ -14,6 +13,7 @@ import com.google.gson.JsonSerializer
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import kotlinx.serialization.Serializable
+import org.elnix.dragonlauncher.utils.logs.logE
 import java.lang.reflect.Type
 
 // Keep the same data classes, no @Serializable needed
@@ -215,7 +215,7 @@ object SwipeJson {
         return try {
             gson.fromJson(jsonString, listType)
         } catch (e: Throwable) {
-            Log.e("SwipeJson", "Decode failed: ${e.message}", e)
+            logE("SwipeJson", "Decode failed: ${e.message}", e)
             emptyList()
         }
     }
@@ -262,7 +262,7 @@ object SwipeJson {
         return try {
             gson.fromJson(json, type)
         } catch (e: Throwable) {
-            Log.e("SwipeJson", "Decode failed: ${e.message}", e)
+            logE("SwipeJson", "Decode failed: ${e.message}", e)
             emptyList()
         }
     }

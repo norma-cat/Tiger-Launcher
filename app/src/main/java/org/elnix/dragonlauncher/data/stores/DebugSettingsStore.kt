@@ -16,6 +16,7 @@ import org.elnix.dragonlauncher.data.putIfNonDefault
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.AUTO_RAISE_DRAGON_ON_SYSTEM_LAUNCHER
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.DEBUG_ENABLED
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.DEBUG_INFOS
+import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.ENABLE_LOGGING
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.FORCE_APP_LANGUAGE_SELECTOR
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.FORCE_APP_WIDGETS_SELECTOR
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore.Keys.SETTINGS_DEBUG_INFOS
@@ -42,6 +43,7 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
         val autoRaiseDragonOnSystemLauncher: Boolean = false,
         val systemLauncherPackageName: String = "",
         val useAccessibilityInsteadOfContextToExpandActionPanel: Boolean = true,
+        val enableLogging: Boolean = false
         )
 
     private val defaults = DebugSettingsBackup()
@@ -62,6 +64,7 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
         val USE_ACCESSIBILITY_INSTEAD_OF_CONTEXT =
             booleanPreferencesKey(DebugSettingsBackup::useAccessibilityInsteadOfContextToExpandActionPanel.name)
 
+        val ENABLE_LOGGING = booleanPreferencesKey(DebugSettingsBackup::enableLogging.name)
         val ALL = listOf(
             DEBUG_ENABLED,
             DEBUG_INFOS,
@@ -72,7 +75,8 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
             FORCE_APP_WIDGETS_SELECTOR,
             AUTO_RAISE_DRAGON_ON_SYSTEM_LAUNCHER,
             SYSTEM_LAUNCHER_PACKAGE_NAME,
-            USE_ACCESSIBILITY_INSTEAD_OF_CONTEXT
+            USE_ACCESSIBILITY_INSTEAD_OF_CONTEXT,
+            ENABLE_LOGGING
         )
     }
 
@@ -175,6 +179,14 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
         ctx.privateSettingsStore.edit { it[USE_ACCESSIBILITY_INSTEAD_OF_CONTEXT] = v }
     }
 
+    fun getEnableLogging(ctx: Context): Flow<Boolean> =
+        ctx.debugDatastore.data.map { prefs ->
+            prefs[ENABLE_LOGGING] ?: defaults.enableLogging
+        }
+
+    suspend fun setEnableLogging(ctx: Context, enabled: Boolean) {
+        ctx.debugDatastore.edit { it[ENABLE_LOGGING] = enabled }
+    }
 
 
     // -------------------------------------------------------------------------
@@ -206,6 +218,7 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
                 prefs[USE_ACCESSIBILITY_INSTEAD_OF_CONTEXT],
                 defaults.useAccessibilityInsteadOfContextToExpandActionPanel
             )
+            putIfNonDefault(ENABLE_LOGGING, prefs[ENABLE_LOGGING], defaults.enableLogging)
         }
     }
 
@@ -251,6 +264,9 @@ object DebugSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
                         defaults.useAccessibilityInsteadOfContextToExpandActionPanel
                     )
             }
+
+            prefs[ENABLE_LOGGING] =
+                getBooleanStrict(value,ENABLE_LOGGING, defaults.enableLogging)
         }
     }
 }

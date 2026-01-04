@@ -2,7 +2,6 @@ package org.elnix.dragonlauncher.utils
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -12,6 +11,10 @@ import org.elnix.dragonlauncher.data.SwipeJson
 import org.elnix.dragonlauncher.data.allStores
 import org.elnix.dragonlauncher.data.stores.BackupSettingsStore
 import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore.savePoints
+import org.elnix.dragonlauncher.utils.logs.logD
+import org.elnix.dragonlauncher.utils.logs.logE
+import org.elnix.dragonlauncher.utils.logs.logI
+import org.elnix.dragonlauncher.utils.logs.logW
 import org.json.JSONObject
 import java.io.FileOutputStream
 
@@ -22,14 +25,14 @@ object SettingsBackupManager {
      */
     suspend fun triggerBackup(ctx: Context) {
         if (!BackupSettingsStore.getAutoBackupEnabled(ctx).first()) {
-            Log.w(BACKUP_TAG, "Auto-backup disabled")
+            logW(BACKUP_TAG, "Auto-backup disabled")
             return
         }
 
         try {
             val uriString = BackupSettingsStore.getAutoBackupUri(ctx).first()
             if (uriString.isNullOrBlank()) {
-                Log.w(BACKUP_TAG, "No backup URI set")
+                logW(BACKUP_TAG, "No backup URI set")
                 return
             }
 
@@ -37,7 +40,7 @@ object SettingsBackupManager {
             val path = getFilePathFromUri(ctx, uri)
 
             if (!ctx.hasUriReadWritePermission(uri)) {
-                Log.e(BACKUP_TAG, "URI permission expired!")
+                this.logW(BACKUP_TAG, "URI permission expired!")
                 ctx.showToast("Auto-backup URI expired. Please reselect file.")
                 return
             }
@@ -48,10 +51,10 @@ object SettingsBackupManager {
             exportSettings(ctx, uri, selectedStores)
 
             BackupSettingsStore.setLastBackupTime(ctx)
-            Log.i(BACKUP_TAG, "Auto-backup completed to $path")
+            logI(BACKUP_TAG, "Auto-backup completed to $path")
 
         } catch (e: Exception) {
-            Log.e(BACKUP_TAG, "Auto-backup failed", e)
+            this.logE(BACKUP_TAG, "Auto-backup failed", e)
             if (e.message?.contains("permission") == true) {
                 ctx.showToast("URI permission lost. Reselect backup file.")
             }
@@ -68,7 +71,7 @@ object SettingsBackupManager {
                     fos.flush()
                 }
             } ?: run {
-                Log.e(
+                this.logE(
                     BACKUP_TAG,
                     "Failed to open FileDescriptor - URI permission expired!"
                 )
@@ -116,7 +119,7 @@ object SettingsBackupManager {
         json: JSONObject,
         requestedStores: List<DataStoreName>
     ) {
-        Log.d(BACKUP_TAG, json.toString())
+        logD(BACKUP_TAG, json.toString())
 
         allStores.forEach { store ->
             val key = store.backupKey
@@ -129,7 +132,7 @@ object SettingsBackupManager {
 
         // LEGACY format: fallback for "actions" array
         json.optJSONArray("actions")?.let { actionsArray ->
-            Log.d(BACKUP_TAG, "Fallback to legacy system")
+            logD(BACKUP_TAG, "Fallback to legacy system")
             val legacyPoints = SwipeJson.decode(actionsArray.toString())
             savePoints(ctx, legacyPoints)
         }

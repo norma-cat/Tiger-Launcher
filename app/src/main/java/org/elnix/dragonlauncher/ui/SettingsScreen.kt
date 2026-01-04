@@ -1,6 +1,5 @@
 package org.elnix.dragonlauncher.ui
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -110,6 +109,9 @@ import org.elnix.dragonlauncher.utils.circles.autoSeparate
 import org.elnix.dragonlauncher.utils.circles.normalizeAngle
 import org.elnix.dragonlauncher.utils.circles.randomFreeAngle
 import org.elnix.dragonlauncher.utils.circles.rememberNestNavigation
+import org.elnix.dragonlauncher.utils.logs.logD
+import org.elnix.dragonlauncher.utils.logs.logE
+import org.elnix.dragonlauncher.utils.logs.logW
 import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
 import org.elnix.dragonlauncher.utils.showToast
@@ -202,9 +204,9 @@ fun SettingsScreen(
     val currentFilteredPoints by rememberUpdatedState(filteredPoints)
 
     LaunchedEffect(points, nestId) {
-        Log.e(TAG, nestId.toString())
-        Log.e(TAG, currentNest.toString())
-        Log.e(TAG, points.filter { it.nestId == nestId }.toString())
+        logE(TAG, nestId.toString())
+        logE(TAG, currentNest.toString())
+        logE(TAG, points.filter { it.nestId == nestId }.toString())
     }
 
     /**
@@ -228,7 +230,7 @@ fun SettingsScreen(
      */
     LaunchedEffect(nestId, nests.size) {
         if (nests.isNotEmpty() && nests.none { it.id == nestId }) {
-            Log.d(TAG, "Creating missing nest $nestId")
+            logD(TAG, "Creating missing nest $nestId")
             pendingNestUpdate = nests + CircleNest(id = nestId, parentId = 0)
         }
     }
@@ -239,7 +241,7 @@ fun SettingsScreen(
      */
     LaunchedEffect(pendingNestUpdate) {
         pendingNestUpdate?.let { nests ->
-            Log.e(TAG, "Saving: ${nests.size} nests")
+            logE(TAG, "Saving: ${nests.size} nests")
             SwipeSettingsStore.saveNests(ctx, nests)
             pendingNestUpdate = null
         }
@@ -603,9 +605,9 @@ fun SettingsScreen(
                                     var tapped: UiSwipePoint? = null
                                     var best = Float.MAX_VALUE
 
-                                    Log.d(TAG, currentFilteredPoints.toString())
+                                    logD(TAG, currentFilteredPoints.toString())
                                     currentFilteredPoints.forEach { p ->
-                                        Log.w(TAG, p.toString())
+                                        logW(TAG, p.toString())
                                         val circle =
                                             circles.getOrNull(p.circleNumber) ?: return@forEach
                                         val px =
@@ -619,7 +621,7 @@ fun SettingsScreen(
                                             tapped = p
                                         }
                                     }
-                                    Log.w(TAG, "Tapped: $tapped")
+                                    logW(TAG, "Tapped: $tapped")
 
                                     selectedPoint =
                                         if (best <= TOUCH_THRESHOLD_PX)
@@ -926,17 +928,17 @@ fun SettingsScreen(
                             .clip(CircleShape)
                             .clickable {
 
-                                Log.e(TAG, nests.toString())
-                                Log.e(TAG, "Received add update, current nests size: ${nests.size}")
+                                logE(TAG, nests.toString())
+                                logE(TAG, "Received add update, current nests size: ${nests.size}")
 
 
                                 // The new circle id is the size minus one, cause circleIndexes
                                 // starts at 0 and the cancel zone is always in the list
                                 val newCircleNumber = currentNest.dragDistances.size - 1
 
-                                Log.e(TAG, "new circle number: $newCircleNumber")
+                                logE(TAG, "new circle number: $newCircleNumber")
 
-                                Log.e(TAG, nests.map {
+                                logE(TAG, nests.map {
                                     if (it.id == nestId) {
                                         it.copy(
                                             dragDistances = it.dragDistances + (newCircleNumber to defaultDragDistance(
