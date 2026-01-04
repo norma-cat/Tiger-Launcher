@@ -95,6 +95,8 @@ val defaultChoosableActions = listOf(
 )
 
 const val TAG = "DragonLauncherDebug"
+const val APPS_TAG = "AppsVm"
+const val ICONS_TAG = "IconsDebug"
 const val BACKUP_TAG = "SettingsBackupManager"
 
 

@@ -11,7 +11,7 @@ data class AppModel(
     @SerializedName("e") val isWorkProfile: Boolean,
     @SerializedName("f") val isLaunchable: Boolean?,
     @SerializedName("g") val settings: Map<String, Any> = emptyMap(),
-    @SerializedName("i") val userId: Int? = 0
+    @SerializedName("h") val userId: Int? = 0
 ) {
     val action = SwipeActionSerializable.LaunchApp(packageName)
 }
@@ -30,7 +30,7 @@ data class Workspace(
     val name: String,
     val type: WorkspaceType,
     val appIds: List<String>,
-    val removedAppIds: List<String>?, // Nullable cause I added it recently in 1.2.2, so if you were on previous versions, it'll cause crash
+    val removedAppIds: List<String>?, // Nullable cause I added it in 1.2.2, so if you were on previous versions, it'll cause crash
     val enabled: Boolean
 )
 
