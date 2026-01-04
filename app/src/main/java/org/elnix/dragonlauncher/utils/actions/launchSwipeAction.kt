@@ -2,6 +2,8 @@ package org.elnix.dragonlauncher.utils.actions
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.LauncherApps
+import android.os.UserManager
 import androidx.core.net.toUri
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.services.SystemControl
@@ -35,19 +37,42 @@ fun launchSwipeAction(
     when (action) {
 
         is SwipeActionSerializable.LaunchApp -> {
-            val i = ctx.packageManager.getLaunchIntentForPackage(action.packageName)
-            if (i != null) {
-                try {
-                    ctx.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                } catch (e: SecurityException) {
-                    throw AppLaunchException("Security error launching ${action.packageName}", e)
-                } catch (e: NullPointerException) {
-                    throw AppLaunchException("App component not found for ${action.packageName}", e)
-                } catch (e: Exception) {
-                    throw AppLaunchException("Failed to launch ${action.packageName}", e)
-                }
+            val userManager = ctx.getSystemService(Context.USER_SERVICE) as UserManager
+            val launcherApps = ctx.getSystemService(LauncherApps::class.java)
+                ?: throw AppLaunchException("LauncherApps unavailable")
+
+            val allUsers = userManager.userProfiles
+
+            // 1. Find the user profile that owns the package
+            val targetUserHandle = allUsers.firstOrNull { userHandle ->
+                launcherApps
+                    .getActivityList(null, userHandle)
+                    .any { it.applicationInfo.packageName == action.packageName }
+            } ?: android.os.Process.myUserHandle()
+
+            // 2. Find the launcher activity in that profile
+            val activity = launcherApps
+                .getActivityList(null, targetUserHandle)
+                .firstOrNull { it.applicationInfo.packageName == action.packageName }
+                ?: throw AppLaunchException("Launcher activity not found for ${action.packageName}")
+
+            // 3. Launch correctly (profile-aware)
+            try {
+                launcherApps.startMainActivity(
+                    activity.componentName,
+                    targetUserHandle,
+                    null,
+                    null
+                )
+            } catch (e: SecurityException) {
+                throw AppLaunchException("Security error launching ${action.packageName}", e)
+            } catch (e: NullPointerException) {
+                throw AppLaunchException("App component not found for ${action.packageName}", e)
+            } catch (e: Exception) {
+                throw AppLaunchException("Failed to launch ${action.packageName}", e)
             }
         }
+
 
         is SwipeActionSerializable.LaunchShortcut -> {
             launchShortcut(ctx, action.packageName, action.shortcutId)

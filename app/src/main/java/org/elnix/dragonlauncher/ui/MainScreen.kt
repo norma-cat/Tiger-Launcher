@@ -53,7 +53,9 @@ import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
 import org.elnix.dragonlauncher.ui.helpers.rememberHoldToOpenSettings
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
+import org.elnix.dragonlauncher.utils.TAG
 import org.elnix.dragonlauncher.utils.WIDGET_TAG
+import org.elnix.dragonlauncher.utils.actions.AppLaunchException
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
 import org.elnix.dragonlauncher.utils.circles.rememberNestNavigation
 import org.elnix.dragonlauncher.utils.logs.logE
@@ -210,18 +212,24 @@ fun MainScreen(
         current = null
         lastClickTime = 0
 
-        launchSwipeAction(
-            ctx = ctx,
-            action = point?.action,
-            useAccessibilityInsteadOfContextToExpandActionPanel = useAccessibilityInsteadOfContextToExpandActionPanel,
-            onAskWhatMethodToUseToOpenQuickActions = { showMethodDialog = true },
-            onReloadApps = { scope.launch { appsViewModel.reloadApps(ctx) } },
-            onReselectFile = { showFilePicker = point },
-            onAppSettings = onLongPress3Sec,
-            onAppDrawer = onAppDrawer,
-            onOpenNestCircle = { nestNavigation.goToNest(it) },
-            onParentNest = { nestNavigation.goBack() }
-        )
+        try {
+            launchSwipeAction(
+                ctx = ctx,
+                action = point?.action,
+                useAccessibilityInsteadOfContextToExpandActionPanel = useAccessibilityInsteadOfContextToExpandActionPanel,
+                onAskWhatMethodToUseToOpenQuickActions = { showMethodDialog = true },
+                onReloadApps = { scope.launch { appsViewModel.reloadApps(ctx) } },
+                onReselectFile = { showFilePicker = point },
+                onAppSettings = onLongPress3Sec,
+                onAppDrawer = onAppDrawer,
+                onOpenNestCircle = { nestNavigation.goToNest(it) },
+                onParentNest = { nestNavigation.goBack() }
+            )
+        } catch (e: AppLaunchException) {
+            ctx.logE(TAG, e.message!!) // Lol if it crashes when logging for an exception
+        } catch (e: Exception) {
+            ctx.logE(TAG, e.message?:"")
+        }
     }
 
     /**
@@ -296,7 +304,8 @@ fun MainScreen(
                                 dm = dm,
                                 density = density, // 👈 Pass this
                                 cellSizePx = cellSizePx
-                            )) {
+                            )
+                        ) {
                             // Let widget handle scroll - do NOT consume or process
                             continue
                         }
