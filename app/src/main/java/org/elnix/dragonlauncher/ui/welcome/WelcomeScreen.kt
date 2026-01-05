@@ -42,7 +42,7 @@ import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.DataStoreName
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
-import org.elnix.dragonlauncher.ui.settings.backup.ImportSettingsDialog
+import org.elnix.dragonlauncher.ui.components.dialogs.ImportSettingsDialog
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
 import org.elnix.dragonlauncher.utils.logs.logD
 import org.elnix.dragonlauncher.utils.models.BackupResult

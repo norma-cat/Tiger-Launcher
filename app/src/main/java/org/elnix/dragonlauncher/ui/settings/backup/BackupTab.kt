@@ -51,6 +51,8 @@ import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.DataStoreName
 import org.elnix.dragonlauncher.data.backupableStores
 import org.elnix.dragonlauncher.data.stores.BackupSettingsStore
+import org.elnix.dragonlauncher.ui.components.dialogs.ExportSettingsDialog
+import org.elnix.dragonlauncher.ui.components.dialogs.ImportSettingsDialog
 import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
@@ -482,7 +484,11 @@ fun BackupTab(
 
                     scope.launch {
                         try {
-                            SettingsBackupManager.importSettingsFromJson(ctx, json , selectedStoresForImport)
+                            SettingsBackupManager.importSettingsFromJson(
+                                ctx,
+                                json,
+                                selectedStoresForImport
+                            )
                             backupViewModel.setResult(
                                 BackupResult(
                                     export = false,

@@ -1,11 +1,10 @@
-package org.elnix.dragonlauncher.ui.settings.backup
+package org.elnix.dragonlauncher.ui.components.dialogs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -22,24 +21,18 @@ import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.data.DataStoreName
 import org.elnix.dragonlauncher.data.backupableStores
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
-import org.json.JSONObject
 
 @Composable
-fun ImportSettingsDialog(
-    backupJson: JSONObject,
+fun ExportSettingsDialog(
     onDismiss: () -> Unit,
+    availableStores: List<DataStoreName> = backupableStores,
+    defaultStores: List<DataStoreName> = backupableStores,
     onConfirm: (selectedStores: List<DataStoreName>) -> Unit
 ) {
 
-    // Filter stores that exist in backup JSON
-    val availableStores = backupableStores.filter {
-        backupJson.has(it.backupKey) ||
-        backupJson.has("actions") // Old actions store, for legacy support
-    }
-
     val selected = remember(availableStores) {
         mutableStateMapOf<DataStoreName, Boolean>().apply {
-            availableStores.forEach { put(it, true) }
+            availableStores.forEach { put(it, it in defaultStores) }
         }
     }
 
@@ -52,8 +45,8 @@ fun ImportSettingsDialog(
                 },
                 colors = AppObjectsColors.buttonColors()
             ) {
-                Text("Import")
-            }
+                Text("Export")
+              }
         },
         dismissButton = {
             TextButton(
@@ -61,10 +54,11 @@ fun ImportSettingsDialog(
                 colors = AppObjectsColors.cancelButtonColors()
             ) { Text("Cancel") }
         },
-        title = { Text("Select settings to import") },
+        title = { Text("Select settings to export") },
         text = {
             LazyColumn {
-                items(availableStores) { store ->
+                items(availableStores.size) { index ->
+                    val store = availableStores[index]
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

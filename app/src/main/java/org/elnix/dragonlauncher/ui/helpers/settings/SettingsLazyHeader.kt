@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
@@ -41,6 +42,7 @@ fun SettingsLazyHeader(
     resetTitle: String = stringResource(R.string.reset_default_settings),
     resetText: String? = stringResource(R.string.reset_settings_in_this_tab),
     reorderState: ReorderableLazyListState? = null,
+    listState: LazyListState? = null,
     banner: @Composable (() -> Unit)? = null,
     titleContent: (LazyListScope.() -> Unit)? = null,
     bottomContent: (LazyListScope.() -> Unit)? = null,
@@ -98,7 +100,7 @@ fun SettingsLazyHeader(
                             .reorderable(reorderState)
                             .detectReorderAfterLongPress(reorderState)
                     } else modifier,
-                    state = reorderState?.listState ?: rememberLazyListState()
+                    state = reorderState?.listState ?: listState ?: rememberLazyListState()
                 ) {
                     lazyContent()
                 }

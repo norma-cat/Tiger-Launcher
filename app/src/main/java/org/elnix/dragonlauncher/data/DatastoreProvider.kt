@@ -44,6 +44,12 @@ enum class DataStoreName(
 val allStores = DataStoreName.entries
 val backupableStores = allStores.filter { it.userBackup }
 
+
+/**
+ * All the stores, minus the 2 that hols big data (the wallpapers in b64 and the app cache)
+ */
+val defaultDebugStores = allStores.filter { it.store != AppsSettingsStore && it.store != WallpaperSettingsStore }
+
 val Context.uiDatastore by preferencesDataStore(name = DataStoreName.UI.value)
 val Context.colorModeDatastore by preferencesDataStore(name = DataStoreName.COLOR_MODE.value)
 val Context.colorDatastore by preferencesDataStore(name = DataStoreName.COLOR.value)

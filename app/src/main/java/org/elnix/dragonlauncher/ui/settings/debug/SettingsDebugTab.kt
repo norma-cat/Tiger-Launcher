@@ -1,10 +1,21 @@
+@file:Suppress("AssignedValueIsNeverRead")
+
 package org.elnix.dragonlauncher.ui.settings.debug
 
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Loop
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -17,12 +28,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.allStores
-import org.elnix.dragonlauncher.data.stores.WallpaperSettingsStore
+import org.elnix.dragonlauncher.data.defaultDebugStores
+import org.elnix.dragonlauncher.ui.components.dialogs.ExportSettingsDialog
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.utils.copyToClipboard
 import org.json.JSONObject
 
 @Composable
@@ -34,12 +46,15 @@ fun SettingsDebugTab(
 
     var settingsJson by remember { mutableStateOf<JSONObject?>(null) }
 
+    var selectedStores by remember { mutableStateOf(defaultDebugStores) }
+    var showStoresDialog by remember { mutableStateOf(false) }
 
     fun loadSettings() {
+        settingsJson = null
         scope.launch {
             val json = JSONObject()
 
-            allStores.filter { it.store != WallpaperSettingsStore }.forEach { store ->
+            selectedStores.forEach { store ->
                 store.store.exportForBackup(ctx)?.let {
                     json.put(store.backupKey, it)
                 }
@@ -47,35 +62,77 @@ fun SettingsDebugTab(
             settingsJson = json
         }
     }
+
+    val jsonLines by remember(settingsJson) {
+        mutableStateOf(settingsJson?.toString(2)?.lines().orEmpty())
+    }
+
     LaunchedEffect(Unit) {
         loadSettings()
     }
+
+    val listState = rememberLazyListState()
+
     SettingsLazyHeader(
-        title = stringResource(R.string.debug),
+        title = "Settings debug json",
         onBack = onBack,
         helpText = "settings json",
         onReset = null,
-        resetText = null
-    ) {
-
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Spacer(Modifier.weight(1f))
-                IconButton(
-                    onClick = { loadSettings() }
+        resetText = null,
+        listState = listState,
+        titleContent = {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    Icon(Icons.Default.Loop, null)
+
+                    Button(
+                        onClick = { showStoresDialog = true }
+                    ) {
+                        Text("Select visibles stores")
+                    }
+
+                    Spacer(Modifier.weight(1f))
+                    IconButton(
+                        onClick = { settingsJson?.let { ctx.copyToClipboard(it.toString(2)) } }
+                    ) {
+                        Icon(Icons.Default.ContentCopy, null)
+                    }
+
+                    IconButton(
+                        onClick = { loadSettings() }
+                    ) {
+                        Icon(Icons.Default.Loop, null)
+                    }
+                }
+            }
+        },
+        content = {
+            LazyColumn{
+                items(jsonLines) { line ->
+                    SelectionContainer {
+                        Text(
+                            text = line,
+                            softWrap = false,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState())
+                        )
+                    }
                 }
             }
         }
-        item {
-            settingsJson?.let {
-                Text(
-                    text = it.toString(2)
-                )
-            }
+    )
+    if (showStoresDialog) {
+        ExportSettingsDialog(
+            onDismiss = { showStoresDialog = false },
+            defaultStores = selectedStores,
+            availableStores = allStores
+        ) {
+            selectedStores = it
+            showStoresDialog = false
+            loadSettings()
         }
     }
 }
