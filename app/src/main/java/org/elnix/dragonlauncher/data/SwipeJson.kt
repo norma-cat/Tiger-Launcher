@@ -63,27 +63,27 @@ data class SwipePointSerializable(
 
     /** Border color in ARGB format when not selected. */
     @SerializedName("i")
-    val borderColor: Long? = null,
+    val borderColor: Int? = null,
 
     /** Border color in ARGB format when selected. */
     @SerializedName("j")
-    val borderColorSelected: Long? = null,
+    val borderColorSelected: Int? = null,
 
     /** Background fill color (ARGB) in normal state. */
     @SerializedName("k")
-    val backgroundColor: Long? = null,
+    val backgroundColor: Int? = null,
 
     /** Background fill color (ARGB) in selected state. */
     @SerializedName("l")
-    val backgroundColorSelected: Long? = null,
+    val backgroundColorSelected: Int? = null,
 
     /** Global opacity multiplier (0.0 – 1.0) applied to the whole swipe point. */
     @SerializedName("m")
     val opacity: Float? = null,
 
-    /** Global scale factor applied after layout but before rendering. */
+    /** Enables haptic feedback when the swipe point is activated. */
     @SerializedName("n")
-    val scale: Float? = null,
+    val haptic: Boolean? = null,
 
     /** Optional user-defined display name (labels, accessibility, debug UI). */
     @SerializedName("o")
@@ -93,25 +93,9 @@ data class SwipePointSerializable(
     @SerializedName("p")
     val cornerRadius: CornerRadiusSerializable? = null,
 
-    /** Explicit size override (dp). If null, renderer decides. */
-    @SerializedName("q")
-    val sizeDp: Float? = null,
-
     /** Inner padding (dp) between border and content. */
-    @SerializedName("r")
-    val paddingDp: Float? = null,
-
-    /** Enables haptic feedback when the swipe point is activated. */
-    @SerializedName("s")
-    val haptic: Boolean? = null,
-
-    /** Enables sound feedback when the swipe point is activated. */
-    @SerializedName("t")
-    val sound: Boolean? = null,
-
-    /** Whether this swipe point is interactable and rendered as enabled. */
-    @SerializedName("u")
-    val enabled: Boolean? = null
+    @SerializedName("q")
+    val paddingDp: Int? = null
 )
 
 fun dummySwipePoint(action: SwipeActionSerializable?) =
@@ -122,6 +106,15 @@ fun dummySwipePoint(action: SwipeActionSerializable?) =
         id = null,
         nestId = 0
     )
+
+val defaultSwipePointsValues = dummySwipePoint(null).copy(
+    borderStroke = 4f,
+    borderStrokeSelected = 10f,
+    opacity = 1f,
+    cornerRadius = null,
+    paddingDp = 0,
+    haptic = false
+)
 
 /**
  * New CircleNest system, where every bloc of circles is contained inside one of those*
