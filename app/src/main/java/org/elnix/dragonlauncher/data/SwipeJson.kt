@@ -109,7 +109,7 @@ fun dummySwipePoint(action: SwipeActionSerializable?) =
 
 val defaultSwipePointsValues = dummySwipePoint(null).copy(
     borderStroke = 4f,
-    borderStrokeSelected = 10f,
+    borderStrokeSelected = 8f,
     opacity = 1f,
     cornerRadius = null,
     paddingDp = 0,

@@ -158,8 +158,6 @@ fun SettingsScreen(
     val snapPoints by UiSettingsStore.getSnapPoints(ctx).collectAsState(initial = true)
     val autoSeparatePoints by UiSettingsStore.getAutoSeparatePoints(ctx).collectAsState(initial = true)
 
-    val showActionIconBorder by UiSettingsStore.getShowActionIconBorder(ctx)
-        .collectAsState(initial = false)
 
     val settingsDebugInfos by DebugSettingsStore.getSettingsDebugInfos(ctx)
         .collectAsState(initial = false)
@@ -263,7 +261,6 @@ fun SettingsScreen(
     var availableWidth by remember { mutableFloatStateOf(0f) }
 
 
-    val backgroundColor = MaterialTheme.colorScheme.background
     val extraColors = LocalExtraColors.current
 
 
@@ -492,15 +489,13 @@ fun SettingsScreen(
                                 actionsInCircle(
                                     selected = p.id == selectedPoint?.id,
                                     drawScope = this,
-                                    action = p.action,
+                                    point = p,
                                     nests = nests,
                                     circleColor = circleColor,
-                                    backgroundColor = backgroundColor,
                                     colorAction = actionColor(p.action, extraColors),
                                     px = px, py = py,
                                     ctx = ctx,
-                                    icons = icons,
-                                    drawBorder = showActionIconBorder
+                                    icons = icons
                                 )
                             }
                         }
