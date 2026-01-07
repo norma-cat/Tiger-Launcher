@@ -4,6 +4,7 @@ package org.elnix.dragonlauncher.ui.components.dialogs
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,10 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -76,8 +80,14 @@ fun EditPointDialog(
 
     val backgroundSurfaceColor = MaterialTheme.colorScheme.surface.adjustBrightness(0.7f)
 
+    val currentActionColor = actionColor(editPoint.action, extraColors)
+
     CustomAlertDialog(
+        modifier = Modifier.padding(16.dp),
         onDismissRequest = onDismiss,
+        imePadding = false,
+        scroll = false,
+        alignment = Alignment.Center,
         confirmButton = {
             ValidateCancelButtons(
                 onCancel = onDismiss
@@ -85,55 +95,88 @@ fun EditPointDialog(
                 onConfirm(editPoint)
             }
         },
-        title = { Text(stringResource(R.string.edit_point)) },
-        text = {
+        title = {
             Column(
-                verticalArrangement = Arrangement.spacedBy(5.dp)
+                verticalArrangement = Arrangement.spacedBy(5.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
             ) {
+                Text(
+                    text = stringResource(R.string.edit_point),
+                    style = MaterialTheme.typography.titleLarge,
+                )
 
-                /**
-                 * Icon Row; preview it and edit button at right that opens the icon editor
-                 */
-                Canvas(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(130.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(backgroundSurfaceColor)
                 ) {
-                    val center = size.center
-                    val actionSpacing = 150f
-                    val drawScope = this
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Text(
+                            text = "Unselected Action"
+                        )
 
-                    // Left action
-                    actionsInCircle(
-                        selected = false,
-                        drawScope = drawScope,
-                        point = editPoint,
-                        nests = emptyList(),
-                        px = center.x - actionSpacing,
-                        py = center.y,
-                        ctx = ctx,
-                        circleColor = circleColor,
-                        colorAction = actionColor(editPoint.action, extraColors),
-                        icons = icons
-                    )
+                        Text(
+                            text = "Selected Action"
+                        )
+                    }
 
 
-                    // Right action
-                    // Left action
-                    actionsInCircle(
-                        selected = true,
-                        drawScope = drawScope,
-                        point = editPoint,
-                        nests = emptyList(),
-                        px = center.x + actionSpacing,
-                        py = center.y,
-                        ctx = ctx,
-                        circleColor = circleColor,
-                        colorAction = actionColor(editPoint.action, extraColors),
-                        icons = icons
-                    )
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        val center = size.center
+                        val actionSpacing = 240f
+                        val drawScope = this
+
+                        // Left action
+                        actionsInCircle(
+                            selected = false,
+                            drawScope = drawScope,
+                            point = editPoint,
+                            nests = emptyList(),
+                            px = center.x - actionSpacing,
+                            py = center.y,
+                            ctx = ctx,
+                            circleColor = circleColor,
+                            colorAction = actionColor(editPoint.action, extraColors),
+                            icons = icons
+                        )
+
+                        // Right action
+                        // Left action
+                        actionsInCircle(
+                            selected = true,
+                            drawScope = drawScope,
+                            point = editPoint,
+                            nests = emptyList(),
+                            px = center.x + actionSpacing,
+                            py = center.y,
+                            ctx = ctx,
+                            circleColor = circleColor,
+                            colorAction = actionColor(editPoint.action, extraColors),
+                            icons = icons
+                        )
+                    }
                 }
+            }
 
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(5.dp),
+                modifier = Modifier
+                    .height(500.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
 
                 SettingsItem(
                     title = stringResource(R.string.edit_action),
@@ -141,6 +184,40 @@ fun EditPointDialog(
                     backgroundColor = backgroundSurfaceColor
                 ) {
                     showEditActionDialog = true
+                }
+
+                TextField(
+                    value = editPoint.customName ?: "",
+                    onValueChange = {
+                        editPoint = editPoint.copy(customName = it)
+                    },
+                    label = { Text(stringResource(R.string.custom_name)) },
+                    trailingIcon = {
+                        if (editPoint.customName != null && editPoint.customName!!.isNotEmpty()) {
+                            IconButton(
+                                onClick = {
+                                    editPoint = editPoint.copy(customName = null)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Restore,
+                                    contentDescription = stringResource(R.string.reset)
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                    colors = AppObjectsColors.outlinedTextFieldColors(removeBorder = true, backgroundColor = backgroundSurfaceColor)
+                )
+
+                ColorPickerRow(
+                    label = stringResource(R.string.custom_action_color),
+                    defaultColor = currentActionColor,
+                    currentColor = editPoint.customActionColor?.let { Color(it) }
+                        ?: currentActionColor,
+                    backgroundColor = backgroundSurfaceColor
+                ) { selectedColor ->
+                    editPoint = editPoint.copy(customActionColor = selectedColor.toArgb())
                 }
 
                 Column(
@@ -167,20 +244,20 @@ fun EditPointDialog(
 
                     ColorPickerRow(
                         label = stringResource(R.string.border_color),
-                        defaultColor = LocalExtraColors.current.circle,
+                        defaultColor = Color.Unspecified,
                         currentColor = editPoint.borderColor?.let { Color(it) }
-                            ?: LocalExtraColors.current.circle
+                            ?: Color.Unspecified
                     ) { selectedColor ->
                         editPoint = editPoint.copy(borderColor = selectedColor.toArgb())
                     }
 
                     ColorPickerRow(
-                        label = stringResource(R.string.border_color_selected),
-                        defaultColor = LocalExtraColors.current.circle,
-                        currentColor = editPoint.borderColorSelected?.let { Color(it) }
-                            ?: LocalExtraColors.current.circle
+                        label = stringResource(R.string.background_color),
+                        defaultColor = Color.Unspecified,
+                        currentColor = editPoint.backgroundColor?.let { Color(it) }
+                            ?: Color.Unspecified
                     ) { selectedColor ->
-                        editPoint = editPoint.copy(borderColorSelected = selectedColor.toArgb())
+                        editPoint = editPoint.copy(backgroundColor = selectedColor.toArgb())
                     }
                 }
 
@@ -208,88 +285,51 @@ fun EditPointDialog(
                     }
 
 
-
                     ColorPickerRow(
                         label = stringResource(R.string.border_color_selected),
-                        defaultColor = LocalExtraColors.current.circle,
+                        defaultColor = Color.Unspecified,
                         currentColor = editPoint.borderColorSelected?.let { Color(it) }
-                            ?: LocalExtraColors.current.circle
+                            ?: Color.Unspecified
                     ) { selectedColor ->
                         editPoint = editPoint.copy(borderColorSelected = selectedColor.toArgb())
                     }
 
 
                     ColorPickerRow(
-                        label = stringResource(R.string.border_color_selected),
-                        defaultColor = LocalExtraColors.current.circle,
-                        currentColor = editPoint.borderColorSelected?.let { Color(it) }
-                            ?: LocalExtraColors.current.circle
+                        label = stringResource(R.string.border_background_selected),
+                        defaultColor = Color.Unspecified,
+                        currentColor = editPoint.backgroundColorSelected?.let { Color(it) }
+                            ?: Color.Unspecified
                     ) { selectedColor ->
-                        editPoint = editPoint.copy(borderColorSelected = selectedColor.toArgb())
+                        editPoint = editPoint.copy(backgroundColorSelected = selectedColor.toArgb())
                     }
                 }
-
-                ColorPickerRow(
-                    label = stringResource(R.string.background_color),
-                    defaultColor = MaterialTheme.colorScheme.background,
-                    currentColor = editPoint.backgroundColor?.let { Color(it) }
-                        ?: MaterialTheme.colorScheme.background,
-                    backgroundColor = backgroundSurfaceColor
-                ) { selectedColor ->
-                    editPoint = editPoint.copy(backgroundColor = selectedColor.toArgb())
-                }
-
-                ColorPickerRow(
-                    label = stringResource(R.string.background_color_selected),
-                    defaultColor = MaterialTheme.colorScheme.background,
-                    currentColor = editPoint.backgroundColorSelected?.let { Color(it) }
-                        ?: MaterialTheme.colorScheme.background,
-                    backgroundColor = backgroundSurfaceColor
-                ) { selectedColor ->
-                    editPoint = editPoint.copy(backgroundColorSelected = selectedColor.toArgb())
-                }
-
-                SliderWithLabel(
-                    label = stringResource(R.string.opacity),
-                    value = editPoint.opacity ?: defaultSwipePointsValues.opacity!!,
-                    valueRange = 0f..1f,
-                    color = MaterialTheme.colorScheme.primary,
-                    onReset = {
-                        editPoint = editPoint.copy(opacity = defaultSwipePointsValues.opacity!!)
-                    }
-                ) {
-                    editPoint = editPoint.copy(opacity = it)
-                }
-
-                TextField(
-                    value = editPoint.customName ?: "",
-                    onValueChange = {
-                        editPoint = editPoint.copy(customName = it)
-                    },
-                    label = { Text(stringResource(R.string.custom_name)) },
-                    trailingIcon = {
-                        if (editPoint.customName != null && editPoint.customName!!.isNotEmpty()) {
-                            IconButton(
-                                onClick = {
-                                    editPoint = editPoint.copy(customName = null)
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Restore,
-                                    contentDescription = stringResource(R.string.reset)
-                                )
-                            }
-                        }
-                    },
-                    modifier = Modifier.fillMaxSize(),
-                    colors = AppObjectsColors.outlinedTextFieldColors(removeBorder = true)
-                )
 
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) { }
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable {
+                            if (editPoint.haptic == null) editPoint.haptic = true
+                            else editPoint.haptic = !editPoint.haptic!!
+
+                        }
+                        .padding(8.dp)
+                ) {
+                    Checkbox(
+                        checked = editPoint.haptic
+                            ?: defaultSwipePointsValues.haptic!!,
+                        onCheckedChange = {
+                            editPoint.haptic = it
+                        }
+                    )
+
+                    Text(
+                        text = "Haptic feedback"
+                    )
+                }
             }
         },
         containerColor = MaterialTheme.colorScheme.surface

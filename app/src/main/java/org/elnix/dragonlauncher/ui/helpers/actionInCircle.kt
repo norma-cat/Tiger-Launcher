@@ -38,6 +38,12 @@ fun actionsInCircle(
         point.borderColor?.let { Color(it) }
     } ?: circleColor
 
+    val backgroundColor = if (selected) {
+        point.backgroundColorSelected?.let { Color(it) }
+    } else {
+        point.backgroundColor?.let { Color(it) }
+    } ?: Color.Transparent
+
     if (action !is SwipeActionSerializable.OpenCircleNest) {
         // if no background color provided, erases the background
         val eraseBg = point.backgroundColor == null || point.backgroundColor == Color.Transparent.toArgb()
@@ -52,14 +58,14 @@ fun actionsInCircle(
             )
         } else
             drawScope.drawCircle(
-                color = Color(point.backgroundColor!!),
+                color = backgroundColor,
                 radius = 44f,
                 center = Offset(px, py)
             )
 
 
         drawScope.drawCircle(
-            color =  circleColor,
+            color =  borderColor,
             radius = 44f,
             center = Offset(px, py),
             style = Stroke(

@@ -251,4 +251,6 @@
     <string name="opacity">Opacity %</string>
     <string name="custom_name">Custom name</string>
     <string name="edit_action">Edit Action</string>
+    <string name="border_background_selected">Border Background Selected</string>
+    <string name="custom_action_color">Custom Action Color</string>
 </resources>

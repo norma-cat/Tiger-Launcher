@@ -16,6 +16,7 @@ import androidx.compose.ui.window.DialogProperties
 fun FullScreenOverlay(
     onDismissRequest: () -> Unit,
     alignment: Alignment = Alignment.BottomCenter,
+    imePadding: Boolean = true,
     content: @Composable () -> Unit
 ) {
     Dialog(
@@ -28,7 +29,11 @@ fun FullScreenOverlay(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .imePadding()
+                .then(
+                    if (imePadding)
+                        Modifier.imePadding()
+                    else Modifier
+                )
                 .clickable(
                     indication = null,
                     interactionSource = null
