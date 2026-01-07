@@ -56,3 +56,9 @@ Builds:
     commit: v2.0.0
     gradle:
       - yes
+
+  - versionName: 2.0.2
+    versionCode: 25
+    commit: 16243b53eb4dfced5b6bd89b9488fdb20301d50e
+    gradle:
+      - yes
