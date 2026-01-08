@@ -253,4 +253,9 @@
     <string name="edit_action">Edit Action</string>
     <string name="border_background_selected">Border Background Selected</string>
     <string name="custom_action_color">Custom Action Color</string>
+    <string name="icon_picker">Icon Picker</string>
+    <string name="pick_image">Pick image</string>
+    <string name="pick_from_icon_pack">Pick from icon pack</string>
+    <string name="no_custom_icon">No custom icon</string>
+    <string name="no_search_match">No search match</string>
 </resources>

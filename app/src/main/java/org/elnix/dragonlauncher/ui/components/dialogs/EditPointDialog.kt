@@ -3,7 +3,6 @@
 package org.elnix.dragonlauncher.ui.components.dialogs
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -56,8 +54,8 @@ import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
+import org.elnix.dragonlauncher.utils.actions.ActionIcon
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.elnix.dragonlauncher.utils.colors.adjustBrightness
@@ -241,17 +239,10 @@ fun EditPointDialog(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Image(
-                            painter = BitmapPainter(
-                                actionIconBitmap(
-                                    icons,
-                                    editPoint.action,
-                                    ctx,
-                                    tintColor = actionColor
-                                )
-                            ),
-                            contentDescription = label,
-                            modifier = Modifier.size(22.dp)
+                        ActionIcon(
+                            point = editPoint,
+                            icons = icons,
+                            modifier = Modifier.size(30.dp),
                         )
 
                         Text(
@@ -450,8 +441,9 @@ fun EditPointDialog(
     if (showEditIconDialog) {
         IconPickerDialog(
             appsViewModel = appsViewModel,
-            onDismiss = { showEditIconDialog = false}
+            onDismiss = { showEditIconDialog = false }
         ) {
+            showEditIconDialog = false
             editPoint.customIcon = it
         }
     }

@@ -3,25 +3,39 @@ package org.elnix.dragonlauncher.utils.actions
 import android.content.Context
 import android.graphics.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.data.SwipePointSerializable
+import org.elnix.dragonlauncher.data.helpers.CornerRadiusSerializable
+import org.elnix.dragonlauncher.data.helpers.CustomIconSerializable
+import org.elnix.dragonlauncher.data.helpers.IconType
 import org.elnix.dragonlauncher.data.targetPackage
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
+import org.elnix.dragonlauncher.utils.IMAGE_TAG
+import org.elnix.dragonlauncher.utils.ImageUtils
 import org.elnix.dragonlauncher.utils.loadShortcutIcon
+import org.elnix.dragonlauncher.utils.logs.logD
 
 @Composable
 fun appIcon(
@@ -39,27 +53,88 @@ fun appIcon(
 
 @Composable
 fun ActionIcon(
-    action: SwipeActionSerializable,
+    action: SwipeActionSerializable? = null,
+    point: SwipePointSerializable? = null,
     icons: Map<String, ImageBitmap>,
     modifier: Modifier = Modifier,
-    size: Int = 48
+    size: Int = 48,
+    showLaunchAppVectorGrid: Boolean = false
 ) {
+    require(
+        (action != null || point != null) &&
+            !(action != null && point != null)
+    ) {
+        "ActionIcon requires either action or point"
+    }
+
     val ctx = LocalContext.current
     val extraColors = LocalExtraColors.current
 
+    val customIcon = point?.customIcon
+
+    val baseSizeDp = customIcon?.sizeDp?.dp ?: size.dp
+
+    val bitmap: ImageBitmap? = when {
+        customIcon != null ->
+            resolveCustomIconBitmap(
+                icon = customIcon,
+                sizePx = size
+            )
+
+        action is SwipeActionSerializable.LaunchApp && showLaunchAppVectorGrid ->
+            loadDrawableResAsBitmap(ctx, R.drawable.ic_app_grid, size, size)
+
+        else ->
+            action?.let {
+                actionIconBitmap(
+                    icons = icons,
+                    action = it,
+                    ctx = ctx,
+                    tintColor = actionColor(it, extraColors),
+                    width = size,
+                    height = size
+                )
+            }
+    }
+
+    ctx.logD(IMAGE_TAG, "ActionIcon - Resolved bitmap for action=${action?.let { actionLabel(it) }} point=${point?.id} : $bitmap")
+    if (bitmap == null) return
+
+    val shape = customIcon?.corners?.toRoundedCornerShape()
+
     Image(
-        painter = BitmapPainter(actionIconBitmap(
-            icons = icons,
-            action = action,
-            ctx = ctx,
-            tintColor = actionColor(action, extraColors),
-            width = size,
-            height = size
-        )),
+        bitmap = bitmap,
         contentDescription = null,
         modifier = modifier
+            .size(baseSizeDp)
+            .thenIf(shape != null) {
+                clip(shape!!)
+            }
+            .graphicsLayer {
+                alpha = customIcon?.opacity ?: 1f
+                rotationZ = customIcon?.rotationDeg ?: 0f
+                scaleX = customIcon?.scaleX ?: 1f
+                scaleY = customIcon?.scaleY ?: 1f
+
+                if (customIcon?.shadowRadius != null) {
+                    shadowElevation = customIcon.shadowRadius!!
+                    translationX = customIcon.shadowOffsetX ?: 0f
+                    translationY = customIcon.shadowOffsetY ?: 0f
+                }
+            }
+            .thenIf(customIcon?.strokeWidth != null && shape != null) {
+                border(
+                    width = customIcon?.strokeWidth!!.dp,
+                    color = Color(customIcon.strokeColor ?: 0x00000000),
+                    shape = shape!!
+                )
+            }
+            .thenIf(customIcon?.tint != null) {
+                background(Color(customIcon?.tint!!))
+            }
     )
 }
+
 
 fun actionIconBitmap(
     icons: Map<String, ImageBitmap>,
@@ -192,3 +267,43 @@ fun loadDrawableAsBitmap(
     }
     return bmp.asImageBitmap()
 }
+
+
+private fun resolveCustomIconBitmap(
+    icon: CustomIconSerializable,
+    sizePx: Int
+): ImageBitmap? {
+    return when (icon.type) {
+        IconType.BITMAP,
+        IconType.ICON_PACK ->
+            ImageUtils.base64ToImageBitmap(icon.source)
+
+        IconType.TEXT ->
+            icon.source?.let {
+                ImageUtils.textToBitmap(
+                    text = it,
+                    sizePx = sizePx
+                )
+            }
+
+        IconType.SHAPE ->
+            null // Shape rendering is not supported yet
+
+        null -> null
+    }
+}
+
+
+private fun CornerRadiusSerializable.toRoundedCornerShape(): RoundedCornerShape {
+    return RoundedCornerShape(
+        topStart = (topLeft ?: 0f).dp,
+        topEnd = (topRight ?: 0f).dp,
+        bottomEnd = (bottomRight ?: 0f).dp,
+        bottomStart = (bottomLeft ?: 0f).dp
+    )
+}
+
+private inline fun Modifier.thenIf(
+    condition: Boolean,
+    block: Modifier.() -> Modifier
+): Modifier = if (condition) this.block() else this

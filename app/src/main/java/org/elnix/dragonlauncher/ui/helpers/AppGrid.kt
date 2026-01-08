@@ -113,7 +113,6 @@ fun AppGrid(
                                 .sizeIn(maxWidth = 96.dp)
                                 .aspectRatio(1f),
                             contentScale = ContentScale.Crop
-
                         )
                     }
 

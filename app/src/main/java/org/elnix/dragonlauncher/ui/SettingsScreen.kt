@@ -1146,13 +1146,12 @@ fun SettingsScreen(
 
     if (selectedPoint != null) {
         val currentPoint = selectedPoint!!
-        val currentAction = currentPoint.action
-        val label = actionLabel(currentAction)
+        val label = actionLabel(currentPoint.action)
         AppPreviewTitle(
             offsetY = offsetY,
             alpha = alpha,
             icons = icons,
-            currentAction = currentAction,
+            point = currentPoint,
             extraColors = extraColors,
             label = label,
             topPadding = 80.dp,

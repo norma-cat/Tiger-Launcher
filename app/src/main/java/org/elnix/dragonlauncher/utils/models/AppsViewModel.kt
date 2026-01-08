@@ -44,6 +44,10 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _apps = MutableStateFlow<List<AppModel>>(emptyList())
     val allApps: StateFlow<List<AppModel>> = _apps.asStateFlow()
+
+    private val _packIcons = MutableStateFlow<Map<String, ImageBitmap>>(emptyMap())
+    val packIcons: StateFlow<Map<String, ImageBitmap>> = _packIcons.asStateFlow()
+
     private val _icons = MutableStateFlow<Map<String, ImageBitmap>>(emptyMap())
     val icons: StateFlow<Map<String, ImageBitmap>> = _icons
 
@@ -218,6 +222,30 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
             null
         }
     }
+
+    fun loadAllIconsFromPack(pack: IconPackInfo) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val mappings = iconPackCache.getOrPut(pack.packageName) {
+                loadIconPackMappings(ctx, pack.packageName)
+            }
+
+            if (mappings.isEmpty()) {
+                _packIcons.value = emptyMap()
+                return@launch
+            }
+
+            val result = LinkedHashMap<String, ImageBitmap>(mappings.size)
+
+            mappings.values.distinct().forEach { drawableName ->
+                val drawable = loadIconFromPack(pack.packageName, drawableName) ?: return@forEach
+                result[drawableName] = loadDrawableAsBitmap(drawable, 128, 128)
+            }
+
+            _packIcons.value = result
+        }
+    }
+
 
 
     private fun getCachedIconMapping(pkgName: String): String? {

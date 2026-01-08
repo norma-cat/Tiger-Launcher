@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.elnix.dragonlauncher.data.CircleNest
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
@@ -48,7 +47,6 @@ import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
-import org.elnix.dragonlauncher.ui.theme.ExtraColors
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionLabel
@@ -97,8 +95,6 @@ fun MainScreenOverlay(
     val linePreviewSnapToAction by UiSettingsStore.getLinePreviewSnapToAction(ctx)
         .collectAsState(initial = false)
     val showAllActionsOnCurrentCircle by UiSettingsStore.getShowAllActionsOnCurrentCircle(ctx)
-        .collectAsState(initial = false)
-    val showActionIconBorder by UiSettingsStore.getShowActionIconBorder(ctx)
         .collectAsState(initial = false)
     val appLabelIconOverlayTopPadding by UiSettingsStore.getAppLabelIconOverlayTopPadding(ctx)
         .collectAsState(initial = 30)
@@ -467,13 +463,13 @@ fun MainScreenOverlay(
 
     // Label on top of the screen to indicate the launching app
     if (hoveredPoint != null && (showLaunchingAppLabel || showLaunchingAppIcon)) {
-        val currentAction = hoveredPoint!!.action
-        val label = actionLabel(currentAction)
+        val currentPoint = hoveredPoint!!
+        val label = actionLabel(currentPoint.action)
         AppPreviewTitle(
             offsetY = offsetY,
             alpha = alpha,
             icons = icons,
-            currentAction = currentAction,
+            point = currentPoint,
             extraColors = extraColors,
             label = label,
             topPadding = appLabelIconOverlayTopPadding.dp,
@@ -481,29 +477,7 @@ fun MainScreenOverlay(
             showIcon = showLaunchingAppIcon
         )
     }
-
-
-    // Debug to test calendar and alarms opening
-//    Row(
-//        modifier = Modifier.fillMaxWidth()
-//    ){
-//        Button(
-//            onClick = { openCalendar(ctx) },
-//            colors = AppObjectsColors.buttonColors()
-//        ) { Text("Test open calendar") }
-//
-//        Button(
-//            onClick = { openAlarmApp(ctx) },
-//            colors = AppObjectsColors.buttonColors()
-//        ) { Text("Test open alarm") }
-//    }
 }
-
-fun actionTint(action: SwipeActionSerializable, extraColors: ExtraColors): Color =
-    when (action) {
-        is SwipeActionSerializable.LaunchApp, SwipeActionSerializable.OpenDragonLauncherSettings  -> Color.Unspecified
-        else -> actionColor(action, extraColors)
-    }
 
 
 private fun actionLine(

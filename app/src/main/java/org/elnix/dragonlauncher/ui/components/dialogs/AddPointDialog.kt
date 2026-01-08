@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,14 +36,13 @@ import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
-import org.elnix.dragonlauncher.ui.actionTint
 import org.elnix.dragonlauncher.ui.drawer.AppModel
+import org.elnix.dragonlauncher.ui.theme.ExtraColors
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.PackageManagerCompat
+import org.elnix.dragonlauncher.utils.actions.ActionIcon
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.actionLabel
-import org.elnix.dragonlauncher.utils.actions.loadDrawableResAsBitmap
 import org.elnix.dragonlauncher.utils.defaultChoosableActions
 import org.elnix.dragonlauncher.utils.models.AppsViewModel
 import org.elnix.dragonlauncher.utils.models.WorkspaceViewModel
@@ -219,19 +217,7 @@ fun AddPointColumn(
     icons: Map<String, ImageBitmap>,
     onSelected: () -> Unit
 ) {
-    val ctx = LocalContext.current
     val extraColors = LocalExtraColors.current
-
-
-    val icon = when(action) {
-        is SwipeActionSerializable.LaunchApp -> loadDrawableResAsBitmap(ctx, R.drawable.ic_app_grid, 48, 48)
-        else -> actionIconBitmap(
-            icons,
-            action,
-            ctx,
-            tintColor = actionColor(action, extraColors)
-        )
-    }
 
     val name = when(action) {
         is SwipeActionSerializable.LaunchApp -> "Open App"
@@ -255,11 +241,18 @@ fun AddPointColumn(
             color = Color.White,
             textAlign = TextAlign.Center
         )
-        Icon(
-            bitmap = icon,
-            contentDescription = action.toString(),
-            tint = actionTint(action, extraColors),
-            modifier = Modifier.size(30.dp)
+
+        ActionIcon(
+            action = action,
+            icons = icons,
+            modifier = Modifier.size(30.dp),
+            showLaunchAppVectorGrid = true
         )
     }
 }
+
+fun actionTint(action: SwipeActionSerializable, extraColors: ExtraColors): Color =
+    when (action) {
+        is SwipeActionSerializable.LaunchApp, SwipeActionSerializable.OpenDragonLauncherSettings  -> Color.Unspecified
+        else -> actionColor(action, extraColors)
+    }

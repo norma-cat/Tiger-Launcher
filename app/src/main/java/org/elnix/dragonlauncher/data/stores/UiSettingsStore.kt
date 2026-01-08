@@ -24,7 +24,6 @@ import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.LINE_PREVIEW_SN
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.MIN_ANGLE_FROM_A_POINT_TO_ACTIVATE_IT
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.RGB_LINE
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.RGB_LOADING
-import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.SHOW_ACTION_ICON_BORDER
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.SHOW_ALL_ACTIONS_ON_CURRENT_CIRCLE
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.SHOW_ANGLE_PREVIEW
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore.Keys.SHOW_APP_LAUNCH_PREVIEW
@@ -79,7 +78,6 @@ object UiSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
         val MIN_ANGLE_FROM_A_POINT_TO_ACTIVATE_IT = intPreferencesKey("minAngleFromAPointToActivateIt")
         val SHOW_ALL_ACTIONS_ON_CURRENT_CIRCLE = booleanPreferencesKey("showAllActionsOnCurrentCircle")
         val ICON_PACK_KEY = stringPreferencesKey("selected_icon_pack")
-        val SHOW_ACTION_ICON_BORDER = booleanPreferencesKey("showActionIconBorder")
 
         val APP_LABEL_ICON_OVERLAY_TOP_PADDING =
             intPreferencesKey("appLabelIconOverlayTopPadding")
@@ -101,7 +99,6 @@ object UiSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
             MIN_ANGLE_FROM_A_POINT_TO_ACTIVATE_IT,
             SHOW_ALL_ACTIONS_ON_CURRENT_CIRCLE,
             ICON_PACK_KEY,
-            SHOW_ACTION_ICON_BORDER,
             APP_LABEL_ICON_OVERLAY_TOP_PADDING
         )
     }
@@ -211,12 +208,6 @@ object UiSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
         ctx.uiDatastore.edit { it[SHOW_ALL_ACTIONS_ON_CURRENT_CIRCLE] = value }
     }
 
-    fun getShowActionIconBorder(ctx: Context): Flow<Boolean> =
-        ctx.uiDatastore.data.map { it[SHOW_ACTION_ICON_BORDER] ?: defaults.showActionIconBorder }
-
-    suspend fun setShowActionIconBorder(ctx: Context, value: Boolean) {
-        ctx.uiDatastore.edit { it[SHOW_ACTION_ICON_BORDER] = value }
-    }
 
     suspend fun getIconPack(ctx: Context): String? {
         return ctx.appDrawerDataStore.data
@@ -354,11 +345,6 @@ object UiSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
                 prefs[ICON_PACK_KEY],
                 ""
             )
-            putIfNonDefault(
-                SHOW_ACTION_ICON_BORDER,
-                prefs[SHOW_ACTION_ICON_BORDER],
-                defaults.showActionIconBorder
-            )
 
             putIfNonDefault(
                 APP_LABEL_ICON_OVERLAY_TOP_PADDING,
@@ -411,13 +397,6 @@ object UiSettingsStore : BaseSettingsStore<Map<String, Any?>>() {
                     value,
                     SHOW_APP_PREVIEW_ICON_CENTER_START_POSITION,
                     defaults.showAppPreviewIconCenterStartPosition
-                )
-
-            prefs[SHOW_ACTION_ICON_BORDER] =
-                getBooleanStrict(
-                    value,
-                    SHOW_ACTION_ICON_BORDER,
-                    defaults.showActionIconBorder
                 )
 
             prefs[LINE_PREVIEW_SNAP_TO_ACTION] =
