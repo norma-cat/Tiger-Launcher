@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.XmlResourceParser
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.AndroidViewModel
@@ -18,9 +19,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.AppsSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.drawer.AppModel
@@ -34,7 +37,9 @@ import org.elnix.dragonlauncher.utils.APPS_TAG
 import org.elnix.dragonlauncher.utils.ICONS_TAG
 import org.elnix.dragonlauncher.utils.PackageManagerCompat
 import org.elnix.dragonlauncher.utils.TAG
+import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.loadDrawableAsBitmap
+import org.elnix.dragonlauncher.utils.actions.resolveCustomIconBitmap
 import org.elnix.dragonlauncher.utils.logs.logD
 import org.elnix.dragonlauncher.utils.logs.logE
 import org.xmlpull.v1.XmlPullParser
@@ -50,6 +55,10 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _icons = MutableStateFlow<Map<String, ImageBitmap>>(emptyMap())
     val icons: StateFlow<Map<String, ImageBitmap>> = _icons
+
+    private val _pointIcons = MutableStateFlow<Map<String, ImageBitmap>>(emptyMap())
+    val pointIcons: StateFlow<Map<String, ImageBitmap>> = _pointIcons.asStateFlow()
+
 
 
     // Only used for preview, the real user apps getter are using the appsForWorkspace function
@@ -193,6 +202,90 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
 
         } catch (e: Exception) {
             logE(APPS_TAG, e.toString())
+        }
+    }
+
+
+    fun renderPointIcon(
+        ctx: Context,
+        point: SwipePointSerializable,
+        icons: Map<String, ImageBitmap>,
+        tint: Color,
+        sizePx: Int
+    ): ImageBitmap {
+        val base = actionIconBitmap(
+            icons = icons,
+            action = point.action,
+            ctx = ctx,
+            tintColor = tint,
+            width = sizePx,
+            height = sizePx
+        )
+
+        val final = if (point.customIcon != null) {
+            resolveCustomIconBitmap(
+                base = base,
+                icon = point.customIcon!!,
+                sizePx = sizePx
+            )
+        } else {
+            base
+        }
+        return final
+    }
+
+    fun preloadPointIcons(
+        ctx: Context,
+        points: List<SwipePointSerializable>,
+        tintProvider: (SwipePointSerializable) -> Color,
+        sizePx: Int
+    ) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val newIcons = buildMap {
+                points.forEach { p ->
+                    val id = p.id ?: return@forEach
+                    if (_pointIcons.value.containsKey(id)) return@forEach
+
+                    put(
+                        id,
+                        renderPointIcon(
+                            ctx = ctx,
+                            point = p,
+                            icons = icons.value,
+                            tint = tintProvider(p),
+                            sizePx = sizePx
+                        )
+                    )
+                }
+            }
+
+            if (newIcons.isNotEmpty()) {
+                _pointIcons.update { it + newIcons }
+            }
+        }
+    }
+
+
+    fun ensurePointIcon(
+        ctx: Context,
+        point: SwipePointSerializable,
+        tint: Color,
+        sizePx: Int = 48
+    ) {
+        val id = point.id ?: return
+
+        if (_pointIcons.value.containsKey(id)) return
+
+        viewModelScope.launch(Dispatchers.Default) {
+            val bmp = renderPointIcon(
+                ctx = ctx,
+                point = point,
+                icons = icons.value,
+                tint = tint,
+                sizePx = sizePx
+            )
+
+            _pointIcons.update { it + (id to bmp) }
         }
     }
 

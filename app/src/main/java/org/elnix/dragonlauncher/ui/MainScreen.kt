@@ -54,9 +54,11 @@ import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
 import org.elnix.dragonlauncher.ui.helpers.rememberHoldToOpenSettings
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.TAG
 import org.elnix.dragonlauncher.utils.WIDGET_TAG
 import org.elnix.dragonlauncher.utils.actions.AppLaunchException
+import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
 import org.elnix.dragonlauncher.utils.circles.rememberNestNavigation
 import org.elnix.dragonlauncher.utils.logs.logE
@@ -76,6 +78,7 @@ fun MainScreen(
     onLongPress3Sec: () -> Unit
 ) {
     val ctx = LocalContext.current
+    val extraColors = LocalExtraColors.current
     val scope = rememberCoroutineScope()
 
     var showFilePicker: SwipePointSerializable? by remember { mutableStateOf(null) }
@@ -113,6 +116,7 @@ fun MainScreen(
 
 
     val icons by appsViewModel.icons.collectAsState()
+    val pointIcons by appsViewModel.pointIcons.collectAsState()
 
     var start by remember { mutableStateOf<Offset?>(null) }
     var current by remember { mutableStateOf<Offset?>(null) }
@@ -157,7 +161,6 @@ fun MainScreen(
     val points by SwipeSettingsStore.getPointsFlow(ctx).collectAsState(emptyList())
     val nests by SwipeSettingsStore.getNestsFlow(ctx).collectAsState(emptyList())
 
-
     val nestNavigation = rememberNestNavigation(nests)
     val nestId = nestNavigation.nestId
 
@@ -165,6 +168,16 @@ fun MainScreen(
     val dm = ctx.resources.displayMetrics
     val density = LocalDensity.current
     val cellSizePx = floatingAppsViewModel.cellSizePx
+
+    LaunchedEffect(points, nestId) {
+        appsViewModel.preloadPointIcons(
+            ctx = ctx,
+            points = points.filter { it.nestId == nestId },
+            tintProvider = { p -> actionColor(p.action, extraColors) },
+            sizePx = 56
+        )
+    }
+
 
 
     fun launchAction(point: SwipePointSerializable?) {
@@ -351,13 +364,13 @@ fun MainScreen(
         }
 
         MainScreenOverlay(
-            icons = icons,
             start = start,
             current = current,
             nestId = nestId,
             isDragging = isDragging,
             surface = size,
             points = points,
+            pointIcons = pointIcons,
             nests = nests,
             onLaunch = { launchAction(it) }
         )

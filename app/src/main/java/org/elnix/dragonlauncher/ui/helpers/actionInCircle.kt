@@ -13,7 +13,6 @@ import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.CircleNest
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.data.SwipePointSerializable
-import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.loadDrawableResAsBitmap
 
 
@@ -27,7 +26,7 @@ fun actionsInCircle(
     ctx: Context,
     circleColor: Color,
     colorAction: Color,
-    icons: Map<String, ImageBitmap>,
+    pointIcons: Map<String, ImageBitmap>,
     preventBgErasing: Boolean = false
 ) {
     val action = point.action
@@ -74,19 +73,16 @@ fun actionsInCircle(
         )
 
 
+        val icon = point.id?.let { pointIcons[it] }
 
-        drawScope.drawImage(
-            image = actionIconBitmap(
-                icons = icons,
-                action = action,
-                ctx = ctx,
-                tintColor = colorAction,
-                width = 56,
-                height = 56
-            ),
-            dstOffset = IntOffset(px.toInt() - 28, py.toInt() - 28),
-            dstSize = IntSize(56, 56)
-        )
+        if (icon != null) {
+            drawScope.drawImage(
+                image = icon,
+                dstOffset = IntOffset(px.toInt() - 28, py.toInt() - 28),
+                dstSize = IntSize(56, 56)
+            )
+        }
+
     } else {
         nests.find { it.id == action.nestId }?.let { nest ->
 

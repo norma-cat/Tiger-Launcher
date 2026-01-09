@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,7 +53,6 @@ import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
-import org.elnix.dragonlauncher.utils.actions.ActionIcon
 import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
@@ -74,7 +72,6 @@ fun EditPointDialog(
     val ctx = LocalContext.current
     val extraColors = LocalExtraColors.current
 
-
     var editPoint by remember { mutableStateOf(point) }
     var showEditIconDialog by remember { mutableStateOf(false) }
     var showEditActionDialog by remember { mutableStateOf(false) }
@@ -82,7 +79,7 @@ fun EditPointDialog(
     val circleColor by ColorSettingsStore.getCircleColor(ctx)
         .collectAsState(initial = AmoledDefault.CircleColor)
 
-    val icons by appsViewModel.icons.collectAsState()
+    val pointIcons by appsViewModel.pointIcons.collectAsState()
 
     val backgroundSurfaceColor = MaterialTheme.colorScheme.surface.adjustBrightness(0.7f)
 
@@ -91,6 +88,13 @@ fun EditPointDialog(
     val label = actionLabel(editPoint.action)
     val actionColor = actionColor(editPoint.action, extraColors)
 
+    fun reloadIcon() {
+        appsViewModel.ensurePointIcon(
+            ctx = ctx,
+            point = editPoint,
+            tint = actionColor(editPoint.action, extraColors),
+        )
+    }
 
     CustomAlertDialog(
         modifier = Modifier.padding(16.dp),
@@ -102,6 +106,7 @@ fun EditPointDialog(
             ValidateCancelButtons(
                 onCancel = onDismiss
             ) {
+                reloadIcon()
                 onConfirm(editPoint)
             }
         },
@@ -134,6 +139,8 @@ fun EditPointDialog(
                                 action = editPoint.action,
                                 id = editPoint.id
                             )
+
+                            reloadIcon()
                         }
                     ) {
                         Icon(
@@ -189,8 +196,8 @@ fun EditPointDialog(
                             ctx = ctx,
                             circleColor = circleColor,
                             colorAction = actionColor(editPoint.action, extraColors),
-                            icons = icons,
-                            preventBgErasing = true
+                            preventBgErasing = true,
+                            pointIcons = pointIcons
                         )
 
                         // Right action
@@ -205,13 +212,12 @@ fun EditPointDialog(
                             ctx = ctx,
                             circleColor = circleColor,
                             colorAction = actionColor(editPoint.action, extraColors),
-                            icons = icons,
-                            preventBgErasing = true
+                            preventBgErasing = true,
+                            pointIcons = pointIcons
                         )
                     }
                 }
             }
-
         },
         text = {
             Column(
@@ -239,12 +245,6 @@ fun EditPointDialog(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        ActionIcon(
-                            point = editPoint,
-                            icons = icons,
-                            modifier = Modifier.size(30.dp),
-                        )
-
                         Text(
                             text = label,
                             color = actionColor,
@@ -439,7 +439,8 @@ fun EditPointDialog(
     )
 
     if (showEditIconDialog) {
-        IconPickerDialog(
+        IconEditorDialog(
+            point = editPoint,
             appsViewModel = appsViewModel,
             onDismiss = { showEditIconDialog = false }
         ) {

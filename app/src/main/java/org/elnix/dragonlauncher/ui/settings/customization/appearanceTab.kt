@@ -283,7 +283,7 @@ fun AppearanceTab(
         AppPreviewTitle(
             offsetY = offsetY,
             alpha = alpha,
-            icons = icons,
+            pointIcons = icons,
             point = dummySwipePoint(SwipeActionSerializable.OpenDragonLauncherSettings),
             extraColors = extraColors,
             label = stringResource(R.string.dragon_launcher_settings),

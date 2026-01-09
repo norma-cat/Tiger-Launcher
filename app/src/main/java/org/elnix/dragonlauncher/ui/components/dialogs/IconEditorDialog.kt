@@ -4,6 +4,7 @@ package org.elnix.dragonlauncher.ui.components.dialogs
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,27 +51,43 @@ import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.helpers.CustomIconSerializable
 import org.elnix.dragonlauncher.data.helpers.IconType
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
+import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.ImageUtils.bitmapToBase64
 import org.elnix.dragonlauncher.utils.ImageUtils.uriToBase64
+import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.elnix.dragonlauncher.utils.colors.adjustBrightness
 import org.elnix.dragonlauncher.utils.models.AppsViewModel
 
 @Composable
-fun IconPickerDialog(
+fun IconEditorDialog(
+    point: SwipePointSerializable,
     appsViewModel: AppsViewModel,
     onDismiss: () -> Unit,
     onPicked: (CustomIconSerializable?) -> Unit
 ) {
     val ctx = LocalContext.current
+    val extraColors = LocalExtraColors.current
     val scope = rememberCoroutineScope()
 
+    val circleColor = LocalExtraColors.current.circle
 
-    var selectedIcon by remember { mutableStateOf<CustomIconSerializable?>(null) }
+    val pointIcons by appsViewModel.pointIcons.collectAsState()
+
+    val icon = point.customIcon
+    var selectedIcon by remember { mutableStateOf(icon) }
     var textValue by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        if (selectedIcon?.type == IconType.TEXT) {
+            textValue = selectedIcon?.source ?: ""
+        }
+    }
 
     val source = selectedIcon?.source
 
@@ -106,6 +126,16 @@ fun IconPickerDialog(
         )
     }
 
+    fun reloadIcon() {
+        appsViewModel.ensurePointIcon(
+            ctx = ctx,
+            point = point,
+            tint = actionColor(point.action, extraColors),
+        )
+    }
+
+    LaunchedEffect(selectedIcon.hashCode()) { reloadIcon() }
+
     CustomAlertDialog(
         alignment = Alignment.Center,
         onDismissRequest = onDismiss,
@@ -117,9 +147,31 @@ fun IconPickerDialog(
             ) {
                 Text(
                     text = stringResource(R.string.icon_picker),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(1f)
+                    style = MaterialTheme.typography.titleLarge
                 )
+
+                Canvas(
+                    modifier = Modifier
+                        .width(50.dp)
+                ) {
+                    val center = size.center
+                    val drawScope = this
+
+                    // Left action
+                    actionsInCircle(
+                        selected = false,
+                        drawScope = drawScope,
+                        point = point,
+                        nests = emptyList(),
+                        px = center.x,
+                        py = center.y,
+                        ctx = ctx,
+                        circleColor = circleColor,
+                        colorAction = actionColor(point.action, extraColors),
+                        preventBgErasing = true,
+                        pointIcons = pointIcons
+                    )
+                }
 
                 IconButton(
                     onClick = {

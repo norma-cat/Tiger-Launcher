@@ -28,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -59,9 +58,8 @@ fun CustomActionSelector(
     onSelected: (SwipeActionSerializable) -> Unit
 ) {
     val extraColors = LocalExtraColors.current
-    val ctx = LocalContext.current
 
-    val icons by appsViewModel.icons.collectAsState()
+    val pointIcons by appsViewModel.pointIcons.collectAsState()
 
     var showDialog by remember { mutableStateOf(false) }
 
@@ -112,7 +110,7 @@ fun CustomActionSelector(
 
                 ActionIcon(
                     action = currentAction,
-                    icons = icons,
+                    icons = pointIcons,
                     modifier = Modifier.size(30.dp),
                     showLaunchAppVectorGrid = true
                 )

@@ -57,13 +57,13 @@ import kotlin.math.sin
 
 @Composable
 fun MainScreenOverlay(
-    icons: Map<String, ImageBitmap>,
     start: Offset?,
     current: Offset?,
     nestId: Int,
     isDragging: Boolean,
     surface: IntSize,
     points: List<SwipePointSerializable>,
+    pointIcons: Map<String, ImageBitmap>,
     nests: List<CircleNest>,
     onLaunch: (SwipePointSerializable?) -> Unit
 ) {
@@ -416,7 +416,7 @@ fun MainScreenOverlay(
                                     colorAction = actionColor(p.action, extraColors),
                                     px = px, py = py,
                                     ctx = ctx,
-                                    icons = icons
+                                    pointIcons = pointIcons
                                 )
                             }
                         }
@@ -432,7 +432,7 @@ fun MainScreenOverlay(
                                 ctx = ctx,
                                 colorAction = colorAction,
                                 circleColor = circleColor,
-                                icons = icons
+                                pointIcons = pointIcons
                             )
                         }
                     }
@@ -452,7 +452,7 @@ fun MainScreenOverlay(
                         ctx = ctx,
                         colorAction = colorAction,
                         circleColor = circleColor,
-                        icons = icons
+                        pointIcons = pointIcons
                     )
                 }
             }
@@ -468,7 +468,7 @@ fun MainScreenOverlay(
         AppPreviewTitle(
             offsetY = offsetY,
             alpha = alpha,
-            icons = icons,
+            pointIcons = pointIcons,
             point = currentPoint,
             extraColors = extraColors,
             label = label,
