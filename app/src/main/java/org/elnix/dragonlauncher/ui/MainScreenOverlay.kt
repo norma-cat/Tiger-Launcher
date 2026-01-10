@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.elnix.dragonlauncher.data.CircleNest
-import org.elnix.dragonlauncher.data.SwipePointSerializable
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
@@ -49,7 +49,6 @@ import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionLabel
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
@@ -407,15 +406,15 @@ fun MainScreenOverlay(
                                 val px = start.x + radius * sin(Math.toRadians(p.angleDeg)).toFloat()
                                 val py = start.y - radius * cos(Math.toRadians(p.angleDeg)).toFloat()
 
-                                actionsInCircle(
+                                this.actionsInCircle(
                                     selected = false,
-                                    drawScope = this,
                                     point = p,
                                     nests = nests,
+                                    px = px,
+                                    py = py,
+                                    ctx = ctx,
                                     circleColor = circleColor,
                                     colorAction = actionColor(p.action, extraColors),
-                                    px = px, py = py,
-                                    ctx = ctx,
                                     pointIcons = pointIcons
                                 )
                             }
@@ -423,15 +422,14 @@ fun MainScreenOverlay(
 
                         // Draw here the actual selected action (if requested)
                         if (showAppLaunchPreview) {
-                            actionsInCircle(
+                            this.actionsInCircle(
                                 selected = true,
-                                drawScope = this,
                                 point = point,
                                 nests = nests,
-                                px = px, py = py,
-                                ctx = ctx,
-                                colorAction = colorAction,
+                                px = px,
+                                py = py, ctx = ctx,
                                 circleColor = circleColor,
+                                colorAction = colorAction,
                                 pointIcons = pointIcons
                             )
                         }
@@ -443,15 +441,14 @@ fun MainScreenOverlay(
                 if (showAppPreviewIconCenterStartPosition && hoveredPoint != null) {
                     val currentPoint = hoveredPoint!!
 
-                    actionsInCircle(
+                    this.actionsInCircle(
                         selected = false,
-                        drawScope = this,
                         point = currentPoint,
                         nests = nests,
-                        px = start.x, py = start.y,
-                        ctx = ctx,
-                        colorAction = colorAction,
+                        px = start.x,
+                        py = start.y, ctx = ctx,
                         circleColor = circleColor,
+                        colorAction = colorAction,
                         pointIcons = pointIcons
                     )
                 }
@@ -464,14 +461,11 @@ fun MainScreenOverlay(
     // Label on top of the screen to indicate the launching app
     if (hoveredPoint != null && (showLaunchingAppLabel || showLaunchingAppIcon)) {
         val currentPoint = hoveredPoint!!
-        val label = actionLabel(currentPoint.action)
         AppPreviewTitle(
             offsetY = offsetY,
             alpha = alpha,
             pointIcons = pointIcons,
             point = currentPoint,
-            extraColors = extraColors,
-            label = label,
             topPadding = appLabelIconOverlayTopPadding.dp,
             showLabel = showLaunchingAppLabel,
             showIcon = showLaunchingAppIcon

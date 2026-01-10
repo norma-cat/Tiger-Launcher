@@ -43,20 +43,15 @@ fun CustomAlertDialog(
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .then(
-                    if (scroll) {
-                        Modifier.verticalScroll(rememberScrollState())
-                    }
-                    else Modifier
-                )
                 .clip(shape)
                 .background(containerColor),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(15.dp),
+                    .padding(horizontal = 15.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -64,14 +59,24 @@ fun CustomAlertDialog(
                 title?.invoke()
             }
 
-            Box(Modifier.padding(15.dp)){
+            Box(
+                Modifier
+                    .padding(horizontal = 15.dp)
+                    .weight(1f)
+                    .then(
+                        if (scroll) {
+                            Modifier.verticalScroll(rememberScrollState())
+                        }
+                        else Modifier
+                    )
+            ) {
                 text?.invoke()
             }
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(15.dp),
+                    .padding(horizontal = 15.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {

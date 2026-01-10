@@ -15,12 +15,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -83,8 +84,8 @@ import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.CircleNest
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.UiCircle
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
@@ -106,7 +107,6 @@ import org.elnix.dragonlauncher.utils.ICONS_TAG
 import org.elnix.dragonlauncher.utils.SWIPE_TAG
 import org.elnix.dragonlauncher.utils.TAG
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionLabel
 import org.elnix.dragonlauncher.utils.circles.autoSeparate
 import org.elnix.dragonlauncher.utils.circles.normalizeAngle
 import org.elnix.dragonlauncher.utils.circles.randomFreeAngle
@@ -153,9 +153,7 @@ fun SettingsScreen(
     val extraColors = LocalExtraColors.current
     val scope = rememberCoroutineScope()
 
-    val icons by appsViewModel.icons.collectAsState()
     val pointIcons by appsViewModel.pointIcons.collectAsState()
-
 
     val circleColor by ColorSettingsStore.getCircleColor(ctx)
         .collectAsState(initial = AmoledDefault.CircleColor)
@@ -244,7 +242,6 @@ fun SettingsScreen(
         appsViewModel.preloadPointIcons(
             ctx = ctx,
             points = points.filter { it.nestId == nestId },
-            tintProvider = { p -> actionColor(p.action, extraColors) },
             sizePx = 56
         )
     }
@@ -409,7 +406,8 @@ fun SettingsScreen(
         Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .windowInsetsPadding(WindowInsets.displayCutout)
+            .windowInsetsPadding(WindowInsets.statusBars)
     ) {
         Row(
             modifier = Modifier
@@ -498,17 +496,17 @@ fun SettingsScreen(
                                 val py =
                                     center.y - circle.radius * cos(Math.toRadians(p.angleDeg)).toFloat()
 
-                                actionsInCircle(
-                                    selected = p.id == selectedPoint?.id,
-                                    drawScope = this,
-                                    point = p,
-                                    nests = nests,
-                                    circleColor = circleColor,
-                                    colorAction = actionColor(p.action, extraColors),
-                                    px = px, py = py,
-                                    ctx = ctx,
-                                    pointIcons = pointIcons
-                                )
+                                    this.actionsInCircle(
+                                        selected = p.id == selectedPoint?.id,
+                                        point = p,
+                                        nests = nests,
+                                        px = px,
+                                        py = py,
+                                        ctx = ctx,
+                                        circleColor = circleColor,
+                                        colorAction = actionColor(p.action, extraColors),
+                                        pointIcons = pointIcons
+                                    )
                             }
                         }
                     }
@@ -1121,7 +1119,7 @@ fun SettingsScreen(
                 // If changing to nest action, create the nest
                 pendingNestUpdate = nests + CircleNest(id = newPoint.nestId ?: 0, parentId = nestId)
             }
-            ctx.logE(ICONS_TAG, "Received edit of point id: ${editPoint.id} (new: $newPoint.id}")
+            ctx.logE(ICONS_TAG, "Received edit of point id: ${editPoint.id} (new: ${newPoint.id}")
 
             applyChange {
                 val index = points.indexOfFirst { it.id == editPoint.id }
@@ -1129,7 +1127,7 @@ fun SettingsScreen(
                     points[index] = newPoint
                 }
             }
-            recomposeTrigger++
+            selectedPoint = newPoint
             showEditDialog = null
         }
     }
@@ -1159,14 +1157,11 @@ fun SettingsScreen(
 
     if (selectedPoint != null) {
         val currentPoint = selectedPoint!!
-        val label = actionLabel(currentPoint.action)
         AppPreviewTitle(
             offsetY = offsetY,
             alpha = alpha,
             pointIcons = pointIcons,
             point = currentPoint,
-            extraColors = extraColors,
-            label = label,
             topPadding = 80.dp,
             showLabel = true,
             showIcon = true

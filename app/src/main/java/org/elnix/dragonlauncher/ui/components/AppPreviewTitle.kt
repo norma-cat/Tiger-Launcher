@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,9 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.elnix.dragonlauncher.data.SwipePointSerializable
-import org.elnix.dragonlauncher.ui.theme.ExtraColors
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
+import org.elnix.dragonlauncher.utils.actions.actionLabel
 
 @Composable
 fun AppPreviewTitle(
@@ -28,12 +30,15 @@ fun AppPreviewTitle(
     alpha: Float,
     pointIcons: Map<String, ImageBitmap>,
     point: SwipePointSerializable,
-    extraColors: ExtraColors,
-    label: String,
     topPadding: Dp = 60.dp,
     showLabel: Boolean,
     showIcon: Boolean
 ) {
+
+    val extraColors = LocalExtraColors.current
+
+    val label = actionLabel(point.action, point.customName)
+
     val action = point.action
     if (showIcon || showLabel) {
         Box(
@@ -49,16 +54,11 @@ fun AppPreviewTitle(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (showIcon) {
-//                    ActionIcon(
-//                        action = action,
-//                        icons = pointIcons,
-//                        modifier = Modifier.size(22.dp),
-//                    )
                     pointIcons[point.id]?.let {
                         Image(
                             bitmap = it,
-                            contentDescription = null
-
+                            contentDescription = null,
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                 }

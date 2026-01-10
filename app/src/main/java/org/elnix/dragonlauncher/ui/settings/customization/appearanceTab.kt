@@ -35,7 +35,6 @@ import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 
 
 @Composable
@@ -98,7 +97,6 @@ fun AppearanceTab(
         targetValue = if (isDraggingAppLabelIcon) 0.dp else (-20).dp,
         animationSpec = tween(150)
     )
-    val extraColors = LocalExtraColors.current
 
     val icons = emptyMap<String, ImageBitmap>()
 
@@ -285,8 +283,6 @@ fun AppearanceTab(
             alpha = alpha,
             pointIcons = icons,
             point = dummySwipePoint(SwipeActionSerializable.OpenDragonLauncherSettings),
-            extraColors = extraColors,
-            label = stringResource(R.string.dragon_launcher_settings),
             topPadding = appLabelIconOverlayTopPadding.dp,
             showLabel = showLaunchingAppLabel,
             showIcon = showLaunchingAppIcon

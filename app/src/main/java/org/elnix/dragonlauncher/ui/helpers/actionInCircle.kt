@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -12,13 +13,12 @@ import androidx.compose.ui.unit.IntSize
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.CircleNest
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.data.SwipePointSerializable
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.utils.actions.loadDrawableResAsBitmap
 
 
-fun actionsInCircle(
+fun DrawScope.actionsInCircle(
     selected: Boolean,
-    drawScope: DrawScope,
     point: SwipePointSerializable,
     nests: List<CircleNest>,
     px: Float,
@@ -49,21 +49,21 @@ fun actionsInCircle(
 
         // Erases the color, instead of putting it, that lets the wallpaper pass trough
         if (eraseBg) {
-            drawScope.drawCircle(
+            drawCircle(
                 color = Color.Transparent,
                 radius = 44f,
                 center = Offset(px, py),
                 blendMode = BlendMode.Clear
             )
         } else
-            drawScope.drawCircle(
+            drawCircle(
                 color = backgroundColor,
                 radius = 44f,
                 center = Offset(px, py)
             )
 
 
-        drawScope.drawCircle(
+        drawCircle(
             color =  borderColor,
             radius = 44f,
             center = Offset(px, py),
@@ -76,10 +76,16 @@ fun actionsInCircle(
         val icon = point.id?.let { pointIcons[it] }
 
         if (icon != null) {
-            drawScope.drawImage(
+            drawImage(
                 image = icon,
                 dstOffset = IntOffset(px.toInt() - 28, py.toInt() - 28),
-                dstSize = IntSize(56, 56)
+                dstSize = IntSize(56, 56),
+                colorFilter = if (
+                    action !is SwipeActionSerializable.LaunchApp &&
+                    action !is SwipeActionSerializable.LaunchShortcut &&
+                    action !is SwipeActionSerializable.OpenDragonLauncherSettings
+                ) ColorFilter.tint(colorAction)
+                else null
             )
         }
 
@@ -94,14 +100,14 @@ fun actionsInCircle(
             nests.find { it.id == action.nestId }!!.dragDistances.filter { it.key != -1 }
                 .forEach { (index, _) ->
                     val radius = 100f * circlesWidthIncrement * (index + 1)
-                    drawScope.drawCircle(
+                    drawCircle(
                         color = colorAction,
                         radius = radius,
                         center = Offset(px, py),
                         style = Stroke(if (selected) 8f else 4f)
                     )
                 }
-        } ?: drawScope.drawImage(
+        } ?: drawImage(
             image = loadDrawableResAsBitmap(ctx, R.drawable.ic_app_default, 48, 48),
             dstOffset = IntOffset(px.toInt() - 28, py.toInt() - 28),
             dstSize = IntSize(56, 56)

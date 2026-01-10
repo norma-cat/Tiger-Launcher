@@ -39,9 +39,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.dummySwipePoint
 import org.elnix.dragonlauncher.data.helpers.FloatingAppObject
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
@@ -54,11 +54,9 @@ import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
 import org.elnix.dragonlauncher.ui.helpers.rememberHoldToOpenSettings
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
-import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.TAG
 import org.elnix.dragonlauncher.utils.WIDGET_TAG
 import org.elnix.dragonlauncher.utils.actions.AppLaunchException
-import org.elnix.dragonlauncher.utils.actions.actionColor
 import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
 import org.elnix.dragonlauncher.utils.circles.rememberNestNavigation
 import org.elnix.dragonlauncher.utils.logs.logE
@@ -78,7 +76,7 @@ fun MainScreen(
     onLongPress3Sec: () -> Unit
 ) {
     val ctx = LocalContext.current
-    val extraColors = LocalExtraColors.current
+//    val extraColors = LocalExtraColors.current
     val scope = rememberCoroutineScope()
 
     var showFilePicker: SwipePointSerializable? by remember { mutableStateOf(null) }
@@ -173,7 +171,7 @@ fun MainScreen(
         appsViewModel.preloadPointIcons(
             ctx = ctx,
             points = points.filter { it.nestId == nestId },
-            tintProvider = { p -> actionColor(p.action, extraColors) },
+//            tintProvider = { p -> actionColor(p.action, extraColors) },
             sizePx = 56
         )
     }

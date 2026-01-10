@@ -253,9 +253,13 @@
     <string name="edit_action">Edit Action</string>
     <string name="border_background_selected">Border Background Selected</string>
     <string name="custom_action_color">Custom Action Color</string>
-    <string name="icon_picker">Icon Picker</string>
+    <string name="icon_editor">Icon Editor</string>
     <string name="pick_image">Pick image</string>
     <string name="pick_from_icon_pack">Pick from icon pack</string>
     <string name="no_custom_icon">No custom icon</string>
     <string name="no_search_match">No search match</string>
+    <string name="size">Size</string>
+    <string name="rotation">Rotation</string>
+    <string name="scale_x">Scale X</string>
+    <string name="scale_y">Scale Y</string>
 </resources>

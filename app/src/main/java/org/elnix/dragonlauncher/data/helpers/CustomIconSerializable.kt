@@ -12,7 +12,7 @@ data class CustomIconSerializable(
 
     /** Icon source type determining how `source` is interpreted. */
     @SerializedName("a")
-    var type: IconType? = null,
+    val type: IconType? = null,
 
     /**
      * Icon source reference.
@@ -22,67 +22,63 @@ data class CustomIconSerializable(
      * - SHAPE: renderer-defined primitive
      */
     @SerializedName("b")
-    var source: String? = null,
+    val source: String? = null,
 
     /** Tint color (ARGB) applied after rendering. */
     @SerializedName("c")
-    var tint: Long? = null,
+    val tint: Long? = null,
 
     /** Icon opacity multiplier (0.0 – 1.0). */
     @SerializedName("d")
-    var opacity: Float? = null,
-
-    /** Explicit icon size in dp. */
-    @SerializedName("e")
-    var sizeDp: Float? = null,
+    val opacity: Float? = null,
 
     /** Per-corner radius override for icon clipping. */
     @SerializedName("f")
-    var corners: CornerRadiusSerializable? = null,
+    val corners: CornerRadiusSerializable? = null,
 
     /** Stroke width (dp) around the icon shape. */
     @SerializedName("g")
-    var strokeWidth: Float? = null,
+    val strokeWidth: Float? = null,
 
     /** Stroke color (ARGB) around the icon. */
     @SerializedName("h")
-    var strokeColor: Long? = null,
+    val strokeColor: Long? = null,
 
     /** Blur radius for icon shadow. */
     @SerializedName("i")
-    var shadowRadius: Float? = null,
+    val shadowRadius: Float? = null,
 
     /** Shadow color (ARGB). */
     @SerializedName("j")
-    var shadowColor: Long? = null,
+    val shadowColor: Long? = null,
 
     /** Horizontal shadow offset (dp). */
     @SerializedName("k")
-    var shadowOffsetX: Float? = null,
+    val shadowOffsetX: Float? = null,
 
     /** Vertical shadow offset (dp). */
     @SerializedName("l")
-    var shadowOffsetY: Float? = null,
+    val shadowOffsetY: Float? = null,
 
     /** Rotation applied to the icon in degrees. */
     @SerializedName("m")
-    var rotationDeg: Float? = null,
+    val rotationDeg: Float? = null,
 
     /** Horizontal scale multiplier. */
     @SerializedName("n")
-    var scaleX: Float? = null,
+    val scaleX: Float? = null,
 
     /** Vertical scale multiplier. */
     @SerializedName("o")
-    var scaleY: Float? = null,
+    val scaleY: Float? = null,
 
     /** Optional blend mode name (renderer-defined, e.g. SRC_IN, MULTIPLY). */
     @SerializedName("p")
-    var blendMode: String? = null,
+    val blendMode: String? = null,
 
     /** Whether this icon supports animation (Lottie, animated vector, etc.). */
     @SerializedName("q")
-    var animated: Boolean? = null
+    val animated: Boolean? = null
 )
 
 /**
@@ -98,6 +94,7 @@ enum class IconType {
 
     /** Text-based icon (emoji, glyph, font icon). */
     TEXT,
+    PLAIN_COLOR,
 
     /** Procedural or primitive shape rendered by code. */
     SHAPE
@@ -110,8 +107,8 @@ enum class IconType {
  * Any null value falls back to renderer defaults or global radius.
  */
 data class CornerRadiusSerializable(
-    @SerializedName("a") var topLeft: Float? = null,
-    @SerializedName("b") var topRight: Float? = null,
-    @SerializedName("c") var bottomRight: Float? = null,
-    @SerializedName("d") var bottomLeft: Float? = null
+    @SerializedName("a") val topLeft: Float? = null,
+    @SerializedName("b") val topRight: Float? = null,
+    @SerializedName("c") val bottomRight: Float? = null,
+    @SerializedName("d") val bottomLeft: Float? = null
 )

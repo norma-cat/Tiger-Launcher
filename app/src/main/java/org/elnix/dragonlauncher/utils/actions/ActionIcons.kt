@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -61,7 +62,7 @@ fun ActionIcon(
                 icons = icons,
                 action = action,
                 ctx = ctx,
-                tintColor = actionColor(action, extraColors),
+//                tintColor = actionColor(action, extraColors),
                 width = size,
                 height = size
             )
@@ -74,6 +75,12 @@ fun ActionIcon(
     Image(
         bitmap = bitmap,
         contentDescription = null,
+        colorFilter = if (
+            action !is SwipeActionSerializable.LaunchApp &&
+            action !is SwipeActionSerializable.LaunchShortcut &&
+            action !is SwipeActionSerializable.OpenDragonLauncherSettings
+        ) ColorFilter.tint(actionColor(action, extraColors))
+        else null,
         modifier = modifier
     )
 }
@@ -83,20 +90,20 @@ fun actionIconBitmap(
     icons: Map<String, ImageBitmap>,
     action: SwipeActionSerializable,
     ctx: Context,
-    tintColor: Color,
+//    tintColor: Color,
     width: Int = 48,
     height: Int = 48
 ): ImageBitmap {
-    val bitmap = createUntintedBitmap(action, ctx, icons, width, height)
-    return if (
-        action is SwipeActionSerializable.LaunchApp ||
-        action is SwipeActionSerializable.LaunchShortcut ||
-        action is SwipeActionSerializable.OpenDragonLauncherSettings
-    ) {
-        bitmap
-    } else {
-        tintBitmap(bitmap, tintColor)
-    }
+    return createUntintedBitmap(action, ctx, icons, width, height)
+//    return if (
+//        action is SwipeActionSerializable.LaunchApp ||
+//        action is SwipeActionSerializable.LaunchShortcut ||
+//        action is SwipeActionSerializable.OpenDragonLauncherSettings
+//    ) {
+//        bitmap
+//    } else {
+//        tintBitmap(bitmap, tintColor)
+//    }
 }
 
 
@@ -122,6 +129,16 @@ fun resolveCustomIconBitmap(
                 )
             } ?: base
         }
+
+        IconType.PLAIN_COLOR -> icon.source?.let {
+            try {
+                val sourceColor = Color(it.toInt())
+                val bmp = createDefaultBitmap(sizePx, sizePx)
+                tintBitmap(bmp, sourceColor)
+            } catch (_: Exception) {
+                base
+            }
+        } ?: base
 
         IconType.SHAPE,
         null -> base
@@ -157,7 +174,7 @@ fun resolveCustomIconBitmap(
     // Step 6: shadow
     if (icon.shadowRadius != null) {
         paint.setShadowLayer(
-            icon.shadowRadius!!,
+            icon.shadowRadius,
             icon.shadowOffsetX ?: 0f,
             icon.shadowOffsetY ?: 0f,
             (icon.shadowColor ?: 0x55000000).toInt()
@@ -190,8 +207,8 @@ fun resolveCustomIconBitmap(
     if (icon.strokeWidth != null && icon.strokeColor != null) {
         val strokePaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
             style = android.graphics.Paint.Style.STROKE
-            strokeWidth = icon.strokeWidth!!
-            color = icon.strokeColor!!.toInt()
+            strokeWidth = icon.strokeWidth
+            color = icon.strokeColor.toInt()
         }
         canvas.drawRect(
             0f,

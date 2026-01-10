@@ -16,11 +16,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Restore
@@ -51,10 +50,11 @@ import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.helpers.CustomIconSerializable
 import org.elnix.dragonlauncher.data.helpers.IconType
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
+import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.ImageUtils.bitmapToBase64
@@ -88,6 +88,17 @@ fun IconEditorDialog(
             textValue = selectedIcon?.source ?: ""
         }
     }
+
+    LaunchedEffect(selectedIcon) {
+        val previewPoint = point.copy(customIcon = selectedIcon)
+
+        appsViewModel.reloadPointIcon(
+            ctx = ctx,
+            point = previewPoint,
+//            tint = actionColor(point.action, extraColors)
+        )
+    }
+
 
     val source = selectedIcon?.source
 
@@ -126,19 +137,13 @@ fun IconEditorDialog(
         )
     }
 
-    fun reloadIcon() {
-        appsViewModel.ensurePointIcon(
-            ctx = ctx,
-            point = point,
-            tint = actionColor(point.action, extraColors),
-        )
-    }
-
-    LaunchedEffect(selectedIcon.hashCode()) { reloadIcon() }
-
     CustomAlertDialog(
-        alignment = Alignment.Center,
+        modifier = Modifier
+            .padding(24.dp)
+            .height(700.dp),
         onDismissRequest = onDismiss,
+        imePadding = false,
+        alignment = Alignment.Center,
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -146,7 +151,7 @@ fun IconEditorDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(R.string.icon_picker),
+                    text = stringResource(R.string.icon_editor),
                     style = MaterialTheme.typography.titleLarge
                 )
 
@@ -155,21 +160,33 @@ fun IconEditorDialog(
                         .width(50.dp)
                 ) {
                     val center = size.center
+                    val actionSpacing = 150f
                     val drawScope = this
 
-                    // Left action
-                    actionsInCircle(
+                    drawScope.actionsInCircle(
                         selected = false,
-                        drawScope = drawScope,
                         point = point,
                         nests = emptyList(),
-                        px = center.x,
+                        px = center.x - actionSpacing,
                         py = center.y,
                         ctx = ctx,
                         circleColor = circleColor,
                         colorAction = actionColor(point.action, extraColors),
-                        preventBgErasing = true,
-                        pointIcons = pointIcons
+                        pointIcons = pointIcons,
+                        preventBgErasing = true
+                    )
+
+                    drawScope.actionsInCircle(
+                        selected = true,
+                        point = point,
+                        nests = emptyList(),
+                        px = center.x + actionSpacing,
+                        py = center.y,
+                        ctx = ctx,
+                        circleColor = circleColor,
+                        colorAction = actionColor(point.action, extraColors),
+                        pointIcons = pointIcons,
+                        preventBgErasing = true
                     )
                 }
 
@@ -177,12 +194,11 @@ fun IconEditorDialog(
                     onClick = {
                         selectedIcon = null
                         textValue = ""
-                    },
-                    colors = AppObjectsColors.iconButtonColors()
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Restore,
-                        contentDescription  = stringResource(R.string.reset)
+                        contentDescription = stringResource(R.string.reset)
                     )
                 }
             }
@@ -193,15 +209,18 @@ fun IconEditorDialog(
             ) { onPicked(selectedIcon) }
         },
         text = {
-            LazyVerticalGrid(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(520.dp),
-                columns = GridCells.Fixed(2)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-
-                item {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     SelectableCard(
+                        modifier = Modifier.weight(1f),
                         selected = selectedIcon?.type == IconType.BITMAP && source != null,
                         onClick = {
                             imagePicker.launch(arrayOf("image/*"))
@@ -211,10 +230,11 @@ fun IconEditorDialog(
                         Spacer(Modifier.width(12.dp))
                         Text(stringResource(R.string.pick_image))
                     }
-                }
 
-                item {
+
+
                     SelectableCard(
+                        modifier = Modifier.weight(1f),
                         selected = selectedIcon?.type == IconType.TEXT && source != null,
                         onClick = {}
                     ) {
@@ -222,7 +242,11 @@ fun IconEditorDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(MaterialTheme.colorScheme.surface.adjustBrightness(0.7f))
+                                .background(
+                                    MaterialTheme.colorScheme.surface.adjustBrightness(
+                                        0.7f
+                                    )
+                                )
                                 .padding(12.dp)
                         ) {
                             Text("Text / Emoji", fontWeight = FontWeight.Bold)
@@ -252,19 +276,27 @@ fun IconEditorDialog(
                     }
                 }
 
-                item {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     SelectableCard(
+                        modifier = Modifier.weight(1f),
                         selected = selectedIcon?.type == IconType.ICON_PACK && source != null,
-                        onClick = { showIconPackPicker = true }
+                        onClick = {
+                            showIconPackPicker = true
+                        }
                     ) {
                         Icon(Icons.Default.Palette, null)
                         Spacer(Modifier.width(12.dp))
                         Text(stringResource(R.string.pick_from_icon_pack))
                     }
-                }
 
-                item {
+
+
                     SelectableCard(
+                        modifier = Modifier.weight(1f),
                         selected = selectedIcon?.type == null || selectedIcon?.source == null,
                         onClick = {
                             selectedIcon = selectedIcon?.copy(
@@ -274,44 +306,110 @@ fun IconEditorDialog(
                             textValue = ""
                         }
                     ) {
-                        Icon(Icons.Default.Restore, null)
+                        Icon(Icons.Default.Close, null)
                         Spacer(Modifier.width(12.dp))
                         Text(stringResource(R.string.no_custom_icon))
                     }
                 }
-            }
 
+
+
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surface.adjustBrightness(0.7f))
+                        .padding(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+
+                    // Opacity
+                    SliderWithLabel(
+                        label = stringResource(R.string.opacity),
+                        value = selectedIcon?.opacity ?: 1f,
+                        valueRange = 0f..1f,
+                        color = MaterialTheme.colorScheme.primary,
+                        onReset = {
+                            selectedIcon = selectedIcon?.copy(opacity = null)
+                        }
+                    ) {
+                        selectedIcon = (selectedIcon ?: CustomIconSerializable()).copy(opacity = it)
+                    }
+                    &
+                    // Rotation
+                    SliderWithLabel(
+                        label = stringResource(R.string.rotation),
+                        value = selectedIcon?.rotationDeg ?: 0f,
+                        valueRange = -180f..180f,
+                        color = MaterialTheme.colorScheme.primary,
+                        onReset = {
+                            selectedIcon = selectedIcon?.copy(rotationDeg = null)
+                        }
+                    ) {
+                        selectedIcon =
+                            (selectedIcon ?: CustomIconSerializable()).copy(rotationDeg = it)
+                    }
+
+                    // Scale X
+                    SliderWithLabel(
+                        label = stringResource(R.string.scale_x),
+                        value = selectedIcon?.scaleX ?: 1f,
+                        valueRange = 0.2f..3f,
+                        color = MaterialTheme.colorScheme.primary,
+                        onReset = {
+                            selectedIcon = selectedIcon?.copy(scaleX = null)
+                        }
+                    ) {
+                        selectedIcon = (selectedIcon ?: CustomIconSerializable()).copy(scaleX = it)
+                    }
+
+                    // Scale Y
+                    SliderWithLabel(
+                        label = stringResource(R.string.scale_y),
+                        value = selectedIcon?.scaleY ?: 1f,
+                        valueRange = 0.2f..3f,
+                        color = MaterialTheme.colorScheme.primary,
+                        onReset = {
+                            selectedIcon = selectedIcon?.copy(scaleY = null)
+                        }
+                    ) {
+                        selectedIcon = (selectedIcon ?: CustomIconSerializable()).copy(scaleY = it)
+                    }
+                }
+            }
         },
         containerColor = MaterialTheme.colorScheme.surface
     )
 
     if (showIconPackPicker) {
-         IconPackPickerDialog(
-             appsViewModel = appsViewModel,
-             onDismiss = { showIconPackPicker = false },
-             onIconPicked = { iconBitmap ->
-                 scope.launch {
-                     val base64 = bitmapToBase64(iconBitmap)
-                     selectedIcon = selectedIcon?.copy(
-                         type = IconType.ICON_PACK,
-                         source = base64
-                     )
-                     showIconPackPicker = false
-                 }
-             }
-         )
+        IconPackPickerDialog(
+            appsViewModel = appsViewModel,
+            onDismiss = { showIconPackPicker = false },
+            onIconPicked = { iconBitmap ->
+                scope.launch {
+                    val base64 = bitmapToBase64(iconBitmap)
+                    selectedIcon = selectedIcon?.copy(
+                        type = IconType.ICON_PACK,
+                        source = base64
+                    )
+                    showIconPackPicker = false
+                }
+            }
+        )
     }
 }
 
 @Composable
 private fun SelectableCard(
+    modifier: Modifier,
     selected: Boolean,
     onClick: () -> Unit,
     content: @Composable RowScope.() -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .padding(6.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surface.adjustBrightness(0.7f))

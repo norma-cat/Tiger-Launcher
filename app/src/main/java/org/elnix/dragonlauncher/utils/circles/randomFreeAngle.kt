@@ -1,6 +1,6 @@
 package org.elnix.dragonlauncher.utils.circles
 
-import org.elnix.dragonlauncher.data.SwipePointSerializable
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.data.UiCircle
 import org.elnix.dragonlauncher.ui.minAngleGapForCircle
 

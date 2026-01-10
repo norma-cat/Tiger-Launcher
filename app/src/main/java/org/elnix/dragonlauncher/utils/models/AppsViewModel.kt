@@ -5,7 +5,6 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.XmlResourceParser
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.AndroidViewModel
@@ -23,8 +22,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.elnix.dragonlauncher.data.SwipePointSerializable
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.AppsSettingsStore
+import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.drawer.AppModel
 import org.elnix.dragonlauncher.ui.drawer.AppOverride
@@ -42,6 +42,7 @@ import org.elnix.dragonlauncher.utils.actions.loadDrawableAsBitmap
 import org.elnix.dragonlauncher.utils.actions.resolveCustomIconBitmap
 import org.elnix.dragonlauncher.utils.logs.logD
 import org.elnix.dragonlauncher.utils.logs.logE
+import org.elnix.dragonlauncher.utils.logs.logI
 import org.xmlpull.v1.XmlPullParser
 
 
@@ -57,7 +58,7 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
     val icons: StateFlow<Map<String, ImageBitmap>> = _icons
 
     private val _pointIcons = MutableStateFlow<Map<String, ImageBitmap>>(emptyMap())
-    val pointIcons: StateFlow<Map<String, ImageBitmap>> = _pointIcons.asStateFlow()
+    val pointIcons: StateFlow<Map<String, ImageBitmap>> = _pointIcons
 
 
 
@@ -193,6 +194,17 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
             _apps.value = apps.toList()
             _icons.value = loadIcons(apps)
 
+            invalidateAllPointIcons()
+
+            val points = SwipeSettingsStore.getPoints(ctx)
+
+            preloadPointIcons(
+                ctx = ctx,
+                points = points,
+                sizePx = 48,
+                reloadAll = true
+            )
+
 
             withContext(Dispatchers.IO) {
                 AppsSettingsStore.saveCachedApps(ctx, gson.toJson(apps))
@@ -209,15 +221,15 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
     fun renderPointIcon(
         ctx: Context,
         point: SwipePointSerializable,
-        icons: Map<String, ImageBitmap>,
-        tint: Color,
         sizePx: Int
     ): ImageBitmap {
+
+        logD(ICONS_TAG, "Rendering ${point.id}")
+        val startTime = System.currentTimeMillis()
         val base = actionIconBitmap(
-            icons = icons,
+            icons = icons.value,
             action = point.action,
             ctx = ctx,
-            tintColor = tint,
             width = sizePx,
             height = sizePx
         )
@@ -225,34 +237,38 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
         val final = if (point.customIcon != null) {
             resolveCustomIconBitmap(
                 base = base,
-                icon = point.customIcon!!,
+                icon = point.customIcon,
                 sizePx = sizePx
             )
         } else {
             base
         }
+
+        logD(ICONS_TAG, "Rendered in ${point.id}, took ${System.currentTimeMillis() - startTime}ms")
         return final
+    }
+
+    private fun invalidateAllPointIcons() {
+        _pointIcons.value = emptyMap()
     }
 
     fun preloadPointIcons(
         ctx: Context,
         points: List<SwipePointSerializable>,
-        tintProvider: (SwipePointSerializable) -> Color,
-        sizePx: Int
+        sizePx: Int,
+        reloadAll: Boolean = false
     ) {
         viewModelScope.launch(Dispatchers.Default) {
             val newIcons = buildMap {
                 points.forEach { p ->
                     val id = p.id ?: return@forEach
-                    if (_pointIcons.value.containsKey(id)) return@forEach
+                    if (_pointIcons.value.containsKey(id) && !reloadAll) return@forEach
 
                     put(
                         id,
                         renderPointIcon(
                             ctx = ctx,
                             point = p,
-                            icons = icons.value,
-                            tint = tintProvider(p),
                             sizePx = sizePx
                         )
                     )
@@ -266,26 +282,26 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun ensurePointIcon(
+    fun reloadPointIcon(
         ctx: Context,
         point: SwipePointSerializable,
-        tint: Color,
         sizePx: Int = 48
     ) {
+        logI(ICONS_TAG, "Ensuring point icon: ${point.id}")
+
         val id = point.id ?: return
 
-        if (_pointIcons.value.containsKey(id)) return
-
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(Dispatchers.IO) {
             val bmp = renderPointIcon(
                 ctx = ctx,
                 point = point,
-                icons = icons.value,
-                tint = tint,
                 sizePx = sizePx
             )
 
             _pointIcons.update { it + (id to bmp) }
+
+            logD(ICONS_TAG, "Updated _pointIcons")
+
         }
     }
 

@@ -3,13 +3,16 @@ package org.elnix.dragonlauncher.ui.components.dialogs
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -17,10 +20,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -50,7 +51,6 @@ fun IconPickerListDialog(
     onIconSelected: (iconName: String, icon: ImageBitmap) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    var isSearchEnabled by remember { mutableStateOf(false) }
 
     val filteredIcons = remember(searchQuery, icons) {
         if (searchQuery.isBlank()) icons
@@ -63,63 +63,61 @@ fun IconPickerListDialog(
         imePadding = false,
         scroll = false,
         alignment = Alignment.Center,
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier
+            .padding(32.dp)
+            .height(500.dp),
         onDismissRequest = onDismiss,
         title = {
             Column {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
                     modifier = Modifier
                         .height(75.dp)
                 ) {
-                    if (!isSearchEnabled) {
-                        Text(
-                            text = "Select Icon",
-                            modifier = Modifier.weight(1f),
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                    Text(
+                        text = "Select Icon",
+                        modifier = Modifier.wrapContentWidth(),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
 
-                        IconButton(onClick = { isSearchEnabled = true }) {
-                            Icon(Icons.Default.Search, contentDescription = null)
-                        }
-                    } else {
-                        TextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            singleLine = true,
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.Close,
-                                    contentDescription = null,
-                                    modifier = Modifier.clickable {
-                                        searchQuery = ""
-                                        isSearchEnabled = false
-                                    }
-                                )
-                            },
-                            placeholder = { Text("Search icons") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(CircleShape),
-                            colors = AppObjectsColors.outlinedTextFieldColors(
-                                removeBorder = true,
-                                backgroundColor = MaterialTheme.colorScheme.surface.adjustBrightness(0.8f)
+
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        singleLine = true,
+                        trailingIcon = {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = null,
+                                modifier = Modifier.clickable {
+                                    searchQuery = ""
+                                }
+                            )
+                        },
+                        placeholder = { Text("Search icons") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(CircleShape),
+                        colors = AppObjectsColors.outlinedTextFieldColors(
+                            removeBorder = true,
+                            backgroundColor = MaterialTheme.colorScheme.surface.adjustBrightness(
+                                0.8f
                             )
                         )
-                    }
+                    )
                 }
             }
         },
         text = {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(72.dp),
-                modifier = Modifier
-                    .height(500.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                if (filteredIcons.isNotEmpty()) {
+            if (filteredIcons.isNotEmpty()) {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(72.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     items(filteredIcons.entries.toList()) { (name, bitmap) ->
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -149,14 +147,23 @@ fun IconPickerListDialog(
                             }
                         }
                     }
-                } else if (icons.isNotEmpty()) {
-                    item {
-                        Text(stringResource(R.string.no_search_match))
-                    }
-                } else {
-                    item {
-                        CircularProgressIndicator()
-                    }
+                }
+            } else if (icons.isNotEmpty()) {
+
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(stringResource(R.string.no_search_match))
+
+                }
+            } else {
+
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         },
