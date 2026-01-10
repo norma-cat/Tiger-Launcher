@@ -37,7 +37,6 @@ import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.drawer.AppModel
-import org.elnix.dragonlauncher.ui.theme.ExtraColors
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.PackageManagerCompat
 import org.elnix.dragonlauncher.utils.actions.ActionIcon
@@ -220,9 +219,9 @@ fun AddPointColumn(
     val extraColors = LocalExtraColors.current
 
     val name = when(action) {
-        is SwipeActionSerializable.LaunchApp -> "Open App"
-        is SwipeActionSerializable.OpenUrl -> "Open Url"
-        is SwipeActionSerializable.OpenFile -> "Open File"
+        is SwipeActionSerializable.LaunchApp -> stringResource(R.string.open_app)
+        is SwipeActionSerializable.OpenUrl -> stringResource(R.string.open_url)
+        is SwipeActionSerializable.OpenFile -> stringResource(R.string.open_file)
         else -> actionLabel(action)
     }
 
@@ -250,9 +249,3 @@ fun AddPointColumn(
         )
     }
 }
-
-fun actionTint(action: SwipeActionSerializable, extraColors: ExtraColors): Color =
-    when (action) {
-        is SwipeActionSerializable.LaunchApp, SwipeActionSerializable.OpenDragonLauncherSettings  -> Color.Unspecified
-        else -> actionColor(action, extraColors)
-    }

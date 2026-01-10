@@ -170,7 +170,7 @@ fun AppearanceTab(
         item {
             SwitchRow(
                 rgbLoading,
-                "RGB loading settings",
+                stringResource(R.string.rgb_loading_settings),
             ) { scope.launch { UiSettingsStore.setRGBLoading(ctx, it) } }
 
         }
@@ -178,7 +178,7 @@ fun AppearanceTab(
         item {
             SwitchRow(
                 rgbLine,
-                "RGB line selector",
+                stringResource(R.string.rgb_line_selector),
             ) { scope.launch { UiSettingsStore.setRGBLine(ctx, it) } }
         }
 
@@ -216,42 +216,45 @@ fun AppearanceTab(
         item {
             SwitchRow(
                 showAppLaunchPreview,
-                "Show App launch preview",
+                stringResource(R.string.show_app_launch_preview),
             ) { scope.launch { UiSettingsStore.setShowAppLaunchPreview(ctx, it) } }
         }
 
         item {
             SwitchRow(
                 showAppCirclePreview,
-                "Show App circle preview",
+                stringResource(R.string.show_app_circle_preview),
             ) { scope.launch { UiSettingsStore.setShowCirclePreview(ctx, it) } }
         }
 
         item {
             SwitchRow(
                 showAppLinePreview,
-                "Show App line preview",
+                stringResource(R.string.show_app_line_preview),
             ) { scope.launch { UiSettingsStore.setShowLinePreview(ctx, it) } }
         }
 
         item {
             SwitchRow(
                 showAppAnglePreview,
-                "Show App Angle preview. ${if (!showAppAnglePreview) " Do you hate it?" else ""}",
+                stringResource(
+                    R.string.show_app_angle_preview,
+                    if (!showAppAnglePreview) stringResource(R.string.do_you_hate_it) else ""
+                ),
             ) { scope.launch { UiSettingsStore.setShowAnglePreview(ctx, it) } }
         }
 
         item {
             SwitchRow(
                 showAppPreviewIconCenterStartPosition,
-                "Show App Icon angle preview in center of start dragging position",
+                stringResource(R.string.show_app_icon_angle_preview_in_center_of_start_dragging_position),
             ) { scope.launch { UiSettingsStore.setShowAppPreviewIconCenterStartPosition(ctx, it) } }
         }
 
         item {
             SwitchRow(
                 linePreviewSnapToAction,
-                "Line Preview snap to action",
+                stringResource(R.string.line_preview_snap_to_action),
             ) { scope.launch { UiSettingsStore.setLinePreviewSnapToAction(ctx, it) } }
         }
 

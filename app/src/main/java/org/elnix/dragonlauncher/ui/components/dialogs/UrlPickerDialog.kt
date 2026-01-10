@@ -13,8 +13,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.utils.colors.adjustBrightness
 
 @Composable
 fun UrlInputDialog(
@@ -26,7 +29,7 @@ fun UrlInputDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Enter URL") },
+        title = { Text(stringResource(R.string.enter_url)) },
         text = {
             Column {
                 TextField(
@@ -36,10 +39,11 @@ fun UrlInputDialog(
                         error = false
                     },
                     singleLine = true,
-                    label = { Text("https://example.com") }
+                    label = { Text("https://example.com") },
+                    colors = AppObjectsColors.outlinedTextFieldColors(removeBorder = true, backgroundColor = MaterialTheme.colorScheme.surface.adjustBrightness(0.7f))
                 )
                 if (error) {
-                    Text("Invalid URL", color = Color.Red)
+                    Text(stringResource(R.string.invalid_url), color = Color.Red)
                 }
             }
         },
@@ -57,14 +61,14 @@ fun UrlInputDialog(
                 },
                 colors = AppObjectsColors.buttonColors()
             ) {
-                Text("OK")
+                Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
                 colors = AppObjectsColors.cancelButtonColors()
-            ) { Text("Cancel") }
+            ) { Text(stringResource(R.string.cancel)) }
         },
         containerColor = MaterialTheme.colorScheme.surface
     )

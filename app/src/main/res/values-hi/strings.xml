@@ -262,4 +262,25 @@
     <string name="rotation">रोटेशन</string>
     <string name="scale_x">स्केल एक्स</string>
     <string name="scale_y">स्केल Y</string>
+    <string name="open_app">ऐप खोलें</string>
+    <string name="open_url">यूआरएल खोलें</string>
+    <string name="open_file">फ़ाइल खोलें</string>
+    <string name="select_app">ऐप चुनें</string>
+    <string name="enter_url">यूआरएल दर्ज करें</string>
+    <string name="invalid_url">असामान्य यूआरएल</string>
+    <string name="unselected_action">अचयनित क्रिया</string>
+    <string name="selected_action">चयनित क्रिया</string>
+    <string name="haptic_feedback">हैप्टिक राय</string>
+    <string name="text_emoji">टेक्स्ट/इमोजी</string>
+    <string name="rgb_loading_settings">आरजीबी लोडिंग सेटिंग्स</string>
+    <string name="rgb_line_selector">आरजीबी लाइन चयनकर्ता</string>
+    <string name="show_app_launch_preview">ऐप लॉन्च पूर्वावलोकन दिखाएँ</string>
+    <string name="show_app_circle_preview">ऐप सर्कल पूर्वावलोकन दिखाएँ</string>
+    <string name="show_app_line_preview">ऐप लाइन पूर्वावलोकन दिखाएँ</string>
+    <string name="show_app_angle_preview">ऐप एंगल पूर्वावलोकन दिखाएँ। %1$s</string>
+    <string name="do_you_hate_it">\"क्या तुम्हें इससे नफरत है\?\"</string>
+    <string name="show_app_icon_angle_preview_in_center_of_start_dragging_position">ड्रैगिंग प्रारंभ स्थिति के केंद्र में ऐप आइकन कोण पूर्वावलोकन दिखाएं</string>
+    <string name="line_preview_snap_to_action">कार्रवाई के लिए लाइन पूर्वावलोकन स्नैप</string>
+    <string name="icon_packs_found">%1$d आइकन पैक मिले</string>
+    <string name="default_text">गलती करना</string>
 </resources>

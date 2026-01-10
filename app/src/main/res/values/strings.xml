@@ -262,4 +262,25 @@
     <string name="rotation">Rotation</string>
     <string name="scale_x">Scale X</string>
     <string name="scale_y">Scale Y</string>
+    <string name="open_app">Open App</string>
+    <string name="open_url">Open Url</string>
+    <string name="open_file">Open File</string>
+    <string name="select_app">Select App</string>
+    <string name="enter_url">Enter URL</string>
+    <string name="invalid_url">Invalid URL</string>
+    <string name="unselected_action">Unselected Action</string>
+    <string name="selected_action">Selected Action</string>
+    <string name="haptic_feedback">Haptic feedback</string>
+    <string name="text_emoji">Text / Emoji</string>
+    <string name="rgb_loading_settings">RGB loading settings</string>
+    <string name="rgb_line_selector">RGB line selector</string>
+    <string name="show_app_launch_preview">Show App launch preview</string>
+    <string name="show_app_circle_preview">Show App circle preview</string>
+    <string name="show_app_line_preview">Show App line preview</string>
+    <string name="show_app_angle_preview">Show App Angle preview. %1$s</string>
+    <string name="do_you_hate_it">" Do you hate it?"</string>
+    <string name="show_app_icon_angle_preview_in_center_of_start_dragging_position">Show App Icon angle preview in center of start dragging position</string>
+    <string name="line_preview_snap_to_action">Line Preview snap to action</string>
+    <string name="icon_packs_found">%1$d icon packs found</string>
+    <string name="default_text">Default</string>
 </resources>

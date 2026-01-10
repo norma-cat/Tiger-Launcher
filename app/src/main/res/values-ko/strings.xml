@@ -262,4 +262,25 @@
     <string name="rotation">회전</string>
     <string name="scale_x">스케일 X</string>
     <string name="scale_y">Y 척도</string>
+    <string name="open_app">앱 열어</string>
+    <string name="open_url">오픈 URL</string>
+    <string name="open_file">오픈 파일</string>
+    <string name="select_app">셀렉트 앱</string>
+    <string name="enter_url">URL을 입력하세요</string>
+    <string name="invalid_url">잘못된 URL</string>
+    <string name="unselected_action">선택되지 않은 작업</string>
+    <string name="selected_action">선택한 작업</string>
+    <string name="haptic_feedback">햅틱 피드백</string>
+    <string name="text_emoji">텍스트/이모지</string>
+    <string name="rgb_loading_settings">RGB 로딩 설정</string>
+    <string name="rgb_line_selector">RGB 라인 선택기</string>
+    <string name="show_app_launch_preview">앱 실행 미리보기 표시</string>
+    <string name="show_app_circle_preview">앱서클 미리보기 표시</string>
+    <string name="show_app_line_preview">앱 라인 미리보기 표시</string>
+    <string name="show_app_angle_preview">앱 각도 미리보기를 표시합니다. %1$s</string>
+    <string name="do_you_hate_it">\"당신은 그것을 싫어합니까\?\"</string>
+    <string name="show_app_icon_angle_preview_in_center_of_start_dragging_position">드래그 시작 위치 중앙에 앱 아이콘 각도 미리보기 표시</string>
+    <string name="line_preview_snap_to_action">라인 미리보기 스냅 투 액션</string>
+    <string name="icon_packs_found">%1$d개의 아이콘 팩이 발견되었습니다.</string>
+    <string name="default_text">기본</string>
 </resources>

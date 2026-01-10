@@ -262,4 +262,25 @@
     <string name="rotation">Rotación</string>
     <string name="scale_x">Escala X</string>
     <string name="scale_y">Escala Y</string>
+    <string name="open_app">Open App</string>
+    <string name="open_url">URL abierta</string>
+    <string name="open_file">Archivo abierto</string>
+    <string name="select_app">Seleccionar la aplicación</string>
+    <string name="enter_url">Ingrese la URL</string>
+    <string name="invalid_url">URL no válida</string>
+    <string name="unselected_action">Acción no seleccionada</string>
+    <string name="selected_action">Acción seleccionada</string>
+    <string name="haptic_feedback">Retroalimentación háptica</string>
+    <string name="text_emoji">Texto/Emoji</string>
+    <string name="rgb_loading_settings">Configuración de carga RGB</string>
+    <string name="rgb_line_selector">Selector de línea RGB</string>
+    <string name="show_app_launch_preview">Mostrar vista previa del inicio de la aplicación</string>
+    <string name="show_app_circle_preview">Mostrar vista previa del círculo de aplicaciones</string>
+    <string name="show_app_line_preview">Mostrar vista previa de la línea de la aplicación</string>
+    <string name="show_app_angle_preview">Mostrar vista previa del ángulo de la aplicación. %1$s</string>
+    <string name="do_you_hate_it">\"¿Lo odias\?\"</string>
+    <string name="show_app_icon_angle_preview_in_center_of_start_dragging_position">Mostrar vista previa del ángulo del ícono de la aplicación en el centro de la posición de inicio de arrastre</string>
+    <string name="line_preview_snap_to_action">Vista previa de línea: ajuste a la acción</string>
+    <string name="icon_packs_found">%1$d paquetes de iconos encontrados</string>
+    <string name="default_text">Por defecto</string>
 </resources>

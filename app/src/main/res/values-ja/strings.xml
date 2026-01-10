@@ -262,4 +262,25 @@
     <string name="rotation">回転</string>
     <string name="scale_x">スケールX</string>
     <string name="scale_y">スケールY</string>
+    <string name="open_app">アプリを開く</string>
+    <string name="open_url">オープンURL(オープンURL)</string>
+    <string name="open_file">オープンファイル</string>
+    <string name="select_app">セレクトアプリ</string>
+    <string name="enter_url">URLを入力してください</string>
+    <string name="invalid_url">無効な URL</string>
+    <string name="unselected_action">選択されていないアクション</string>
+    <string name="selected_action">選択したアクション</string>
+    <string name="haptic_feedback">触覚フィードバック</string>
+    <string name="text_emoji">テキスト/絵文字</string>
+    <string name="rgb_loading_settings">RGB読み込み設定</string>
+    <string name="rgb_line_selector">RGBラインセレクター</string>
+    <string name="show_app_launch_preview">アプリ起動プレビューを表示</string>
+    <string name="show_app_circle_preview">アプリサークルのプレビューを表示</string>
+    <string name="show_app_line_preview">アプリラインのプレビューを表示</string>
+    <string name="show_app_angle_preview">アプリアングルのプレビューを表示します。 %1$s</string>
+    <string name="do_you_hate_it">「嫌いですか？」</string>
+    <string name="show_app_icon_angle_preview_in_center_of_start_dragging_position">ドラッグ開始位置の中心にアプリアイコンの角度プレビューを表示</string>
+    <string name="line_preview_snap_to_action">ラインプレビューのアクションへのスナップ</string>
+    <string name="icon_packs_found">%1$d 個のアイコン パックが見つかりました</string>
+    <string name="default_text">デフォルト</string>
 </resources>

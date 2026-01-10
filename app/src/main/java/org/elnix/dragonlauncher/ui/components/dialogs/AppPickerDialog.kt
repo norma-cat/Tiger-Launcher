@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -85,7 +84,9 @@ fun AppPickerDialog(
         workspaceViewModel.selectWorkspace(workspaceId)
     }
 
-    AlertDialog(
+    CustomAlertDialog(
+        alignment = Alignment.Center,
+        modifier = Modifier.padding(15.dp).height(700.dp),
         onDismissRequest = onDismiss,
         title = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -98,7 +99,7 @@ fun AppPickerDialog(
                 ) {
                     if (!isSearchBarEnabled) {
                         Text(
-                            text = "Select App",
+                            text = stringResource(R.string.select_app),
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.weight(1f)
                         )
@@ -119,7 +120,7 @@ fun AppPickerDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.RestartAlt,
-                                contentDescription = "Reload apps"
+                                contentDescription = stringResource(R.string.reload_apps)
                             )
                         }
                     } else {
@@ -187,7 +188,7 @@ fun AppPickerDialog(
         text = {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.height(350.dp)
+                modifier = Modifier.height(700.dp)
             ) { pageIndex ->
 
                 val workspace = workspaces[pageIndex]

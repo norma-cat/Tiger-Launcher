@@ -249,7 +249,7 @@ fun IconEditorDialog(
                                 )
                                 .padding(12.dp)
                         ) {
-                            Text("Text / Emoji", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.text_emoji), fontWeight = FontWeight.Bold)
                             Spacer(Modifier.height(8.dp))
                             TextField(
                                 value = textValue,

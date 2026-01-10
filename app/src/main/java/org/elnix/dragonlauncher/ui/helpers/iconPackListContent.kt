@@ -26,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.ui.drawer.IconPackInfo
 
 fun LazyListScope.iconPackListContent(
@@ -40,7 +42,7 @@ fun LazyListScope.iconPackListContent(
 
     item {
         Text(
-            text = "${packs.size} icon packs found",
+            text = stringResource(R.string.icon_packs_found, packs.size),
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -121,11 +123,11 @@ fun LazyListScope.iconPackListContent(
 
                     Column {
                         Text(
-                            text = "Default",
+                            text = stringResource(R.string.default_text),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            text = "Use original app icon",
+                            text = stringResource(R.string.use_original_app_icon),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

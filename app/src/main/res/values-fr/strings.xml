@@ -262,4 +262,25 @@
     <string name="rotation">Rotation</string>
     <string name="scale_x">Échelle X</string>
     <string name="scale_y">Gamme Y</string>
+    <string name="open_app">Open App</string>
+    <string name="open_url">URL ouverte</string>
+    <string name="open_file">Fichier ouvert</string>
+    <string name="select_app">Select App</string>
+    <string name="enter_url">Entrez l\'URL</string>
+    <string name="invalid_url">URL invalide</string>
+    <string name="unselected_action">Action non sélectionnée</string>
+    <string name="selected_action">Action sélectionnée</string>
+    <string name="haptic_feedback">Retour haptique</string>
+    <string name="text_emoji">Texte / Emoji</string>
+    <string name="rgb_loading_settings">Paramètres de chargement RVB</string>
+    <string name="rgb_line_selector">Sélecteur de ligne RVB</string>
+    <string name="show_app_launch_preview">Afficher l\'aperçu du lancement de l\'application</string>
+    <string name="show_app_circle_preview">Afficher l\'aperçu du cercle d\'applications</string>
+    <string name="show_app_line_preview">Afficher l\'aperçu de la ligne d\'application</string>
+    <string name="show_app_angle_preview">Afficher l\'aperçu de l\'angle de l\'application. %1$s</string>
+    <string name="do_you_hate_it">\" Est-ce que tu détestes ça \? \"</string>
+    <string name="show_app_icon_angle_preview_in_center_of_start_dragging_position">Afficher l\'aperçu de l\'angle de l\'icône de l\'application au centre de la position de début du glissement</string>
+    <string name="line_preview_snap_to_action">Aperçu de la ligne instantané à l\'action</string>
+    <string name="icon_packs_found">%1$d packs d\'icônes trouvés</string>
+    <string name="default_text">Défaut</string>
 </resources>

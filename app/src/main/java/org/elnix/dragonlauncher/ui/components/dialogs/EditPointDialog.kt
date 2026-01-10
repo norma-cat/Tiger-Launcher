@@ -168,13 +168,13 @@ fun EditPointDialog(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Unselected Action",
+                            text = stringResource(R.string.unselected_action),
                             style = MaterialTheme.typography.labelSmall
                         )
 
                         Spacer(Modifier.width(95.dp))
                         Text(
-                            text = "Selected Action",
+                            text = stringResource(R.string.selected_action),
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -428,7 +428,7 @@ fun EditPointDialog(
                     )
 
                     Text(
-                        text = "Haptic feedback",
+                        text = stringResource(R.string.haptic_feedback),
                         color = MaterialTheme.colorScheme.onSurface.adjustBrightness(0.7f)
                     )
                 }
