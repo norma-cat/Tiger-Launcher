@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.data.dummySwipePoint
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.SETTINGS
 import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
@@ -34,7 +35,6 @@ import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 
 
 @Composable
@@ -85,9 +85,6 @@ fun AppearanceTab(
     val showAllActionsOnCurrentCircle by UiSettingsStore.getShowAllActionsOnCurrentCircle(ctx)
         .collectAsState(initial = false)
 
-    val showActionIconBorder by UiSettingsStore.getShowActionIconBorder(ctx)
-        .collectAsState(initial = false)
-
     val appLabelIconOverlayTopPadding by UiSettingsStore.getAppLabelIconOverlayTopPadding(ctx)
         .collectAsState(initial = 30)
     var isDraggingAppLabelIcon by remember { mutableStateOf(false) }
@@ -100,7 +97,6 @@ fun AppearanceTab(
         targetValue = if (isDraggingAppLabelIcon) 0.dp else (-20).dp,
         animationSpec = tween(150)
     )
-    val extraColors = LocalExtraColors.current
 
     val icons = emptyMap<String, ImageBitmap>()
 
@@ -279,23 +275,14 @@ fun AppearanceTab(
                 text = stringResource(R.string.show_all_actions_on_current_circle),
             ) { scope.launch { UiSettingsStore.setShowAllActionsOnCurrentCircle(ctx, it) } }
         }
-
-        item {
-            SwitchRow(
-                state = showActionIconBorder,
-                text = stringResource(R.string.show_actions_icon_border),
-            ) { scope.launch { UiSettingsStore.setShowActionIconBorder(ctx, it) } }
-        }
     }
 
     if (isDraggingAppLabelIcon) {
         AppPreviewTitle(
             offsetY = offsetY,
             alpha = alpha,
-            icons = icons,
-            currentAction = SwipeActionSerializable.OpenDragonLauncherSettings,
-            extraColors = extraColors,
-            label = stringResource(R.string.dragon_launcher_settings),
+            pointIcons = icons,
+            point = dummySwipePoint(SwipeActionSerializable.OpenDragonLauncherSettings),
             topPadding = appLabelIconOverlayTopPadding.dp,
             showLabel = showLaunchingAppLabel,
             showIcon = showLaunchingAppIcon

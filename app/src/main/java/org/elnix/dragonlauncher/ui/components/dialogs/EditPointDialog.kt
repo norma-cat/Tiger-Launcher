@@ -3,7 +3,6 @@
 package org.elnix.dragonlauncher.ui.components.dialogs
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,11 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Restore
@@ -29,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -47,8 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.defaultSwipePointsValues
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
@@ -57,7 +53,6 @@ import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.elnix.dragonlauncher.utils.colors.adjustBrightness
@@ -76,7 +71,6 @@ fun EditPointDialog(
     val ctx = LocalContext.current
     val extraColors = LocalExtraColors.current
 
-
     var editPoint by remember { mutableStateOf(point) }
     var showEditIconDialog by remember { mutableStateOf(false) }
     var showEditActionDialog by remember { mutableStateOf(false) }
@@ -84,21 +78,34 @@ fun EditPointDialog(
     val circleColor by ColorSettingsStore.getCircleColor(ctx)
         .collectAsState(initial = AmoledDefault.CircleColor)
 
-    val icons by appsViewModel.icons.collectAsState()
+    val pointIcons by appsViewModel.pointIcons.collectAsState()
 
     val backgroundSurfaceColor = MaterialTheme.colorScheme.surface.adjustBrightness(0.7f)
 
     val currentActionColor = actionColor(editPoint.action, extraColors)
 
-    val label = actionLabel(editPoint.action)
-    val actionColor = actionColor(editPoint.action, extraColors)
+    val label = actionLabel(editPoint.action, editPoint.customName)
+    val actionColor = actionColor(editPoint.action, extraColors, editPoint.customActionColor?.let{ Color(it) })
+
+    LaunchedEffect(
+        editPoint.action,
+        editPoint.customIcon,
+        editPoint.customActionColor
+    ) {
+        appsViewModel.reloadPointIcon(
+            ctx = ctx,
+            point = editPoint,
+//            tint = actionColor(editPoint.action, extraColors)
+        )
+    }
 
 
     CustomAlertDialog(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier
+            .padding(16.dp)
+            .height(700.dp),
         onDismissRequest = onDismiss,
         imePadding = false,
-        scroll = false,
         alignment = Alignment.Center,
         confirmButton = {
             ValidateCancelButtons(
@@ -136,6 +143,7 @@ fun EditPointDialog(
                                 action = editPoint.action,
                                 id = editPoint.id
                             )
+
                         }
                     ) {
                         Icon(
@@ -181,9 +189,8 @@ fun EditPointDialog(
                         val drawScope = this
 
                         // Left action
-                        actionsInCircle(
+                        drawScope.actionsInCircle(
                             selected = false,
-                            drawScope = drawScope,
                             point = editPoint,
                             nests = emptyList(),
                             px = center.x - actionSpacing,
@@ -191,15 +198,14 @@ fun EditPointDialog(
                             ctx = ctx,
                             circleColor = circleColor,
                             colorAction = actionColor(editPoint.action, extraColors),
-                            icons = icons,
+                            pointIcons = pointIcons,
                             preventBgErasing = true
                         )
 
                         // Right action
                         // Left action
-                        actionsInCircle(
+                        drawScope.actionsInCircle(
                             selected = true,
-                            drawScope = drawScope,
                             point = editPoint,
                             nests = emptyList(),
                             px = center.x + actionSpacing,
@@ -207,20 +213,16 @@ fun EditPointDialog(
                             ctx = ctx,
                             circleColor = circleColor,
                             colorAction = actionColor(editPoint.action, extraColors),
-                            icons = icons,
+                            pointIcons = pointIcons,
                             preventBgErasing = true
                         )
                     }
                 }
             }
-
         },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(5.dp),
-                modifier = Modifier
-                    .height(500.dp)
-                    .verticalScroll(rememberScrollState())
             ) {
 
                 Row(
@@ -241,19 +243,6 @@ fun EditPointDialog(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Image(
-                            painter = BitmapPainter(
-                                actionIconBitmap(
-                                    icons,
-                                    editPoint.action,
-                                    ctx,
-                                    tintColor = actionColor
-                                )
-                            ),
-                            contentDescription = label,
-                            modifier = Modifier.size(22.dp)
-                        )
-
                         Text(
                             text = label,
                             color = actionColor,
@@ -421,8 +410,8 @@ fun EditPointDialog(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                         .clickable(false) {
-                            if (editPoint.haptic == null) editPoint.haptic = true
-                            else editPoint.haptic = !editPoint.haptic!!
+                            if (editPoint.haptic == null) editPoint.copy(haptic = true)
+                            else editPoint = editPoint.copy(haptic = editPoint.haptic)
 
                         }
                         .padding(8.dp)
@@ -432,7 +421,8 @@ fun EditPointDialog(
                         checked = editPoint.haptic
                             ?: defaultSwipePointsValues.haptic!!,
                         onCheckedChange = {
-                            editPoint.haptic = it
+                            if (editPoint.haptic == null) editPoint.copy(haptic = true)
+                            else editPoint = editPoint.copy(haptic = editPoint.haptic)
                         },
                         colors = AppObjectsColors.checkboxColors()
                     )
@@ -448,11 +438,13 @@ fun EditPointDialog(
     )
 
     if (showEditIconDialog) {
-        IconPickerDialog(
+        IconEditorDialog(
+            point = editPoint,
             appsViewModel = appsViewModel,
-            onDismiss = { showEditIconDialog = false}
+            onDismiss = { showEditIconDialog = false }
         ) {
-            editPoint.customIcon = it
+            showEditIconDialog = false
+            editPoint = editPoint.copy(customIcon = it)
         }
     }
     if (showEditActionDialog) {

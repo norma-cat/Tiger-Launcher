@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -17,10 +18,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.withSave
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
+import org.elnix.dragonlauncher.data.helpers.CustomIconSerializable
+import org.elnix.dragonlauncher.data.helpers.IconType
 import org.elnix.dragonlauncher.data.targetPackage
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
+import org.elnix.dragonlauncher.utils.ImageUtils
 import org.elnix.dragonlauncher.utils.loadShortcutIcon
 
 @Composable
@@ -42,44 +47,181 @@ fun ActionIcon(
     action: SwipeActionSerializable,
     icons: Map<String, ImageBitmap>,
     modifier: Modifier = Modifier,
-    size: Int = 48
+    size: Int = 48,
+    showLaunchAppVectorGrid: Boolean = false
 ) {
     val ctx = LocalContext.current
     val extraColors = LocalExtraColors.current
 
+
+    val bitmap: ImageBitmap? = when {
+        action is SwipeActionSerializable.LaunchApp && showLaunchAppVectorGrid ->
+            loadDrawableResAsBitmap(ctx, R.drawable.ic_app_grid, size, size)
+        else -> {
+            actionIconBitmap(
+                icons = icons,
+                action = action,
+                ctx = ctx,
+//                tintColor = actionColor(action, extraColors),
+                width = size,
+                height = size
+            )
+        }
+    }
+
+    if (bitmap == null) return
+
+
     Image(
-        painter = BitmapPainter(actionIconBitmap(
-            icons = icons,
-            action = action,
-            ctx = ctx,
-            tintColor = actionColor(action, extraColors),
-            width = size,
-            height = size
-        )),
+        bitmap = bitmap,
         contentDescription = null,
+        colorFilter = if (
+            action !is SwipeActionSerializable.LaunchApp &&
+            action !is SwipeActionSerializable.LaunchShortcut &&
+            action !is SwipeActionSerializable.OpenDragonLauncherSettings
+        ) ColorFilter.tint(actionColor(action, extraColors))
+        else null,
         modifier = modifier
     )
 }
+
 
 fun actionIconBitmap(
     icons: Map<String, ImageBitmap>,
     action: SwipeActionSerializable,
     ctx: Context,
-    tintColor: Color,
+//    tintColor: Color,
     width: Int = 48,
     height: Int = 48
 ): ImageBitmap {
-    val bitmap = createUntintedBitmap(action, ctx, icons, width, height)
-    return if (
-        action is SwipeActionSerializable.LaunchApp ||
-        action is SwipeActionSerializable.LaunchShortcut ||
-        action is SwipeActionSerializable.OpenDragonLauncherSettings
-    ) {
-        bitmap
-    } else {
-        tintBitmap(bitmap, tintColor)
-    }
+    return createUntintedBitmap(action, ctx, icons, width, height)
+//    return if (
+//        action is SwipeActionSerializable.LaunchApp ||
+//        action is SwipeActionSerializable.LaunchShortcut ||
+//        action is SwipeActionSerializable.OpenDragonLauncherSettings
+//    ) {
+//        bitmap
+//    } else {
+//        tintBitmap(bitmap, tintColor)
+//    }
 }
+
+
+fun resolveCustomIconBitmap(
+    base: ImageBitmap,
+    icon: CustomIconSerializable,
+    sizePx: Int
+): ImageBitmap {
+    // Step 1: choose source bitmap (override or base)
+    val sourceBitmap: ImageBitmap = when (icon.type) {
+        IconType.BITMAP,
+        IconType.ICON_PACK -> {
+            icon.source
+                ?.let { ImageUtils.base64ToImageBitmap(it) }
+                ?: base
+        }
+
+        IconType.TEXT -> {
+            icon.source?.let {
+                ImageUtils.textToBitmap(
+                    text = it,
+                    sizePx = sizePx
+                )
+            } ?: base
+        }
+
+        IconType.PLAIN_COLOR -> icon.source?.let {
+            try {
+                val sourceColor = Color(it.toInt())
+                val bmp = createDefaultBitmap(sizePx, sizePx)
+                tintBitmap(bmp, sourceColor)
+            } catch (_: Exception) {
+                base
+            }
+        } ?: base
+
+        IconType.SHAPE,
+        null -> base
+    }
+
+    // Step 2: prepare output bitmap
+    val outBitmap = createBitmap(sizePx, sizePx)
+    val canvas = Canvas(outBitmap)
+
+    val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+
+    // Step 3: opacity
+    paint.alpha = ((icon.opacity ?: 1f).coerceIn(0f, 1f) * 255).toInt()
+
+    // Step 4: color tint
+    icon.tint?.let {
+        paint.colorFilter = android.graphics.PorterDuffColorFilter(
+            it.toInt(),
+            android.graphics.PorterDuff.Mode.SRC_IN
+        )
+    }
+
+    // Step 5: blend mode (best-effort)
+    icon.blendMode?.let {
+        paint.xfermode = when (it.uppercase()) {
+            "MULTIPLY" -> android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.MULTIPLY)
+            "SCREEN" -> android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SCREEN)
+            "OVERLAY" -> android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.OVERLAY)
+            else -> null
+        }
+    }
+
+    // Step 6: shadow
+    if (icon.shadowRadius != null) {
+        paint.setShadowLayer(
+            icon.shadowRadius,
+            icon.shadowOffsetX ?: 0f,
+            icon.shadowOffsetY ?: 0f,
+            (icon.shadowColor ?: 0x55000000).toInt()
+        )
+    }
+
+    // Step 7: transform (scale + rotation)
+    canvas.withSave {
+
+        val scaleX = icon.scaleX ?: 1f
+        val scaleY = icon.scaleY ?: 1f
+        val rotation = icon.rotationDeg ?: 0f
+
+        canvas.translate(sizePx / 2f, sizePx / 2f)
+        canvas.rotate(rotation)
+        canvas.scale(scaleX, scaleY)
+        canvas.translate(-sizePx / 2f, -sizePx / 2f)
+
+        // Step 8: draw bitmap
+        canvas.drawBitmap(
+            sourceBitmap.asAndroidBitmap(),
+            null,
+            android.graphics.Rect(0, 0, sizePx, sizePx),
+            paint
+        )
+
+    }
+
+    // Step 9: stroke (rectangular, corner clipping is UI-level)
+    if (icon.strokeWidth != null && icon.strokeColor != null) {
+        val strokePaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+            style = android.graphics.Paint.Style.STROKE
+            strokeWidth = icon.strokeWidth
+            color = icon.strokeColor.toInt()
+        }
+        canvas.drawRect(
+            0f,
+            0f,
+            sizePx.toFloat(),
+            sizePx.toFloat(),
+            strokePaint
+        )
+    }
+
+    return outBitmap.asImageBitmap()
+}
+
 
 private fun createUntintedBitmap(
     action: SwipeActionSerializable,

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -29,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,8 +35,8 @@ import androidx.compose.ui.unit.sp
 import org.elnix.dragonlauncher.data.SwipeActionSerializable
 import org.elnix.dragonlauncher.ui.components.dialogs.AddPointDialog
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
+import org.elnix.dragonlauncher.utils.actions.ActionIcon
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.actionLabel
 import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
 import org.elnix.dragonlauncher.utils.models.AppsViewModel
@@ -60,9 +58,8 @@ fun CustomActionSelector(
     onSelected: (SwipeActionSerializable) -> Unit
 ) {
     val extraColors = LocalExtraColors.current
-    val ctx = LocalContext.current
 
-    val icons by appsViewModel.icons.collectAsState()
+    val pointIcons by appsViewModel.pointIcons.collectAsState()
 
     var showDialog by remember { mutableStateOf(false) }
 
@@ -99,16 +96,23 @@ fun CustomActionSelector(
                     .weight(1f)
                     .padding(start = 12.dp)
             ) {
-                Icon(
-                    bitmap = actionIconBitmap(
-                        icons = icons,
-                        action = currentAction,
-                        ctx = ctx,
-                        tintColor = actionColor
-                    ),
-                    contentDescription = actionLabel(currentAction),
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(22.dp)
+//                Icon(
+//                    bitmap = actionIconBitmap(
+//                        icons = icons,
+//                        action = currentAction,
+//                        ctx = ctx,
+//                        tintColor = actionColor
+//                    ),
+//                    contentDescription = actionLabel(currentAction),
+//                    tint = Color.Unspecified,
+//                    modifier = Modifier.size(22.dp)
+//                )
+
+                ActionIcon(
+                    action = currentAction,
+                    icons = pointIcons,
+                    modifier = Modifier.size(30.dp),
+                    showLaunchAppVectorGrid = true
                 )
 
                 Text(

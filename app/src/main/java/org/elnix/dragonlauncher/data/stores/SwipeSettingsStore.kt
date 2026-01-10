@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 import org.elnix.dragonlauncher.data.BaseSettingsStore
 import org.elnix.dragonlauncher.data.CircleNest
 import org.elnix.dragonlauncher.data.SwipeJson
-import org.elnix.dragonlauncher.data.SwipePointSerializable
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.data.swipeDataStore
 import org.json.JSONArray
 import org.json.JSONObject

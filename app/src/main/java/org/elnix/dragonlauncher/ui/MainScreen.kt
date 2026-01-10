@@ -39,9 +39,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.SwipePointSerializable
 import org.elnix.dragonlauncher.data.dummySwipePoint
 import org.elnix.dragonlauncher.data.helpers.FloatingAppObject
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
@@ -76,6 +76,7 @@ fun MainScreen(
     onLongPress3Sec: () -> Unit
 ) {
     val ctx = LocalContext.current
+//    val extraColors = LocalExtraColors.current
     val scope = rememberCoroutineScope()
 
     var showFilePicker: SwipePointSerializable? by remember { mutableStateOf(null) }
@@ -113,6 +114,7 @@ fun MainScreen(
 
 
     val icons by appsViewModel.icons.collectAsState()
+    val pointIcons by appsViewModel.pointIcons.collectAsState()
 
     var start by remember { mutableStateOf<Offset?>(null) }
     var current by remember { mutableStateOf<Offset?>(null) }
@@ -157,7 +159,6 @@ fun MainScreen(
     val points by SwipeSettingsStore.getPointsFlow(ctx).collectAsState(emptyList())
     val nests by SwipeSettingsStore.getNestsFlow(ctx).collectAsState(emptyList())
 
-
     val nestNavigation = rememberNestNavigation(nests)
     val nestId = nestNavigation.nestId
 
@@ -165,6 +166,16 @@ fun MainScreen(
     val dm = ctx.resources.displayMetrics
     val density = LocalDensity.current
     val cellSizePx = floatingAppsViewModel.cellSizePx
+
+    LaunchedEffect(points, nestId) {
+        appsViewModel.preloadPointIcons(
+            ctx = ctx,
+            points = points.filter { it.nestId == nestId },
+//            tintProvider = { p -> actionColor(p.action, extraColors) },
+            sizePx = 56
+        )
+    }
+
 
 
     fun launchAction(point: SwipePointSerializable?) {
@@ -351,13 +362,13 @@ fun MainScreen(
         }
 
         MainScreenOverlay(
-            icons = icons,
             start = start,
             current = current,
             nestId = nestId,
             isDragging = isDragging,
             surface = size,
             points = points,
+            pointIcons = pointIcons,
             nests = nests,
             onLaunch = { launchAction(it) }
         )

@@ -18,10 +18,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.AppsSettingsStore
+import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.drawer.AppModel
 import org.elnix.dragonlauncher.ui.drawer.AppOverride
@@ -34,9 +37,12 @@ import org.elnix.dragonlauncher.utils.APPS_TAG
 import org.elnix.dragonlauncher.utils.ICONS_TAG
 import org.elnix.dragonlauncher.utils.PackageManagerCompat
 import org.elnix.dragonlauncher.utils.TAG
+import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
 import org.elnix.dragonlauncher.utils.actions.loadDrawableAsBitmap
+import org.elnix.dragonlauncher.utils.actions.resolveCustomIconBitmap
 import org.elnix.dragonlauncher.utils.logs.logD
 import org.elnix.dragonlauncher.utils.logs.logE
+import org.elnix.dragonlauncher.utils.logs.logI
 import org.xmlpull.v1.XmlPullParser
 
 
@@ -44,8 +50,16 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _apps = MutableStateFlow<List<AppModel>>(emptyList())
     val allApps: StateFlow<List<AppModel>> = _apps.asStateFlow()
+
+    private val _packIcons = MutableStateFlow<Map<String, ImageBitmap>>(emptyMap())
+    val packIcons: StateFlow<Map<String, ImageBitmap>> = _packIcons.asStateFlow()
+
     private val _icons = MutableStateFlow<Map<String, ImageBitmap>>(emptyMap())
     val icons: StateFlow<Map<String, ImageBitmap>> = _icons
+
+    private val _pointIcons = MutableStateFlow<Map<String, ImageBitmap>>(emptyMap())
+    val pointIcons: StateFlow<Map<String, ImageBitmap>> = _pointIcons
+
 
 
     // Only used for preview, the real user apps getter are using the appsForWorkspace function
@@ -180,6 +194,17 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
             _apps.value = apps.toList()
             _icons.value = loadIcons(apps)
 
+            invalidateAllPointIcons()
+
+            val points = SwipeSettingsStore.getPoints(ctx)
+
+            preloadPointIcons(
+                ctx = ctx,
+                points = points,
+                sizePx = 48,
+                reloadAll = true
+            )
+
 
             withContext(Dispatchers.IO) {
                 AppsSettingsStore.saveCachedApps(ctx, gson.toJson(apps))
@@ -189,6 +214,94 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
 
         } catch (e: Exception) {
             logE(APPS_TAG, e.toString())
+        }
+    }
+
+
+    fun renderPointIcon(
+        ctx: Context,
+        point: SwipePointSerializable,
+        sizePx: Int
+    ): ImageBitmap {
+
+        logD(ICONS_TAG, "Rendering ${point.id}")
+        val startTime = System.currentTimeMillis()
+        val base = actionIconBitmap(
+            icons = icons.value,
+            action = point.action,
+            ctx = ctx,
+            width = sizePx,
+            height = sizePx
+        )
+
+        val final = if (point.customIcon != null) {
+            resolveCustomIconBitmap(
+                base = base,
+                icon = point.customIcon,
+                sizePx = sizePx
+            )
+        } else {
+            base
+        }
+
+        logD(ICONS_TAG, "Rendered in ${point.id}, took ${System.currentTimeMillis() - startTime}ms")
+        return final
+    }
+
+    private fun invalidateAllPointIcons() {
+        _pointIcons.value = emptyMap()
+    }
+
+    fun preloadPointIcons(
+        ctx: Context,
+        points: List<SwipePointSerializable>,
+        sizePx: Int,
+        reloadAll: Boolean = false
+    ) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val newIcons = buildMap {
+                points.forEach { p ->
+                    val id = p.id ?: return@forEach
+                    if (_pointIcons.value.containsKey(id) && !reloadAll) return@forEach
+
+                    put(
+                        id,
+                        renderPointIcon(
+                            ctx = ctx,
+                            point = p,
+                            sizePx = sizePx
+                        )
+                    )
+                }
+            }
+
+            if (newIcons.isNotEmpty()) {
+                _pointIcons.update { it + newIcons }
+            }
+        }
+    }
+
+
+    fun reloadPointIcon(
+        ctx: Context,
+        point: SwipePointSerializable,
+        sizePx: Int = 48
+    ) {
+        logI(ICONS_TAG, "Ensuring point icon: ${point.id}")
+
+        val id = point.id ?: return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val bmp = renderPointIcon(
+                ctx = ctx,
+                point = point,
+                sizePx = sizePx
+            )
+
+            _pointIcons.update { it + (id to bmp) }
+
+            logD(ICONS_TAG, "Updated _pointIcons")
+
         }
     }
 
@@ -218,6 +331,30 @@ class AppsViewModel(application: Application) : AndroidViewModel(application) {
             null
         }
     }
+
+    fun loadAllIconsFromPack(pack: IconPackInfo) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val mappings = iconPackCache.getOrPut(pack.packageName) {
+                loadIconPackMappings(ctx, pack.packageName)
+            }
+
+            if (mappings.isEmpty()) {
+                _packIcons.value = emptyMap()
+                return@launch
+            }
+
+            val result = LinkedHashMap<String, ImageBitmap>(mappings.size)
+
+            mappings.values.distinct().forEach { drawableName ->
+                val drawable = loadIconFromPack(pack.packageName, drawableName) ?: return@forEach
+                result[drawableName] = loadDrawableAsBitmap(drawable, 128, 128)
+            }
+
+            _packIcons.value = result
+        }
+    }
+
 
 
     private fun getCachedIconMapping(pkgName: String): String? {

@@ -6,20 +6,22 @@ import org.elnix.dragonlauncher.ui.theme.ExtraColors
 
 fun actionColor(
     action: SwipeActionSerializable?,
-    extra: ExtraColors
+    extra: ExtraColors,
+    customColor: Color? = null
 ): Color =
-    when (action) {
-        is SwipeActionSerializable.LaunchApp, is SwipeActionSerializable.LaunchShortcut, is SwipeActionSerializable.OpenWidget -> extra.launchApp
-        is SwipeActionSerializable.OpenUrl -> extra.openUrl
-        SwipeActionSerializable.NotificationShade -> extra.notificationShade
-        SwipeActionSerializable.ControlPanel -> extra.controlPanel
-        SwipeActionSerializable.OpenAppDrawer -> extra.openAppDrawer
-        SwipeActionSerializable.OpenDragonLauncherSettings -> extra.launcherSettings
-        SwipeActionSerializable.Lock -> extra.lock
-        is SwipeActionSerializable.OpenFile -> extra.openFile
-        is SwipeActionSerializable.ReloadApps -> extra.reload
-        SwipeActionSerializable.OpenRecentApps -> extra.openRecentApps
-        null -> Color.Unspecified
-        is SwipeActionSerializable.OpenCircleNest -> extra.openCircleNest
-        SwipeActionSerializable.GoParentNest -> extra.goParentNest
-    }
+    customColor
+        ?: when (action) {
+            is SwipeActionSerializable.LaunchApp, is SwipeActionSerializable.LaunchShortcut, is SwipeActionSerializable.OpenWidget -> extra.launchApp
+            is SwipeActionSerializable.OpenUrl -> extra.openUrl
+            SwipeActionSerializable.NotificationShade -> extra.notificationShade
+            SwipeActionSerializable.ControlPanel -> extra.controlPanel
+            SwipeActionSerializable.OpenAppDrawer -> extra.openAppDrawer
+            SwipeActionSerializable.OpenDragonLauncherSettings -> extra.launcherSettings
+            SwipeActionSerializable.Lock -> extra.lock
+            is SwipeActionSerializable.OpenFile -> extra.openFile
+            is SwipeActionSerializable.ReloadApps -> extra.reload
+            SwipeActionSerializable.OpenRecentApps -> extra.openRecentApps
+            null -> Color.Unspecified
+            is SwipeActionSerializable.OpenCircleNest -> extra.openCircleNest
+            SwipeActionSerializable.GoParentNest -> extra.goParentNest
+        }

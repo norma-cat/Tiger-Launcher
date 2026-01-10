@@ -16,8 +16,8 @@ data class CustomIconSerializable(
 
     /**
      * Icon source reference.
-     * - VECTOR: resource name
-     * - BITMAP: URI or file path
+     * - BITMAP: base64-encoded image
+     * - ICON_PACK: base64-encoded image
      * - TEXT: emoji or glyph
      * - SHAPE: renderer-defined primitive
      */
@@ -31,10 +31,6 @@ data class CustomIconSerializable(
     /** Icon opacity multiplier (0.0 – 1.0). */
     @SerializedName("d")
     val opacity: Float? = null,
-
-    /** Explicit icon size in dp. */
-    @SerializedName("e")
-    val sizeDp: Float? = null,
 
     /** Per-corner radius override for icon clipping. */
     @SerializedName("f")
@@ -90,19 +86,19 @@ data class CustomIconSerializable(
  */
 enum class IconType {
 
-    /** Vector drawable or vector-based resource. */
-    VECTOR,
+    /** Icon sourced from an installed icon pack. */
+    ICON_PACK,
 
-    /** Bitmap image loaded from file or URI. */
+    /** icon sourced from and image (PNG, JPG, WEBP). */
     BITMAP,
 
     /** Text-based icon (emoji, glyph, font icon). */
     TEXT,
+    PLAIN_COLOR,
 
     /** Procedural or primitive shape rendered by code. */
     SHAPE
 }
-
 
 
 /**

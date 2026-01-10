@@ -40,18 +40,15 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.elnix.dragonlauncher.data.CircleNest
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.data.SwipePointSerializable
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
 import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
 import org.elnix.dragonlauncher.ui.theme.AmoledDefault
-import org.elnix.dragonlauncher.ui.theme.ExtraColors
 import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionLabel
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
@@ -59,13 +56,13 @@ import kotlin.math.sin
 
 @Composable
 fun MainScreenOverlay(
-    icons: Map<String, ImageBitmap>,
     start: Offset?,
     current: Offset?,
     nestId: Int,
     isDragging: Boolean,
     surface: IntSize,
     points: List<SwipePointSerializable>,
+    pointIcons: Map<String, ImageBitmap>,
     nests: List<CircleNest>,
     onLaunch: (SwipePointSerializable?) -> Unit
 ) {
@@ -97,8 +94,6 @@ fun MainScreenOverlay(
     val linePreviewSnapToAction by UiSettingsStore.getLinePreviewSnapToAction(ctx)
         .collectAsState(initial = false)
     val showAllActionsOnCurrentCircle by UiSettingsStore.getShowAllActionsOnCurrentCircle(ctx)
-        .collectAsState(initial = false)
-    val showActionIconBorder by UiSettingsStore.getShowActionIconBorder(ctx)
         .collectAsState(initial = false)
     val appLabelIconOverlayTopPadding by UiSettingsStore.getAppLabelIconOverlayTopPadding(ctx)
         .collectAsState(initial = 30)
@@ -411,32 +406,31 @@ fun MainScreenOverlay(
                                 val px = start.x + radius * sin(Math.toRadians(p.angleDeg)).toFloat()
                                 val py = start.y - radius * cos(Math.toRadians(p.angleDeg)).toFloat()
 
-                                actionsInCircle(
+                                this.actionsInCircle(
                                     selected = false,
-                                    drawScope = this,
                                     point = p,
                                     nests = nests,
+                                    px = px,
+                                    py = py,
+                                    ctx = ctx,
                                     circleColor = circleColor,
                                     colorAction = actionColor(p.action, extraColors),
-                                    px = px, py = py,
-                                    ctx = ctx,
-                                    icons = icons
+                                    pointIcons = pointIcons
                                 )
                             }
                         }
 
                         // Draw here the actual selected action (if requested)
                         if (showAppLaunchPreview) {
-                            actionsInCircle(
+                            this.actionsInCircle(
                                 selected = true,
-                                drawScope = this,
                                 point = point,
                                 nests = nests,
-                                px = px, py = py,
-                                ctx = ctx,
-                                colorAction = colorAction,
+                                px = px,
+                                py = py, ctx = ctx,
                                 circleColor = circleColor,
-                                icons = icons
+                                colorAction = colorAction,
+                                pointIcons = pointIcons
                             )
                         }
                     }
@@ -447,16 +441,15 @@ fun MainScreenOverlay(
                 if (showAppPreviewIconCenterStartPosition && hoveredPoint != null) {
                     val currentPoint = hoveredPoint!!
 
-                    actionsInCircle(
+                    this.actionsInCircle(
                         selected = false,
-                        drawScope = this,
                         point = currentPoint,
                         nests = nests,
-                        px = start.x, py = start.y,
-                        ctx = ctx,
-                        colorAction = colorAction,
+                        px = start.x,
+                        py = start.y, ctx = ctx,
                         circleColor = circleColor,
-                        icons = icons
+                        colorAction = colorAction,
+                        pointIcons = pointIcons
                     )
                 }
             }
@@ -467,43 +460,18 @@ fun MainScreenOverlay(
 
     // Label on top of the screen to indicate the launching app
     if (hoveredPoint != null && (showLaunchingAppLabel || showLaunchingAppIcon)) {
-        val currentAction = hoveredPoint!!.action
-        val label = actionLabel(currentAction)
+        val currentPoint = hoveredPoint!!
         AppPreviewTitle(
             offsetY = offsetY,
             alpha = alpha,
-            icons = icons,
-            currentAction = currentAction,
-            extraColors = extraColors,
-            label = label,
+            pointIcons = pointIcons,
+            point = currentPoint,
             topPadding = appLabelIconOverlayTopPadding.dp,
             showLabel = showLaunchingAppLabel,
             showIcon = showLaunchingAppIcon
         )
     }
-
-
-    // Debug to test calendar and alarms opening
-//    Row(
-//        modifier = Modifier.fillMaxWidth()
-//    ){
-//        Button(
-//            onClick = { openCalendar(ctx) },
-//            colors = AppObjectsColors.buttonColors()
-//        ) { Text("Test open calendar") }
-//
-//        Button(
-//            onClick = { openAlarmApp(ctx) },
-//            colors = AppObjectsColors.buttonColors()
-//        ) { Text("Test open alarm") }
-//    }
 }
-
-fun actionTint(action: SwipeActionSerializable, extraColors: ExtraColors): Color =
-    when (action) {
-        is SwipeActionSerializable.LaunchApp, SwipeActionSerializable.OpenDragonLauncherSettings  -> Color.Unspecified
-        else -> actionColor(action, extraColors)
-    }
 
 
 private fun actionLine(

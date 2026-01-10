@@ -13,32 +13,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.ui.theme.ExtraColors
+import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionIconBitmap
+import org.elnix.dragonlauncher.utils.actions.actionLabel
 
 @Composable
 fun AppPreviewTitle(
     offsetY: Dp,
     alpha: Float,
-    icons: Map<String, ImageBitmap>,
-    currentAction: SwipeActionSerializable,
-    extraColors: ExtraColors,
-    label: String,
+    pointIcons: Map<String, ImageBitmap>,
+    point: SwipePointSerializable,
     topPadding: Dp = 60.dp,
     showLabel: Boolean,
     showIcon: Boolean
 ) {
-    val ctx = LocalContext.current
 
+    val extraColors = LocalExtraColors.current
+
+    val label = actionLabel(point.action, point.customName)
+
+    val action = point.action
     if (showIcon || showLabel) {
         Box(
             Modifier
@@ -53,23 +54,18 @@ fun AppPreviewTitle(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (showIcon) {
-                    Image(
-                        painter = BitmapPainter(
-                            actionIconBitmap(
-                                icons,
-                                currentAction,
-                                ctx,
-                                tintColor = actionColor(currentAction, extraColors)
-                            )
-                        ),
-                        contentDescription = label,
-                        modifier = Modifier.size(22.dp)
-                    )
+                    pointIcons[point.id]?.let {
+                        Image(
+                            bitmap = it,
+                            contentDescription = null,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
                 }
                 if (showLabel) {
                     Text(
                         text = label,
-                        color = actionColor(currentAction, extraColors),
+                        color = actionColor(action, extraColors, point.customActionColor?.let { Color(it) }),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
