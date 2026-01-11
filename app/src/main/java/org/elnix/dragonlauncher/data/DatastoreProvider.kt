@@ -15,7 +15,6 @@ import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore
 import org.elnix.dragonlauncher.data.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.data.stores.UiSettingsStore
-import org.elnix.dragonlauncher.data.stores.WallpaperSettingsStore
 import org.elnix.dragonlauncher.data.stores.WorkspaceSettingsStore
 
 enum class DataStoreName(
@@ -36,7 +35,6 @@ enum class DataStoreName(
     APPS("appsDatastore","apps", AppsSettingsStore, false),
     BEHAVIOR("behaviorDatastore", "behavior", BehaviorSettingsStore),
     BACKUP("backupDatastore", "backup", BackupSettingsStore),
-    WALLPAPER("wallpaperDatastore", "wallpaper", WallpaperSettingsStore),
     STATUS_BAR("statusDatastore", "status_bar", StatusBarSettingsStore),
     FLOATING_APPS("floatingAppsDatastore", "floating_apps", FloatingAppsSettingsStore)
 }
@@ -48,7 +46,7 @@ val backupableStores = allStores.filter { it.userBackup }
 /**
  * All the stores, minus the 2 that hols big data (the wallpapers in b64 and the app cache)
  */
-val defaultDebugStores = allStores.filter { it.store != AppsSettingsStore && it.store != WallpaperSettingsStore }
+val defaultDebugStores = allStores.filter { it.store != AppsSettingsStore}
 
 val Context.uiDatastore by preferencesDataStore(name = DataStoreName.UI.value)
 val Context.colorModeDatastore by preferencesDataStore(name = DataStoreName.COLOR_MODE.value)
@@ -62,6 +60,5 @@ val Context.workspaceDataStore by preferencesDataStore(name = DataStoreName.WORK
 val Context.appDrawerDataStore by preferencesDataStore(name = DataStoreName.APPS.value)
 val Context.behaviorDataStore by preferencesDataStore(name = DataStoreName.BEHAVIOR.value)
 val Context.backupDatastore by preferencesDataStore(name = DataStoreName.BACKUP.value)
-val Context.wallpaperSettingsStore by preferencesDataStore(name = DataStoreName.WALLPAPER.value)
 val Context.statusBarDatastore by preferencesDataStore(name = DataStoreName.STATUS_BAR.value)
 val Context.floatingAppsDatastore by preferencesDataStore(name = DataStoreName.FLOATING_APPS.value)

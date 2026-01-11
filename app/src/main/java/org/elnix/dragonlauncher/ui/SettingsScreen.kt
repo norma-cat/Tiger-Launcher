@@ -72,6 +72,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
@@ -151,6 +152,8 @@ fun SettingsScreen(
     val ctx = LocalContext.current
     val extraColors = LocalExtraColors.current
     val scope = rememberCoroutineScope()
+
+    val backgroundColor = MaterialTheme.colorScheme.background
 
     val pointIcons by appsViewModel.pointIcons.collectAsState()
 
@@ -494,16 +497,22 @@ fun SettingsScreen(
                                 val py =
                                     center.y - circle.radius * cos(Math.toRadians(p.angleDeg)).toFloat()
 
+                                    val displayPoint = p.copy(
+                                        backgroundColor = p.backgroundColor ?: backgroundColor.toArgb(),
+                                        backgroundColorSelected = p.backgroundColorSelected
+                                            ?: backgroundColor.toArgb(),
+                                    )
+
                                     actionsInCircle(
                                         selected = p.id == selectedPoint?.id,
-                                        point = p,
+                                        point = displayPoint,
                                         nests = nests,
                                         px = px,
                                         py = py,
                                         ctx = ctx,
                                         circleColor = circleColor,
                                         colorAction = actionColor(p.action, extraColors),
-                                        pointIcons = pointIcons
+                                        pointIcons = pointIcons,
                                     )
                             }
                         }

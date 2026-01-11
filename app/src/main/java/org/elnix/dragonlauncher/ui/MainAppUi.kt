@@ -44,7 +44,6 @@ import org.elnix.dragonlauncher.data.stores.BackupSettingsStore
 import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
-import org.elnix.dragonlauncher.data.stores.WallpaperSettingsStore
 import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.components.dialogs.WidgetPickerDialog
 import org.elnix.dragonlauncher.ui.drawer.AppDrawerScreen
@@ -114,7 +113,6 @@ fun MainAppUi(
     appsViewModel: AppsViewModel,
     floatingAppsViewModel: FloatingAppsViewModel,
     navController: NavHostController,
-//    onLaunchWidgetPicker: (Intent) -> Unit,
     onBindCustomWidget: (Int, ComponentName) -> Unit,
     onLaunchSystemWidgetPicker: () -> Unit,
     onResetWidgetSize: (id: Int, widgetId: Int) -> Unit
@@ -172,13 +170,6 @@ fun MainAppUi(
 
     val showSetDefaultLauncherBanner by PrivateSettingsStore.getShowSetDefaultLauncherBanner(ctx)
         .collectAsState(initial = false)
-
-
-    val useMainWallpaper by WallpaperSettingsStore.getUseOnMain(ctx).collectAsState(initial = false)
-    val mainWallpaper by WallpaperSettingsStore.loadMainBlurredFlow(ctx).collectAsState(initial = null)
-    val useDrawerWallpaper by WallpaperSettingsStore.getUseOnDrawer(ctx).collectAsState(initial = false)
-    val drawerWallpaper by WallpaperSettingsStore.loadDrawerBlurredFlow(ctx).collectAsState(initial = null)
-
 
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -281,6 +272,13 @@ fun MainAppUi(
         }
     }
 
+    val containerColor =
+        if (currentRoute == ROUTES.DRAWER || currentRoute == ROUTES.MAIN || currentRoute == SETTINGS.WALLPAPER) {
+            Color.Transparent
+        } else {
+            MaterialTheme.colorScheme.background
+        }
+
 
     Scaffold(
         topBar = {
@@ -295,7 +293,8 @@ fun MainAppUi(
                 }
             }
         },
-        contentWindowInsets = WindowInsets(0)
+        contentWindowInsets = WindowInsets(0),
+        containerColor = containerColor,
     ) { paddingValues ->
         NavHost(
             navController = navController,
@@ -306,8 +305,6 @@ fun MainAppUi(
             composable(ROUTES.MAIN) {
                 MainScreen(
                     appsViewModel = appsViewModel,
-                    wallpaper = mainWallpaper,
-                    useWallpaper = useMainWallpaper,
                     onAppDrawer = { goDrawer() },
                     onGoWelcome = { goWelcome() },
                     onLongPress3Sec = { goSettingsRoot() },
@@ -326,9 +323,7 @@ fun MainAppUi(
                     leftAction = leftDrawerAction,
                     leftWidth = leftDrawerWidth,
                     rightAction = rightDrawerAction,
-                    rightWidth = rightDrawerWidth,
-                    wallpaper = drawerWallpaper,
-                    useWallpaper = useDrawerWallpaper,
+                    rightWidth = rightDrawerWidth
                 ) { goMainScreen() }
             }
 

@@ -39,19 +39,8 @@ class WallpaperHelper(private val context: Context) {
     }
 
 
-    // Unused cause I found out that getting the current wallpaper no android is very protected, so il only use my app data
-//    fun getCurrentWallpaper(): Drawable? {
-//        return try {
-//            val wallpaperManager = WallpaperManager.getInstance(context)
-//            wallpaperManager.drawable
-//        } catch (e: Exception) {
-//            logE("Wallpaper", "Failed to get wallpaper", e)
-//            null
-//        }
-//    }
-
-   fun createPlainWallpaperBitmap(context: Context, color: Color): Bitmap {
-        val displayMetrics = context.resources.displayMetrics
+   fun createPlainWallpaperBitmap(ctx: Context, color: Color): Bitmap {
+        val displayMetrics = ctx.resources.displayMetrics
         val width = displayMetrics.widthPixels
         val height = displayMetrics.heightPixels
 

@@ -1,10 +1,7 @@
 package org.elnix.dragonlauncher.ui.drawer
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.provider.Settings
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,8 +38,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -72,6 +67,7 @@ import org.elnix.dragonlauncher.utils.showToast
 @Composable
 fun AppDrawerScreen(
     appsViewModel: AppsViewModel,
+//    wallpaperViewModel: WallpaperViewModel,
     showIcons: Boolean,
     showLabels: Boolean,
     autoShowKeyboard: Boolean,
@@ -81,12 +77,23 @@ fun AppDrawerScreen(
     leftWidth: Float,
     rightAction: DrawerActions,
     rightWidth: Float,
-    wallpaper: Bitmap?,
-    useWallpaper: Boolean,
     onClose: () -> Unit
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
+
+
+
+//    val activity = LocalContext.current as? Activity
+//    val window = activity?.window
+//
+//    val drawerBlurRadius by wallpaperViewModel.blurRadiusDrawerScreen.collectAsState(0)
+//
+//    LaunchedEffect(Unit, drawerBlurRadius) {
+//        if (Build.VERSION.SDK_INT >= 31) {
+//            window?.setBackgroundBlurRadius(drawerBlurRadius)
+//        }
+//    }
 
     /* ───────────── Reload all apps asynchronously on entering drawer (icons + apps) ───────────── */
     LaunchedEffect(Unit) {
@@ -202,24 +209,26 @@ fun AppDrawerScreen(
         }
     }
 
-    if (useWallpaper) {
-        wallpaper?.let { bmp ->
-            Image(
-                bitmap = bmp.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
-    }
+//    if (useWallpaper) {
+//        wallpaper?.let { bmp ->
+//            Image(
+//                bitmap = bmp.asImageBitmap(),
+//                contentDescription = null,
+//                modifier = Modifier.fillMaxSize(),
+//                contentScale = ContentScale.Crop
+//            )
+//        }
+//    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .then(
-                if (!useWallpaper) Modifier.background(MaterialTheme.colorScheme.background)
-                else Modifier
-            )
+//            .background(Color.Transparent)
+
+//            .then(
+//                if (!useWallpaper) Modifier.background(MaterialTheme.colorScheme.background)
+//                else Modifier
+//            )
             .clickable(
                 enabled = clickEmptySpaceToRaiseKeyboard,
                 indication = null,

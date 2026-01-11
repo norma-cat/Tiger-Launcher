@@ -1,9 +1,7 @@
 package org.elnix.dragonlauncher.ui
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -12,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,11 +22,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -69,8 +64,7 @@ import org.elnix.dragonlauncher.utils.models.FloatingAppsViewModel
 fun MainScreen(
     appsViewModel: AppsViewModel,
     floatingAppsViewModel: FloatingAppsViewModel,
-    wallpaper: Bitmap?,
-    useWallpaper: Boolean,
+//    wallpaperViewModel: WallpaperViewModel,
     onAppDrawer: () -> Unit,
     onGoWelcome: () -> Unit,
     onLongPress3Sec: () -> Unit
@@ -149,6 +143,16 @@ fun MainScreen(
     /* ────────────────────────────────────────────── */
 
 
+//    val activity = LocalContext.current as? Activity
+//    val window = activity?.window
+//
+//    val mainBlurRadius by wallpaperViewModel.blurRadiusMainScreen.collectAsState(0)
+//
+//    LaunchedEffect(Unit, mainBlurRadius) {
+//        if (Build.VERSION.SDK_INT >= 31) {
+//            window?.setBackgroundBlurRadius(mainBlurRadius)
+//        }
+//    }
 
     LaunchedEffect(hasSeenWelcome) {
         if (!hasSeenWelcome) onGoWelcome()
@@ -217,31 +221,10 @@ fun MainScreen(
     }
 
 
-    // I should store a plain wallpaper color, and print it for performances and optimisations issues but nobody's using a plain color as wallpaper anyways
-    if (useWallpaper) {
-        wallpaper?.let { bmp ->
-            Image(
-                bitmap = bmp.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .onSizeChanged { size = it },
-                contentScale = ContentScale.Crop
-            )
-        }
-    } else {
-        // Moved the background drawing here for more clarity
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .onSizeChanged { size = it }
-        )
-    }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.Transparent)
             .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
