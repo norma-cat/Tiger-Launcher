@@ -36,6 +36,7 @@ fun detectSystemLauncher(ctx: Context): String? {
     val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
     // Method 1: Check foreground task (most reliable)
+    @Suppress("DEPRECATION")
     val task = am.getRunningTasks(1)?.firstOrNull()
     val topPkg = task?.topActivity?.packageName
     if (systemLaunchers.contains(topPkg)) {
@@ -64,7 +65,7 @@ fun detectSystemLauncher(ctx: Context): String? {
             val launcherActivity = pm.queryIntentActivities(homeIntent, 0)
                 .find { it.activityInfo.packageName == sysPkg }
             if (launcherActivity != null) return sysPkg
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Package not installed
         }
     }

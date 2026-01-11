@@ -44,9 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.DataStoreName
 import org.elnix.dragonlauncher.data.backupableStores
@@ -57,11 +55,11 @@ import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
+import org.elnix.dragonlauncher.ui.helpers.rememberSettingsImportLauncher
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
 import org.elnix.dragonlauncher.utils.formatDateTime
 import org.elnix.dragonlauncher.utils.getFilePathFromUri
-import org.elnix.dragonlauncher.utils.logs.logD
 import org.elnix.dragonlauncher.utils.logs.logE
 import org.elnix.dragonlauncher.utils.models.BackupResult
 import org.elnix.dragonlauncher.utils.models.BackupViewModel
@@ -140,63 +138,36 @@ fun BackupTab(
             }
         }
 
-    // ------------------------------------------------------------
-    // SETTINGS IMPORT LAUNCHER (File Picker)
-    // ------------------------------------------------------------
-    val settingsImportLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            ctx.logD("BackupManager", "File picked: $uri")
 
-            if (uri == null) {
-                backupViewModel.setResult(
-                    BackupResult(
-                        export = false,
-                        error = true,
-                        title = ctx.getString(R.string.import_cancelled)
-                    )
+
+    val settingsImportLauncher = rememberSettingsImportLauncher(
+        ctx = ctx,
+        scope = scope,
+        onCancel = {
+            backupViewModel.setResult(
+                BackupResult(
+                    export = false,
+                    error = true,
+                    title = ctx.getString(R.string.import_cancelled)
                 )
-                return@rememberLauncherForActivityResult
-            }
-
-            ctx.contentResolver.takePersistableUriPermission(
-                uri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
-
-            // Read JSON from selected file
-            scope.launch {
-                try {
-                    val jsonString = withContext(Dispatchers.IO) {
-                        ctx.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
-                    }
-
-                    if (jsonString.isNullOrBlank()) {
-                        backupViewModel.setResult(
-                            BackupResult(
-                                export = false,
-                                error = true,
-                                title = ctx.getString(R.string.import_failed),
-                                message = "Invalid or empty backup file"
-                            )
-                        )
-                        return@launch
-                    }
-
-                    importJson = JSONObject(jsonString)
-                    showImportDialog = true
-
-                } catch (e: Exception) {
-                    backupViewModel.setResult(
-                        BackupResult(
-                            export = false,
-                            error = true,
-                            title = ctx.getString(R.string.import_failed),
-                            message = "Failed to read backup file: ${e.message}"
-                        )
-                    )
-                }
-            }
+        },
+        onError = { msg ->
+            backupViewModel.setResult(
+                BackupResult(
+                    export = false,
+                    error = true,
+                    title = ctx.getString(R.string.import_failed),
+                    message = msg
+                )
+            )
+        },
+        onJsonReady = { json ->
+            importJson = json
+            showImportDialog = true
         }
+    )
+
 
     val autoBackupLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/json")

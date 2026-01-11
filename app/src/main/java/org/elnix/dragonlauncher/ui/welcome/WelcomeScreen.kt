@@ -3,10 +3,7 @@
 package org.elnix.dragonlauncher.ui.welcome
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,15 +33,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.DataStoreName
 import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.components.dialogs.ImportSettingsDialog
+import org.elnix.dragonlauncher.ui.helpers.rememberSettingsImportLauncher
 import org.elnix.dragonlauncher.utils.SettingsBackupManager
-import org.elnix.dragonlauncher.utils.logs.logD
 import org.elnix.dragonlauncher.utils.models.BackupResult
 import org.elnix.dragonlauncher.utils.models.BackupViewModel
 import org.json.JSONObject
@@ -65,64 +60,34 @@ fun WelcomeScreen(
     var importJson by remember { mutableStateOf<JSONObject?>(null) }
     var showImportDialog by remember { mutableStateOf(false) }
 
-    // ------------------------------------------------------------
-    // SETTINGS IMPORT LAUNCHER (File Picker)
-    // ------------------------------------------------------------
-    val settingsImportLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            ctx.logD("BackupManager", "File picked: $uri")
-
-            if (uri == null) {
-                backupVm.setResult(
-                    BackupResult(
-                        export = false,
-                        error = true,
-                        title = ctx.getString(R.string.import_cancelled)
-                    )
+    val settingsImportLauncher = rememberSettingsImportLauncher(
+        ctx = ctx,
+        scope = scope,
+        onCancel = {
+            backupVm.setResult(
+                BackupResult(
+                    export = false,
+                    error = true,
+                    title = ctx.getString(R.string.import_cancelled)
                 )
-                return@rememberLauncherForActivityResult
-            }
-
-            // take persistable permission as in the backup launcher, to automatically reset the auto backup if it was the same
-            ctx.contentResolver.takePersistableUriPermission(
-                uri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
-
-            // Read JSON from selected file
-            scope.launch {
-                try {
-                    val jsonString = withContext(Dispatchers.IO) {
-                        ctx.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
-                    }
-
-                    if (jsonString.isNullOrBlank()) {
-                        backupVm.setResult(
-                            BackupResult(
-                                export = false,
-                                error = true,
-                                title = ctx.getString(R.string.import_failed),
-                                message = "Invalid or empty backup file"
-                            )
-                        )
-                        return@launch
-                    }
-
-                    importJson = JSONObject(jsonString)
-                    showImportDialog = true
-
-                } catch (e: Exception) {
-                    backupVm.setResult(
-                        BackupResult(
-                            export = false,
-                            error = true,
-                            title = ctx.getString(R.string.import_failed),
-                            message = "Failed to read backup file: ${e.message}"
-                        )
-                    )
-                }
-            }
+        },
+        onError = { msg ->
+            backupVm.setResult(
+                BackupResult(
+                    export = false,
+                    error = true,
+                    title = ctx.getString(R.string.import_failed),
+                    message = msg
+                )
+            )
+        },
+        onJsonReady = { json ->
+            importJson = json
+            showImportDialog = true
         }
+    )
+
 
 
     // Prevent the user to quit
