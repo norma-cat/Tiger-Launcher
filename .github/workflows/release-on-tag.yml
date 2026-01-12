@@ -49,7 +49,7 @@ jobs:
           echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Build Release APK
-        run: ./gradlew assembleStableRelease assembleFdroidRelease
+        run: ./gradlew assembleStableRelease assembleStableFdroidRelease
 
       - name: Rename APK
         run: |
@@ -59,7 +59,7 @@ jobs:
           
           UNSIGNED="DragonLauncher-${{ env.VERSION }}-unsigned.apk"
           mv app/build/outputs/apk/stable/fdroidRelease/app-stable-fdroidRelease-unsigned.apk "UNSIGNED"
-          echo "UNSIGNED=UNSIGNED" >> $GITHUB_ENV
+          echo "UNSIGNED=$UNSIGNED" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
