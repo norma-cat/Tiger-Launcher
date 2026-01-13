@@ -49,7 +49,7 @@ jobs:
           echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Build Release APK
-        run: ./gradlew assembleStableRelease assembleStableFdroidRelease
+        run: ./gradlew assembleStableRelease assembleFdroidRelease
 
       - name: Rename APK
         run: |
