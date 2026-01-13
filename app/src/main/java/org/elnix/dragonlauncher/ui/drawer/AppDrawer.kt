@@ -95,10 +95,10 @@ fun AppDrawerScreen(
 //        }
 //    }
 
-    /* ───────────── Reload all apps asynchronously on entering drawer (icons + apps) ───────────── */
-    LaunchedEffect(Unit) {
-        scope.launch{ appsViewModel.reloadApps() }
-    }
+//    /* ───────────── Reload all apps asynchronously on entering drawer (icons + apps) ───────────── */
+//    LaunchedEffect(Unit) {
+//        scope.launch{ appsViewModel.reloadApps() }
+//    }
 
 
     val workspaceState by appsViewModel.enabledState.collectAsState()

@@ -122,8 +122,8 @@ fun ColorPickerRow(
                     modifier = Modifier
                         .clip(CircleShape)
                         .background(backgroundColor.adjustBrightness(0.8f))
-                        .padding(5.dp)
                         .clickable(enabled) { onColorPicked(randomColor(minLuminance = 0.2f, maxLuminance = maxLuminance)) }
+                        .padding(5.dp)
                 )
             }
 
@@ -137,8 +137,8 @@ fun ColorPickerRow(
                     modifier = Modifier
                         .clip(CircleShape)
                         .background(backgroundColor.adjustBrightness(0.8f))
-                        .padding(5.dp)
                         .clickable(enabled) { onColorPicked(defaultColor) }
+                        .padding(5.dp)
                 )
             }
 
@@ -331,10 +331,7 @@ private fun ColorPicker(
                 onClick = {
                     context.copyToClipboard(hexText)
                 },
-                colors = AppObjectsColors.iconButtonColors(
-                    backgroundColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                )
+                colors = AppObjectsColors.iconButtonColors()
             ) {
                 Icon(
                     imageVector = Icons.Default.ContentCopy,
@@ -353,10 +350,7 @@ private fun ColorPicker(
                         }
                     }
                 },
-                colors = AppObjectsColors.iconButtonColors(
-                    backgroundColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                )
+                colors = AppObjectsColors.iconButtonColors()
             ) {
                 Icon(
                     imageVector = Icons.Default.ContentPaste,

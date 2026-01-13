@@ -142,9 +142,7 @@ fun SettingItemWithExternalOpen(
 
         IconButton(
             onClick = onExtClick,
-            colors = AppObjectsColors.iconButtonColors(
-                backgroundColor = MaterialTheme.colorScheme.surface
-            ),
+            colors = AppObjectsColors.iconButtonColors(),
             modifier = Modifier
                 .size(52.dp),
             shape = RoundedCornerShape(12.dp)

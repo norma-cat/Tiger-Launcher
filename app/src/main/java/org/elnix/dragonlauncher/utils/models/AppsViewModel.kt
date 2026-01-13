@@ -134,14 +134,15 @@ class AppsViewModel(
 
 
     init {
-        loadWorkspaces()
-        loadApps()
         scope.launch {
+            loadWorkspaces()
+
             val savedPackName = UiSettingsStore.getIconPack(ctx)
             savedPackName?.let { pkg ->
                 loadIconsPacks()
                 _selectedIconPack.value = _iconPacksList.value.find { it.packageName == pkg }
             }
+            loadApps()
         }
     }
 
@@ -204,23 +205,21 @@ class AppsViewModel(
     }
 
 
-    private fun loadApps() {
-        scope.launch(Dispatchers.IO) {
-            val cachedJson = AppsSettingsStore.getCachedApps(ctx)
+    private suspend fun loadApps() {
+        val cachedJson = AppsSettingsStore.getCachedApps(ctx)
 
-            if (!cachedJson.isNullOrEmpty()) {
-                try {
-                    val type = object : TypeToken<List<AppModel>>() {}.type
-                    _apps.value = gson.fromJson(cachedJson, type) ?: emptyList()
-                } catch (e: Exception) {
-                    logE(TAG, "Failed to parse cached apps, clearing: ${e.message}")
-                    AppsSettingsStore.saveCachedApps(ctx, "") // Clear bad cache
-                    _apps.value = emptyList()
-                }
+        if (!cachedJson.isNullOrEmpty()) {
+            try {
+                val type = object : TypeToken<List<AppModel>>() {}.type
+                _apps.value = gson.fromJson(cachedJson, type) ?: emptyList()
+            } catch (e: Exception) {
+                logE(TAG, "Failed to parse cached apps, clearing: ${e.message}")
+                AppsSettingsStore.saveCachedApps(ctx, "") // Clear bad cache
+                _apps.value = emptyList()
             }
-
-            scope.launch { reloadApps() }
         }
+
+        scope.launch { reloadApps() }
     }
 
 
@@ -522,7 +521,7 @@ class AppsViewModel(
 
 
     /** Load the user's workspaces into the _state var, enforced safety due to some crash at start */
-    private fun loadWorkspaces() = scope.launch(Dispatchers.IO) {
+    private suspend fun loadWorkspaces()  {
         try {
             val json = WorkspaceSettingsStore.getAll(ctx).toString()
 

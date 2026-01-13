@@ -144,6 +144,7 @@ fun IconEditorDialog(
             ) {
                 Text(
                     text = stringResource(R.string.icon_editor),
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleLarge
                 )
 
@@ -186,7 +187,8 @@ fun IconEditorDialog(
                         selectedIcon = null
                         onReset?.invoke()
                         textValue = ""
-                    }
+                    },
+                    colors = AppObjectsColors.iconButtonColors(),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Restore,
@@ -221,9 +223,16 @@ fun IconEditorDialog(
                             textValue = ""
                         }
                     ) {
-                        Icon(Icons.Default.Image, null)
+                        Icon(
+                            imageVector = Icons.Default.Image,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
                         Spacer(Modifier.width(12.dp))
-                        Text(stringResource(R.string.pick_image))
+                        Text(
+                            text = stringResource(R.string.pick_image),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
 
 
@@ -244,7 +253,11 @@ fun IconEditorDialog(
                                 )
                                 .padding(12.dp)
                         ) {
-                            Text(stringResource(R.string.text_emoji), fontWeight = FontWeight.Bold)
+                            Text(
+                                stringResource(R.string.text_emoji),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold
+                            )
                             Spacer(Modifier.height(8.dp))
                             TextField(
                                 value = textValue,
@@ -284,9 +297,16 @@ fun IconEditorDialog(
                             textValue = ""
                         }
                     ) {
-                        Icon(Icons.Default.Palette, null)
+                        Icon(
+                            imageVector = Icons.Default.Palette,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
                         Spacer(Modifier.width(12.dp))
-                        Text(stringResource(R.string.pick_from_icon_pack))
+                        Text(
+                            text = stringResource(R.string.pick_from_icon_pack),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
 
 
