@@ -104,7 +104,9 @@ android {
         create("fdroidRelease") {
             initWith(getByName("release"))
             signingConfig = null
+            flavorName = ""
         }
+
         debug {
             isDebuggable = true
             isMinifyEnabled = false
