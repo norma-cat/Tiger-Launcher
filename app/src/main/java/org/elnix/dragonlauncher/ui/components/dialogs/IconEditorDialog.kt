@@ -322,9 +322,16 @@ fun IconEditorDialog(
                             textValue = ""
                         }
                     ) {
-                        Icon(Icons.Default.Close, null)
+                        Icon(
+                            Icons.Default.Close,
+                            null,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
                         Spacer(Modifier.width(12.dp))
-                        Text(stringResource(R.string.no_custom_icon))
+                        Text(
+                            text = stringResource(R.string.no_custom_icon),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
 

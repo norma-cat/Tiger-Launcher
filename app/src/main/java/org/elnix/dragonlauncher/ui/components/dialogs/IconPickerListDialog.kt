@@ -88,6 +88,7 @@ fun IconPickerListDialog(
                     Text(
                         text = "Select Icon",
                         modifier = Modifier.wrapContentWidth(),
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.titleMedium,
                     )
 

@@ -17,15 +17,27 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    flavorDimensions += "channel"
+
+    productFlavors {
+        create("stable") { dimension = "channel" }
+        create("beta")   { dimension = "channel" }
+        create("fdroid") { dimension = "channel" }
+    }
+
     buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+        debug {}
+        release {}
+
+        create("unminifiedRelease") {
+            initWith(getByName("release"))
+        }
+
+        create("debuggableRelease") {
+            initWith(getByName("release"))
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
