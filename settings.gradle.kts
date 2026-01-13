@@ -21,4 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Dragon Launcher"
 include(":app")
- 
+include(":core:ui")
+include(":core:common")
+include(":core:settings")
+include(":core:data")

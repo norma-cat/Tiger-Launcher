@@ -155,8 +155,6 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.glance.appwidget)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.gson)
     implementation(libs.androidx.material3)
@@ -166,6 +164,11 @@ dependencies {
     implementation(libs.android.image.cropper)
     implementation(libs.material)
     implementation(libs.material3)
+
+    implementation(project(":core:ui"))
+    implementation(project(":core:data"))
+    implementation(project(":core:common"))
+    implementation(project(":core:settings"))
 }
 
 
