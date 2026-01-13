@@ -109,6 +109,11 @@
 * Customize gestures and visual settings via the Settings menu.
 * Change background for main screen / drawer, add blur to it
 
+---
+
+### What's this icon ?
+
+![image](/fastlane/metadata/android/en-US/images/phoneScreenshots/17.png)
 ## Signing
 
 Releases signing key (SHA-256):
