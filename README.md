@@ -1,5 +1,7 @@
 <div align="center">
 
+## Just a personalised fork of Dragon-Launcher
+
 <img src="app/src/main/res/drawable/dragon_launcher_foreground.png" width="22%" alt="App Icon"/>
 
 # Dragon Launcher - Fast Gesture based android launcher
