@@ -36,13 +36,13 @@ import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.helpers.DrawerActions
 import org.elnix.dragonlauncher.data.helpers.drawerActionIcon
 import org.elnix.dragonlauncher.data.helpers.drawerActionsLabel
-import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
+import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.helpers.ActionSelectorRow
 import org.elnix.dragonlauncher.ui.helpers.GridSizeSlider
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
+import org.elnix.dragonlauncher.common.models.AppsViewModel
 
 
 @Composable

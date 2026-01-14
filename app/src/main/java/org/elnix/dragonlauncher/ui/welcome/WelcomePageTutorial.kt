@@ -21,7 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
 
 @Composable
 fun WelcomePageTutorial() {

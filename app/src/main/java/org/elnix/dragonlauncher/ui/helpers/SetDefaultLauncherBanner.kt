@@ -23,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
+import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 
 
 @Composable

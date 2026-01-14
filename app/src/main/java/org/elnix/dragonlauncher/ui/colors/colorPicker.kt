@@ -52,17 +52,17 @@ import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.helpers.ColorPickerMode
 import org.elnix.dragonlauncher.data.helpers.colorPickerText
-import org.elnix.dragonlauncher.data.stores.ColorModesSettingsStore.getColorPickerMode
-import org.elnix.dragonlauncher.data.stores.ColorModesSettingsStore.setColorPickerMode
+import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore.getColorPickerMode
+import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore.setColorPickerMode
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
-import org.elnix.dragonlauncher.ui.components.dialogs.CustomAlertDialog
+import org.elnix.dragonlauncher.ui.dialogs.CustomAlertDialog
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
-import org.elnix.dragonlauncher.utils.colors.adjustBrightness
-import org.elnix.dragonlauncher.utils.colors.randomColor
-import org.elnix.dragonlauncher.utils.colors.toHexWithAlpha
-import org.elnix.dragonlauncher.utils.copyToClipboard
-import org.elnix.dragonlauncher.utils.pasteClipboard
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
+import org.elnix.dragonlauncher.common.utils.colors.randomColor
+import org.elnix.dragonlauncher.common.utils.colors.toHexWithAlpha
+import org.elnix.dragonlauncher.common.utils.copyToClipboard
+import org.elnix.dragonlauncher.common.utils.pasteClipboard
 
 @Composable
 fun ColorPickerRow(

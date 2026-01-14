@@ -17,13 +17,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.stores.BehaviorSettingsStore
-import org.elnix.dragonlauncher.data.stores.UiSettingsStore
+import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
+import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.helpers.CustomActionSelector
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
+import org.elnix.dragonlauncher.common.models.AppsViewModel
 
 
 @Composable

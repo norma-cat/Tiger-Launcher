@@ -39,13 +39,21 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.common.models.AppsViewModel
+import org.elnix.dragonlauncher.common.models.BackupViewModel
+import org.elnix.dragonlauncher.common.models.FloatingAppsViewModel
+import org.elnix.dragonlauncher.common.utils.ROUTES
+import org.elnix.dragonlauncher.common.utils.SETTINGS
+import org.elnix.dragonlauncher.common.utils.getVersionCode
+import org.elnix.dragonlauncher.common.utils.hasUriReadWritePermission
+import org.elnix.dragonlauncher.common.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.data.helpers.DrawerActions
-import org.elnix.dragonlauncher.data.stores.BackupSettingsStore
-import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
-import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
-import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
-import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
-import org.elnix.dragonlauncher.ui.components.dialogs.WidgetPickerDialog
+import org.elnix.dragonlauncher.settings.stores.BackupSettingsStore
+import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
+import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
+import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
+import org.elnix.dragonlauncher.ui.dialogs.UserValidation
+import org.elnix.dragonlauncher.ui.dialogs.WidgetPickerDialog
 import org.elnix.dragonlauncher.ui.drawer.AppDrawerScreen
 import org.elnix.dragonlauncher.ui.helpers.ReselectAutoBackupBanner
 import org.elnix.dragonlauncher.ui.helpers.SetDefaultLauncherBanner
@@ -68,43 +76,9 @@ import org.elnix.dragonlauncher.ui.settings.workspace.WorkspaceListScreen
 import org.elnix.dragonlauncher.ui.welcome.WelcomeScreen
 import org.elnix.dragonlauncher.ui.whatsnew.ChangelogsScreen
 import org.elnix.dragonlauncher.ui.whatsnew.WhatsNewBottomSheet
-import org.elnix.dragonlauncher.utils.getVersionCode
-import org.elnix.dragonlauncher.utils.hasUriReadWritePermission
-import org.elnix.dragonlauncher.utils.isDefaultLauncher
-import org.elnix.dragonlauncher.utils.loadChangelogs
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
-import org.elnix.dragonlauncher.utils.models.BackupViewModel
-import org.elnix.dragonlauncher.utils.models.FloatingAppsViewModel
+import org.elnix.dragonlauncher.common.utils.loadChangelogs
 
-// -------------------- SETTINGS --------------------
 
-object SETTINGS {
-    const val ROOT = "settings"
-    const val ADVANCED_ROOT = "settings/advanced"
-    const val APPEARANCE = "settings/advanced/appearance"
-    const val WALLPAPER = "settings/advanced/appearance/wallpaper"
-    const val ICON_PACK = "settings/advanced/appearance/icon_pack"
-    const val STATUS_BAR = "settings/advanced/appearance/status_bar"
-    const val THEME = "settings/advanced/appearance/theme"
-    const val FLOATING_APPS = "settings/advanced/appearance/floating_apps"
-    const val BEHAVIOR = "settings/advanced/behavior"
-    const val COLORS = "settings/advanced/appearance/colors"
-    const val DRAWER = "settings/advanced/drawer"
-    const val WORKSPACE = "settings/advanced/workspace"
-    const val WORKSPACE_DETAIL = "settings/advanced/workspace/{id}"
-    const val BACKUP = "settings/advanced/backup"
-    const val DEBUG = "settings//advanced/debug"
-    const val LOGS = "settings/advanced/debug/logs"
-    const val SETTINGS_JSON = "settings/advanced/debug/settings_json"
-    const val LANGUAGE = "settings/advanced/language"
-    const val CHANGELOGS = "settings/advanced/changelogs"
-}
-
-object ROUTES {
-    const val MAIN = "main"
-    const val DRAWER = "drawer"
-    const val WELCOME = "welcome"
-}
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable

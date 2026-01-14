@@ -15,10 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.delay
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore
-import org.elnix.dragonlauncher.utils.openAlarmApp
-import org.elnix.dragonlauncher.utils.openCalendar
+import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
+import org.elnix.dragonlauncher.common.utils.openAlarmApp
+import org.elnix.dragonlauncher.common.utils.openCalendar
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 

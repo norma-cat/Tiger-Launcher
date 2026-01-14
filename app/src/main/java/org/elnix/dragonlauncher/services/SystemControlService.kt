@@ -12,10 +12,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
-import org.elnix.dragonlauncher.utils.ACCESSIBILITY_TAG
-import org.elnix.dragonlauncher.utils.logs.logD
-import org.elnix.dragonlauncher.utils.logs.logW
+import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
+import org.elnix.dragonlauncher.common.utils.ACCESSIBILITY_TAG
+import org.elnix.dragonlauncher.common.logging.logD
+import org.elnix.dragonlauncher.common.logging.logW
 
 @SuppressLint("AccessibilityPolicy")
 class SystemControlService : AccessibilityService() {

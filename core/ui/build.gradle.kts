@@ -73,4 +73,8 @@ dependencies {
     implementation(libs.android.image.cropper)
     implementation(libs.material)
     implementation(libs.material3)
+
+    implementation(project(":core:data"))
+    implementation(project(":core:common"))
+    implementation(project(":core:settings"))
 }

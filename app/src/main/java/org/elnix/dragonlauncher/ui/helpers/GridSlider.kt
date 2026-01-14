@@ -36,9 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
-import org.elnix.dragonlauncher.ui.drawer.AppModel
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
+import org.elnix.dragonlauncher.common.serializables.AppModel
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
 
 @Composable
 fun GridSizeSlider(

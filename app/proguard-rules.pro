@@ -21,9 +21,9 @@
 #-renamesourcefileattribute SourceFile
 
 # Do not mignify any Workspace-related stuff dur to boot crashes
--keep class org.elnix.dragonlauncher.ui.drawer.WorkspaceState { *; }
--keep class org.elnix.dragonlauncher.ui.drawer.Workspace { *; }
--keep class org.elnix.dragonlauncher.ui.drawer.AppOverride { *; }
+-keep class org.elnix.dragonlauncher.common.serializables.WorkspaceState { *; }
+-keep class org.elnix.dragonlauncher.common.serializables.Workspace { *; }
+-keep class org.elnix.dragonlauncher.common.serializables.AppOverride { *; }
 
 -keepclassmembers enum * {
     public static **[] values();
@@ -62,6 +62,6 @@
 
 
 # Keep adapters
--keep class org.elnix.dragonlauncher.data.SwipeActionAdapter { *; }
+-keep class org.elnix.dragonlauncher.common.serializables.SwipeActionAdapter { *; }
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer

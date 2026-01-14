@@ -45,22 +45,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.ColorCustomisationMode
-import org.elnix.dragonlauncher.data.DefaultThemes
-import org.elnix.dragonlauncher.data.applyDefaultThemeColors
-import org.elnix.dragonlauncher.data.colorCustomizationModeName
-import org.elnix.dragonlauncher.data.defaultThemeName
-import org.elnix.dragonlauncher.data.stores.ColorModesSettingsStore
-import org.elnix.dragonlauncher.data.stores.ColorSettingsStore
+import org.elnix.dragonlauncher.common.enums.ColorCustomisationMode
+import org.elnix.dragonlauncher.common.enums.DefaultThemes
+import org.elnix.dragonlauncher.settings.applyDefaultThemeColors
+import org.elnix.dragonlauncher.common.enums.colorCustomizationModeName
+import org.elnix.dragonlauncher.common.enums.defaultThemeName
+import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
+import org.elnix.dragonlauncher.settings.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
-import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
+import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.ui.theme.AmoledDefault
-import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
-import org.elnix.dragonlauncher.utils.colors.adjustBrightness
-import org.elnix.dragonlauncher.utils.colors.blendWith
+import org.elnix.dragonlauncher.common.theme.AmoledDefault
+import org.elnix.dragonlauncher.common.theme.LocalExtraColors
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
+import org.elnix.dragonlauncher.common.utils.colors.blendWith
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable

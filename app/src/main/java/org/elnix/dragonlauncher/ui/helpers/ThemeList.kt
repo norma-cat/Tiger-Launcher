@@ -28,10 +28,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.DataStoreName
-import org.elnix.dragonlauncher.data.helpers.ThemeObject
-import org.elnix.dragonlauncher.utils.SettingsBackupManager
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.settings.DataStoreName
+import org.elnix.dragonlauncher.data.ThemeObject
+import org.elnix.dragonlauncher.settings.SettingsBackupManager
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
 
 @Composable
 fun ThemesList(

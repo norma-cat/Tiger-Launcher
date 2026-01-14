@@ -63,18 +63,18 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.MainActivity
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.data.helpers.FloatingAppObject
-import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
-import org.elnix.dragonlauncher.data.stores.StatusBarSettingsStore
+import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.common.FloatingAppObject
+import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
+import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
 import org.elnix.dragonlauncher.ui.components.FloatingAppsHostView
-import org.elnix.dragonlauncher.ui.components.dialogs.AddPointDialog
+import org.elnix.dragonlauncher.ui.dialogs.AddPointDialog
 import org.elnix.dragonlauncher.ui.helpers.CircleIconButton
 import org.elnix.dragonlauncher.ui.helpers.UpDownButton
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
-import org.elnix.dragonlauncher.utils.models.FloatingAppsViewModel
+import org.elnix.dragonlauncher.common.models.AppsViewModel
+import org.elnix.dragonlauncher.common.models.FloatingAppsViewModel
 
 @Composable
 fun FloatingAppsTab(

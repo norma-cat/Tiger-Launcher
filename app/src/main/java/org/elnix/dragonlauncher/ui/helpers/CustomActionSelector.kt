@@ -32,14 +32,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.ui.components.dialogs.AddPointDialog
-import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
-import org.elnix.dragonlauncher.utils.actions.ActionIcon
-import org.elnix.dragonlauncher.utils.actions.actionColor
-import org.elnix.dragonlauncher.utils.actions.actionLabel
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
+import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.ui.dialogs.AddPointDialog
+import org.elnix.dragonlauncher.common.theme.LocalExtraColors
+import org.elnix.dragonlauncher.common.utils.actions.ActionIcon
+import org.elnix.dragonlauncher.common.utils.actions.actionColor
+import org.elnix.dragonlauncher.common.utils.actions.actionLabel
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.models.AppsViewModel
 
 
 @Composable

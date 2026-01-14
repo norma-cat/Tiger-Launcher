@@ -35,13 +35,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.DataStoreName
-import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
-import org.elnix.dragonlauncher.ui.components.dialogs.ImportSettingsDialog
+import org.elnix.dragonlauncher.settings.DataStoreName
+import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
+import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
 import org.elnix.dragonlauncher.ui.helpers.rememberSettingsImportLauncher
-import org.elnix.dragonlauncher.utils.SettingsBackupManager
-import org.elnix.dragonlauncher.utils.models.BackupResult
-import org.elnix.dragonlauncher.utils.models.BackupViewModel
+import org.elnix.dragonlauncher.settings.SettingsBackupManager
+import org.elnix.dragonlauncher.common.models.BackupResult
+import org.elnix.dragonlauncher.common.models.BackupViewModel
 import org.json.JSONObject
 
 @SuppressLint("LocalContextGetResourceValueCall")

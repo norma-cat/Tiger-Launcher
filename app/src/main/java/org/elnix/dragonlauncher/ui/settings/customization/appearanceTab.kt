@@ -31,9 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.data.dummySwipePoint
-import org.elnix.dragonlauncher.data.stores.UiSettingsStore
+import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
+import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.SETTINGS
 import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
@@ -41,8 +41,8 @@ import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.colors.adjustBrightness
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
+import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
+import org.elnix.dragonlauncher.common.models.AppsViewModel
 
 
 @Composable

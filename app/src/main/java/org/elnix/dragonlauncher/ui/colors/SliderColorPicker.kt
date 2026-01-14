@@ -22,8 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
-import org.elnix.dragonlauncher.utils.colors.adjustBrightness
-import org.elnix.dragonlauncher.utils.colors.randomColor
+import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
+import org.elnix.dragonlauncher.common.utils.colors.randomColor
 
 @Composable
 fun SliderColorPicker(

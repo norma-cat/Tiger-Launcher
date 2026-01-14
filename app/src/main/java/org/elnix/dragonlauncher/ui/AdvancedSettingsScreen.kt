@@ -55,22 +55,22 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.DataStoreName
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
-import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
+import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.settings.DataStoreName
+import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
+import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.ContributorItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
-import org.elnix.dragonlauncher.utils.copyToClipboard
-import org.elnix.dragonlauncher.utils.getVersionCode
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
-import org.elnix.dragonlauncher.utils.obtainiumPackageName
-import org.elnix.dragonlauncher.utils.openUrl
-import org.elnix.dragonlauncher.utils.showToast
+import org.elnix.dragonlauncher.common.utils.actions.launchSwipeAction
+import org.elnix.dragonlauncher.common.utils.copyToClipboard
+import org.elnix.dragonlauncher.common.utils.getVersionCode
+import org.elnix.dragonlauncher.common.models.AppsViewModel
+import org.elnix.dragonlauncher.common.utils.obtainiumPackageName
+import org.elnix.dragonlauncher.common.utils.openUrl
+import org.elnix.dragonlauncher.common.utils.showToast
 
 
 @Suppress("AssignedValueIsNeverRead")

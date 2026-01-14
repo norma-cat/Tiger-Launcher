@@ -12,9 +12,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.data.CircleNest
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.data.helpers.SwipePointSerializable
-import org.elnix.dragonlauncher.utils.actions.loadDrawableResAsBitmap
+import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
+import org.elnix.dragonlauncher.common.utils.actions.loadDrawableResAsBitmap
 
 
 fun DrawScope.actionsInCircle(

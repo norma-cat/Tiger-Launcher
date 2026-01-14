@@ -33,9 +33,9 @@ import org.elnix.dragonlauncher.data.helpers.WallpaperTarget
 import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
 import org.elnix.dragonlauncher.ui.helpers.ActionSelector
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.WallpaperHelper
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
-import org.elnix.dragonlauncher.utils.showToast
+import org.elnix.dragonlauncher.common.utils.WallpaperHelper
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.utils.showToast
 
 @SuppressLint("LocalContextResourcesRead")
 @Composable

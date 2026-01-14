@@ -1,6 +1,7 @@
 package org.elnix.dragonlauncher.services
 
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.admin.DeviceAdminReceiver
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
@@ -8,10 +9,10 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
-import org.elnix.dragonlauncher.utils.ACCESSIBILITY_TAG
-import org.elnix.dragonlauncher.utils.logs.logD
-import org.elnix.dragonlauncher.utils.logs.logE
-import org.elnix.dragonlauncher.utils.showToast
+import org.elnix.dragonlauncher.common.logging.logD
+import org.elnix.dragonlauncher.common.logging.logE
+import org.elnix.dragonlauncher.common.utils.ACCESSIBILITY_TAG
+import org.elnix.dragonlauncher.common.utils.showToast
 
 object SystemControl {
 
@@ -35,7 +36,7 @@ object SystemControl {
     private fun getService(ctx: Context): SystemControlService? {
         val manager = ctx.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
         val enabled = manager.getEnabledAccessibilityServiceList(
-            android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_GENERIC
+            AccessibilityServiceInfo.FEEDBACK_GENERIC
         )
         return enabled.find {
             it.resolveInfo.serviceInfo.packageName == ctx.packageName &&

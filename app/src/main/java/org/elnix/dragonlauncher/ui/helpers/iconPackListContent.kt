@@ -30,7 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.ui.drawer.IconPackInfo
+import org.elnix.dragonlauncher.common.serializables.IconPackInfo
 
 fun LazyListScope.iconPackListContent(
     packs: List<IconPackInfo>,

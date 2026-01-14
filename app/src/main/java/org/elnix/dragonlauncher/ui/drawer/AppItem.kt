@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.common.serializables.AppModel
 
 @Composable
 fun AppItem(

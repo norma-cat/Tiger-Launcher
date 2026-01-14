@@ -22,9 +22,9 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import org.burnoutcrew.reorderable.ReorderableLazyListState
 import org.burnoutcrew.reorderable.detectReorder
-import org.elnix.dragonlauncher.ui.drawer.Workspace
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
-import org.elnix.dragonlauncher.utils.workspace.WorkspaceAction
+import org.elnix.dragonlauncher.common.serializables.Workspace
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.enums.WorkspaceAction
 
 @Composable
 fun WorkspaceRow(

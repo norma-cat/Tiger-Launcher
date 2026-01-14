@@ -51,4 +51,15 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.gson)
+
+    /* For states and viewModels things*/
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    /* Image Bitmap*/
+    implementation(libs.androidx.ui.graphics)
+
+
+    /* AppObjectColors */
+    implementation(libs.androidx.compose.material3)
 }

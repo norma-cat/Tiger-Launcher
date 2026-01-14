@@ -3,7 +3,7 @@ package org.elnix.dragonlauncher.services
 import android.app.admin.DeviceAdminReceiver
 import android.content.Context
 import android.content.Intent
-import org.elnix.dragonlauncher.utils.logs.logD
+import org.elnix.dragonlauncher.common.logging.logD
 
 class DeviceAdminReceiver : DeviceAdminReceiver() {
 

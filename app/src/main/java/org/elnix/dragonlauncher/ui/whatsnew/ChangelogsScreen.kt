@@ -1,6 +1,5 @@
 package org.elnix.dragonlauncher.ui.whatsnew
 
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -8,10 +7,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.copyToClipboard
-import org.elnix.dragonlauncher.utils.getVersionCode
-import org.elnix.dragonlauncher.utils.loadChangelogs
-import org.elnix.dragonlauncher.utils.openUrl
+import org.elnix.dragonlauncher.common.utils.copyToClipboard
+import org.elnix.dragonlauncher.common.utils.getVersionCode
+import org.elnix.dragonlauncher.common.utils.loadChangelogs
+import org.elnix.dragonlauncher.common.utils.openUrl
 
 @Composable
 fun ChangelogsScreen(

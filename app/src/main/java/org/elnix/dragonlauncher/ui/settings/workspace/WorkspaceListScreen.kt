@@ -27,13 +27,13 @@ import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.ui.components.dialogs.CreateOrEditWorkspaceDialog
-import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
-import org.elnix.dragonlauncher.ui.drawer.Workspace
-import org.elnix.dragonlauncher.ui.drawer.WorkspaceType
+import org.elnix.dragonlauncher.ui.dialogs.CreateOrEditWorkspaceDialog
+import org.elnix.dragonlauncher.ui.dialogs.UserValidation
+import org.elnix.dragonlauncher.common.serializables.Workspace
+import org.elnix.dragonlauncher.common.serializables.WorkspaceType
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
-import org.elnix.dragonlauncher.utils.workspace.WorkspaceAction
+import org.elnix.dragonlauncher.common.models.AppsViewModel
+import org.elnix.dragonlauncher.common.enums.WorkspaceAction
 
 
 @Composable

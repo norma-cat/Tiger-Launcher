@@ -8,8 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import org.elnix.dragonlauncher.data.stores.LanguageSettingsStore
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
+import org.elnix.dragonlauncher.settings.stores.LanguageSettingsStore
+import org.elnix.dragonlauncher.common.models.AppsViewModel
 
 class MyApplication : Application() {
 

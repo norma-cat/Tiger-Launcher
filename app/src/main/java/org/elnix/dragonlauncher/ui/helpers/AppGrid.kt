@@ -32,8 +32,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.ui.drawer.AppItem
-import org.elnix.dragonlauncher.ui.drawer.AppModel
-import org.elnix.dragonlauncher.utils.actions.appIcon
+import org.elnix.dragonlauncher.common.serializables.AppModel
+import org.elnix.dragonlauncher.common.utils.actions.appIcon
 
 @Composable
 fun AppGrid(

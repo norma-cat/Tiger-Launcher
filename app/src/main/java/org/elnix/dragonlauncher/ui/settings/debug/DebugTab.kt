@@ -35,23 +35,23 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.DataStoreName
-import org.elnix.dragonlauncher.data.dummySwipePoint
-import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
-import org.elnix.dragonlauncher.data.stores.PrivateSettingsStore
+import org.elnix.dragonlauncher.settings.DataStoreName
+import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
+import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
+import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.services.SystemControl
 import org.elnix.dragonlauncher.services.SystemControl.activateDeviceAdmin
 import org.elnix.dragonlauncher.services.SystemControl.isDeviceAdminActive
 import org.elnix.dragonlauncher.ui.SETTINGS
-import org.elnix.dragonlauncher.ui.components.dialogs.IconEditorDialog
+import org.elnix.dragonlauncher.ui.dialogs.IconEditorDialog
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
-import org.elnix.dragonlauncher.utils.detectSystemLauncher
-import org.elnix.dragonlauncher.utils.logs.logD
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.utils.detectSystemLauncher
+import org.elnix.dragonlauncher.common.logging.logD
+import org.elnix.dragonlauncher.common.models.AppsViewModel
 
 @Composable
 fun DebugTab(

@@ -9,10 +9,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.helpers.ThemeObject
+import org.elnix.dragonlauncher.data.ThemeObject
 import org.elnix.dragonlauncher.ui.helpers.ThemesList
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.loadThemes
+import org.elnix.dragonlauncher.common.utils.loadThemes
 
 @Composable
 fun ThemesTab(

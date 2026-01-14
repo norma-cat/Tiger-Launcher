@@ -25,9 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.utils.copyToClipboard
-import org.elnix.dragonlauncher.utils.getVersionCode
-import org.elnix.dragonlauncher.utils.openUrl
+import org.elnix.dragonlauncher.common.utils.copyToClipboard
+import org.elnix.dragonlauncher.common.utils.getVersionCode
+import org.elnix.dragonlauncher.common.utils.openUrl
 import java.util.Date
 
 data class Update(

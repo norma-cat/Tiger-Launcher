@@ -18,7 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
 
 @Composable
 fun SwitchRow(

@@ -42,15 +42,15 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.elnix.dragonlauncher.data.stores.DebugSettingsStore
+import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
-import org.elnix.dragonlauncher.utils.copyToClipboard
-import org.elnix.dragonlauncher.utils.formatDateTime
-import org.elnix.dragonlauncher.utils.logs.DragonLogManager
-import org.elnix.dragonlauncher.utils.logs.logD
-import org.elnix.dragonlauncher.utils.logs.logE
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.utils.copyToClipboard
+import org.elnix.dragonlauncher.common.utils.formatDateTime
+import org.elnix.dragonlauncher.common.logging.DragonLogManager
+import org.elnix.dragonlauncher.common.logging.logD
+import org.elnix.dragonlauncher.common.logging.logE
 import java.io.File
 
 @Composable

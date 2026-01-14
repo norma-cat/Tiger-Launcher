@@ -49,18 +49,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.SwipeActionSerializable
-import org.elnix.dragonlauncher.data.dummySwipePoint
+import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
 import org.elnix.dragonlauncher.data.helpers.DrawerActions
-import org.elnix.dragonlauncher.data.stores.DrawerSettingsStore
-import org.elnix.dragonlauncher.ui.components.dialogs.AppLongPressDialog
-import org.elnix.dragonlauncher.ui.components.dialogs.IconEditorDialog
-import org.elnix.dragonlauncher.ui.components.dialogs.RenameAppDialog
+import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
+import org.elnix.dragonlauncher.ui.dialogs.AppLongPressDialog
+import org.elnix.dragonlauncher.ui.dialogs.IconEditorDialog
+import org.elnix.dragonlauncher.ui.dialogs.RenameAppDialog
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
-import org.elnix.dragonlauncher.utils.actions.launchSwipeAction
-import org.elnix.dragonlauncher.utils.models.AppsViewModel
-import org.elnix.dragonlauncher.utils.openSearch
-import org.elnix.dragonlauncher.utils.showToast
+import org.elnix.dragonlauncher.common.utils.actions.launchSwipeAction
+import org.elnix.dragonlauncher.common.models.AppsViewModel
+import org.elnix.dragonlauncher.common.serializables.AppModel
+import org.elnix.dragonlauncher.common.utils.openSearch
+import org.elnix.dragonlauncher.common.utils.showToast
 
 @Suppress("AssignedValueIsNeverRead")
 @OptIn(ExperimentalComposeUiApi::class)

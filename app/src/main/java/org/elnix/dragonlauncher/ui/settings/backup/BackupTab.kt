@@ -46,24 +46,24 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.DataStoreName
-import org.elnix.dragonlauncher.data.backupableStores
-import org.elnix.dragonlauncher.data.stores.BackupSettingsStore
-import org.elnix.dragonlauncher.ui.components.dialogs.ExportSettingsDialog
-import org.elnix.dragonlauncher.ui.components.dialogs.ImportSettingsDialog
-import org.elnix.dragonlauncher.ui.components.dialogs.UserValidation
+import org.elnix.dragonlauncher.settings.DataStoreName
+import org.elnix.dragonlauncher.settings.backupableStores
+import org.elnix.dragonlauncher.settings.stores.BackupSettingsStore
+import org.elnix.dragonlauncher.ui.dialogs.ExportSettingsDialog
+import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
+import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.TextDivider
 import org.elnix.dragonlauncher.ui.helpers.rememberSettingsImportLauncher
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.SettingsBackupManager
-import org.elnix.dragonlauncher.utils.formatDateTime
-import org.elnix.dragonlauncher.utils.getFilePathFromUri
-import org.elnix.dragonlauncher.utils.logs.logE
-import org.elnix.dragonlauncher.utils.models.BackupResult
-import org.elnix.dragonlauncher.utils.models.BackupViewModel
-import org.elnix.dragonlauncher.utils.showToast
+import org.elnix.dragonlauncher.settings.SettingsBackupManager
+import org.elnix.dragonlauncher.common.utils.formatDateTime
+import org.elnix.dragonlauncher.common.utils.getFilePathFromUri
+import org.elnix.dragonlauncher.common.logging.logE
+import org.elnix.dragonlauncher.common.models.BackupResult
+import org.elnix.dragonlauncher.common.models.BackupViewModel
+import org.elnix.dragonlauncher.common.utils.showToast
 import org.json.JSONObject
 
 @SuppressLint("LocalContextGetResourceValueCall")

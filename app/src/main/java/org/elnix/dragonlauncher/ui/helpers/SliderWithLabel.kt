@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
 import kotlin.math.roundToInt
 
 /**

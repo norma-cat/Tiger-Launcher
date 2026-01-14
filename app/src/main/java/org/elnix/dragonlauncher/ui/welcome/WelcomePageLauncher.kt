@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.elnix.dragonlauncher.R
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
-import org.elnix.dragonlauncher.utils.isDefaultLauncher
+import org.elnix.dragonlauncher.common.utils.isDefaultLauncher
 
 @Composable
 fun WelcomePageLauncher() {

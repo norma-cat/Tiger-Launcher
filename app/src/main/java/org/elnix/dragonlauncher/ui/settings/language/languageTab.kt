@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.data.stores.LanguageSettingsStore
+import org.elnix.dragonlauncher.settings.stores.LanguageSettingsStore
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
 
 
 @Composable

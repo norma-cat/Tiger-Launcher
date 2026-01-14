@@ -30,11 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.elnix.dragonlauncher.data.allStores
-import org.elnix.dragonlauncher.data.defaultDebugStores
-import org.elnix.dragonlauncher.ui.components.dialogs.ExportSettingsDialog
+import org.elnix.dragonlauncher.settings.allStores
+import org.elnix.dragonlauncher.settings.defaultDebugStores
+import org.elnix.dragonlauncher.ui.dialogs.ExportSettingsDialog
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.utils.copyToClipboard
+import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.json.JSONObject
 
 @Composable
