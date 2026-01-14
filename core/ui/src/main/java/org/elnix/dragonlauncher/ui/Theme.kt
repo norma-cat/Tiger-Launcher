@@ -8,9 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import org.elnix.dragonlauncher.common.theme.AmoledDefault
-import org.elnix.dragonlauncher.common.theme.ExtraColors
-import org.elnix.dragonlauncher.common.theme.LocalExtraColors
-import org.elnix.dragonlauncher.common.theme.Typography
+import org.elnix.dragonlauncher.ui.theme.ExtraColors
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
+import org.elnix.dragonlauncher.ui.theme.Typography
 
 
 fun generateColorScheme(

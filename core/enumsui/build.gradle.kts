@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -14,6 +15,27 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+    }
+
+    flavorDimensions += "channel"
+
+    productFlavors {
+        create("stable") { dimension = "channel" }
+        create("beta")   { dimension = "channel" }
+        create("fdroid") { dimension = "channel" }
+    }
+
+    buildTypes {
+        debug {}
+        release {}
+
+        create("unminifiedRelease") {
+            initWith(getByName("release"))
+        }
+
+        create("debuggableRelease") {
+            initWith(getByName("release"))
+        }
     }
 
     buildTypes {

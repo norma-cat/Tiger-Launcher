@@ -30,8 +30,8 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.serializables.AppModel
-import org.elnix.dragonlauncher.common.utils.actions.appIcon
-import org.elnix.dragonlauncher.common.utils.actions.loadDrawableAsBitmap
+import org.elnix.dragonlauncher.common.utils.ImageUtils.loadDrawableAsBitmap
+import org.elnix.dragonlauncher.ui.actions.appIcon
 
 @Composable
 fun AppShortcutPickerDialog(

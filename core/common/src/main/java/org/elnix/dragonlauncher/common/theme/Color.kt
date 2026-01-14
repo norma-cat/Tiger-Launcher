@@ -1,7 +1,7 @@
 package org.elnix.dragonlauncher.common.theme
 
 import androidx.compose.ui.graphics.Color
-import org.elnix.dragonlauncher.utils.colors.blendWith
+import org.elnix.dragonlauncher.common.utils.colors.blendWith
 
 object AmoledDefault : ThemeColors {
     override val Primary = Color(0xFF6650a4)

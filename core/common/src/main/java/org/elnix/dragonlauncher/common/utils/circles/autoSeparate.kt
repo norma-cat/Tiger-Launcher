@@ -1,10 +1,16 @@
 package org.elnix.dragonlauncher.common.utils.circles
 
-import org.elnix.dragonlauncher.data.UiCircle
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
-import org.elnix.dragonlauncher.ui.minAngleGapForCircle
+import org.elnix.dragonlauncher.common.utils.POINT_RADIUS_PX
+import org.elnix.dragonlauncher.common.utils.UiCircle
 import kotlin.math.abs
 import kotlin.math.min
+
+fun minAngleGapForCircle(circleRadius: Float): Double {
+    val arcLength = 2 * POINT_RADIUS_PX
+    val minAngleRad = arcLength / circleRadius
+    return Math.toDegrees(minAngleRad.toDouble())
+}
 
 fun autoSeparate(
     points: MutableList<SwipePointSerializable>,

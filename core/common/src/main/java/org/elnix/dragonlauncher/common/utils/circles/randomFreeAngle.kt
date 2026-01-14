@@ -1,8 +1,8 @@
 package org.elnix.dragonlauncher.common.utils.circles
 
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
-import org.elnix.dragonlauncher.data.UiCircle
-import org.elnix.dragonlauncher.ui.minAngleGapForCircle
+import org.elnix.dragonlauncher.common.utils.UiCircle
+
 
 fun randomFreeAngle(circle: UiCircle?, list: List<SwipePointSerializable>): Double? {
 

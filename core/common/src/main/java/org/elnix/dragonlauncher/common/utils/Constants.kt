@@ -103,3 +103,12 @@ const val WIDGET_TAG = "WidgetsDebug"
 const val FLOATING_APPS_TAG = "FloatingAppsDebug"
 const val ACCESSIBILITY_TAG = "SystemControl"
 const val IMAGE_TAG = "ImageDebug"
+
+
+
+/*  ─────────────  Settings Screen Constants  ─────────────  */
+
+const val POINT_RADIUS_PX = 40f
+const val TOUCH_THRESHOLD_PX = 100f
+
+const val SNAP_STEP_DEG = 15.0

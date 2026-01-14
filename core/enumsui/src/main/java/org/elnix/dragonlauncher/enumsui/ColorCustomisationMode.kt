@@ -2,6 +2,8 @@ package org.elnix.dragonlauncher.enumsui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import org.elnix.dragonlauncher.common.R
+
 
 enum class ColorCustomisationMode { DEFAULT, NORMAL, ALL }
 

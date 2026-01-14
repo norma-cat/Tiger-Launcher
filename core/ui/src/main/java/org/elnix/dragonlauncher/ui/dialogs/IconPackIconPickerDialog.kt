@@ -18,8 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.serializables.IconPackInfo
+import org.elnix.dragonlauncher.models.AppsViewModel
 import org.elnix.dragonlauncher.ui.helpers.iconPackListContent
-import org.elnix.dragonlauncher.common.models.AppsViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

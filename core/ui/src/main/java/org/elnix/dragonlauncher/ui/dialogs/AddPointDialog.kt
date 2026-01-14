@@ -33,17 +33,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
-import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.AppModel
-import org.elnix.dragonlauncher.common.theme.LocalExtraColors
+import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.utils.PackageManagerCompat
-import org.elnix.dragonlauncher.common.utils.actions.ActionIcon
-import org.elnix.dragonlauncher.common.utils.actions.actionColor
-import org.elnix.dragonlauncher.common.utils.actions.actionLabel
 import org.elnix.dragonlauncher.common.utils.defaultChoosableActions
-import org.elnix.dragonlauncher.common.models.AppsViewModel
+import org.elnix.dragonlauncher.models.AppsViewModel
+import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
+import org.elnix.dragonlauncher.ui.actions.ActionIcon
+import org.elnix.dragonlauncher.ui.actions.actionColor
+import org.elnix.dragonlauncher.ui.actions.actionLabel
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable

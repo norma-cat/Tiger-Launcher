@@ -43,21 +43,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.common.serializables.defaultSwipePointsValues
+import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.serializables.CircleNest
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
+import org.elnix.dragonlauncher.common.serializables.defaultSwipePointsValues
+import org.elnix.dragonlauncher.common.theme.AmoledDefault
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
+import org.elnix.dragonlauncher.ui.actions.actionColor
+import org.elnix.dragonlauncher.ui.actions.actionLabel
+import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
+import org.elnix.dragonlauncher.models.AppsViewModel
 import org.elnix.dragonlauncher.settings.stores.ColorSettingsStore
+import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
-import org.elnix.dragonlauncher.common.theme.AmoledDefault
-import org.elnix.dragonlauncher.common.theme.LocalExtraColors
-import org.elnix.dragonlauncher.common.utils.actions.actionColor
-import org.elnix.dragonlauncher.common.utils.actions.actionLabel
-import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
-import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
-import org.elnix.dragonlauncher.common.models.AppsViewModel
+
 
 @Composable
 fun EditPointDialog(
@@ -185,7 +187,7 @@ fun EditPointDialog(
                         actionsInCircle(
                             selected = false,
                             point = editPoint,
-                            nests = emptyList(),
+                            nests = emptyList<CircleNest>(),
                             px = center.x - actionSpacing,
                             py = center.y,
                             ctx = ctx,
@@ -199,7 +201,7 @@ fun EditPointDialog(
                         actionsInCircle(
                             selected = true,
                             point = editPoint,
-                            nests = emptyList(),
+                            nests = emptyList<CircleNest>(),
                             px = center.x + actionSpacing,
                             py = center.y,
                             ctx = ctx,

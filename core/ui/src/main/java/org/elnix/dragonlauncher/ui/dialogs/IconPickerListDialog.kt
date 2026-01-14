@@ -43,12 +43,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.IconPackInfo
-import org.elnix.dragonlauncher.common.utils.actions.loadDrawableAsBitmap
-import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.utils.ImageUtils.loadDrawableAsBitmap
 import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
-import org.elnix.dragonlauncher.common.models.AppsViewModel
+import org.elnix.dragonlauncher.models.AppsViewModel
+import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

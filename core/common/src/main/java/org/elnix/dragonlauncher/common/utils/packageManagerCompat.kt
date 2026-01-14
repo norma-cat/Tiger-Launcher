@@ -14,10 +14,10 @@ import android.os.UserManager
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.core.content.ContextCompat
-import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.serializables.AppModel
-import org.elnix.dragonlauncher.utils.actions.loadDrawableAsBitmap
+import org.elnix.dragonlauncher.common.utils.ImageUtils.loadDrawableAsBitmap
 
 class PackageManagerCompat(private val pm: PackageManager, private val ctx: Context) {
 

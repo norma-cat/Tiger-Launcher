@@ -3,7 +3,6 @@ package org.elnix.dragonlauncher.common.utils
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.elnix.dragonlauncher.data.helpers.ThemeObject
 import org.json.JSONObject
 
 suspend fun loadThemes(ctx: Context): List<ThemeObject> = withContext(Dispatchers.IO) {

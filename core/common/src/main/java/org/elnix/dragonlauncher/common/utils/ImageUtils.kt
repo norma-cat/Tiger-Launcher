@@ -6,6 +6,13 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.PorterDuffXfermode
+import android.graphics.Rect
+import android.graphics.drawable.AdaptiveIconDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.renderscript.Allocation
 import android.renderscript.Element
@@ -15,12 +22,22 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.Base64
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
+import androidx.core.graphics.withSave
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logE
+import org.elnix.dragonlauncher.common.serializables.CustomIconSerializable
+import org.elnix.dragonlauncher.common.serializables.IconType
+import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.common.serializables.targetPackage
 import java.io.ByteArrayOutputStream
 import kotlin.math.ceil
 
@@ -30,6 +47,25 @@ object ImageUtils {
         ctx.contentResolver.openInputStream(uri).use {
             return BitmapFactory.decodeStream(it!!)
         }
+    }
+
+
+    fun loadDrawableAsBitmap(
+        drawable: Drawable,
+        width: Int,
+        height: Int
+    ): ImageBitmap {
+        // Adaptive icon support
+        val bmp = if (drawable is AdaptiveIconDrawable) {
+            val bitmap = createBitmap(width, height)
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+            bitmap
+        } else {
+            drawable.toBitmap(width, height)
+        }
+        return bmp.asImageBitmap()
     }
 
     fun cropCenterSquare(src: Bitmap): Bitmap {
@@ -149,5 +185,205 @@ object ImageUtils {
         layout.draw(canvas)
 
         return bitmap.asImageBitmap()
+    }
+
+    private fun tintBitmap(original: ImageBitmap, color: Color): ImageBitmap {
+        val bitmap = createBitmap(original.width, original.height)
+        val canvas = Canvas(bitmap)
+        val paint = Paint().apply {
+            colorFilter = PorterDuffColorFilter(
+                color.toArgb(),
+                PorterDuff.Mode.SRC_IN
+            )
+        }
+        canvas.drawBitmap(original.asAndroidBitmap(), 0f, 0f, paint)
+        return bitmap.asImageBitmap()
+    }
+
+    fun createDefaultBitmap(
+        width: Int,
+        height: Int
+    ): ImageBitmap {
+        val bitmap = createBitmap(width, height)
+        val canvas = Canvas(bitmap)
+        canvas.drawColor(Color.Gray.toArgb())
+        return bitmap.asImageBitmap()
+    }
+
+    fun loadDrawableResAsBitmap(
+        context: Context,
+        resId: Int,
+        width: Int,
+        height: Int
+    ): ImageBitmap {
+        val drawable = ContextCompat.getDrawable(context, resId)
+            ?: return createDefaultBitmap(width, height)
+
+        return loadDrawableAsBitmap(drawable, width, height)
+    }
+
+    fun createUntintedBitmap(
+        action: SwipeActionSerializable,
+        ctx: Context,
+        icons: Map<String, ImageBitmap>,
+        width: Int,
+        height: Int
+    ): ImageBitmap {
+        val pm = ctx.packageManager
+        val pmCompat = PackageManagerCompat(pm, ctx)
+
+        return when (action) {
+            is SwipeActionSerializable.LaunchApp,
+            is SwipeActionSerializable.LaunchShortcut -> {
+                val pkg = action.targetPackage()!!
+
+                if (action is SwipeActionSerializable.LaunchShortcut) {
+                    val shortcutIcon = loadShortcutIcon(ctx, pkg, action.shortcutId)
+                    if (shortcutIcon != null) return shortcutIcon
+                }
+
+                pmCompat.getAppIcon(pkg, 0)
+                icons[pkg] ?: loadDrawableResAsBitmap(ctx, R.drawable.ic_app_default, width, height)
+
+            }
+
+            is SwipeActionSerializable.OpenUrl ->
+                loadDrawableResAsBitmap(ctx, R.drawable.ic_action_web, width, height)
+
+            SwipeActionSerializable.NotificationShade ->
+                loadDrawableResAsBitmap(ctx, R.drawable.ic_action_notification, width, height)
+
+            SwipeActionSerializable.ControlPanel ->
+                loadDrawableResAsBitmap(ctx, R.drawable.ic_action_grid, width, height)
+
+            SwipeActionSerializable.OpenAppDrawer ->
+                loadDrawableResAsBitmap(ctx, R.drawable.ic_action_drawer, width, height)
+
+            SwipeActionSerializable.OpenDragonLauncherSettings ->
+                loadDrawableResAsBitmap(ctx, R.drawable.dragon_launcher_foreground, width, height)
+
+            SwipeActionSerializable.Lock -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_lock, width, height)
+            is SwipeActionSerializable.OpenFile -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_open_file, width, height)
+            SwipeActionSerializable.ReloadApps -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_reload, width, height)
+            SwipeActionSerializable.OpenRecentApps -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_recent, width, height)
+            is SwipeActionSerializable.OpenCircleNest -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_target, width, height)
+            SwipeActionSerializable.GoParentNest -> loadDrawableResAsBitmap(ctx, R.drawable.ic_icon_go_parent_nest, width, height)
+            is SwipeActionSerializable.OpenWidget -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_widgets, width, height)
+        }
+    }
+
+    fun resolveCustomIconBitmap(
+        base: ImageBitmap,
+        icon: CustomIconSerializable,
+        sizePx: Int
+    ): ImageBitmap {
+        // Step 1: choose source bitmap (override or base)
+        val sourceBitmap: ImageBitmap = when (icon.type) {
+            IconType.BITMAP,
+            IconType.ICON_PACK -> {
+                icon.source
+                    ?.let { base64ToImageBitmap(it) }
+                    ?: base
+            }
+
+            IconType.TEXT -> {
+                icon.source?.let {
+                    textToBitmap(
+                        text = it,
+                        sizePx = sizePx
+                    )
+                } ?: base
+            }
+
+            IconType.PLAIN_COLOR -> icon.source?.let {
+                try {
+                    val sourceColor = Color(it.toInt())
+                    val bmp = createDefaultBitmap(sizePx, sizePx)
+                    tintBitmap(bmp, sourceColor)
+                } catch (_: Exception) {
+                    base
+                }
+            } ?: base
+
+            IconType.SHAPE,
+            null -> base
+        }
+
+        // Step 2: prepare output bitmap
+        val outBitmap = createBitmap(sizePx, sizePx)
+        val canvas = Canvas(outBitmap)
+
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+        // Step 3: opacity
+        paint.alpha = ((icon.opacity ?: 1f).coerceIn(0f, 1f) * 255).toInt()
+
+        // Step 4: color tint
+        icon.tint?.let {
+            paint.colorFilter = PorterDuffColorFilter(
+                it.toInt(),
+                PorterDuff.Mode.SRC_IN
+            )
+        }
+
+        // Step 5: blend mode (best-effort)
+        icon.blendMode?.let {
+            paint.xfermode = when (it.uppercase()) {
+                "MULTIPLY" -> PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
+                "SCREEN" -> PorterDuffXfermode(PorterDuff.Mode.SCREEN)
+                "OVERLAY" -> PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
+                else -> null
+            }
+        }
+
+        // Step 6: shadow
+        if (icon.shadowRadius != null) {
+            paint.setShadowLayer(
+                icon.shadowRadius,
+                icon.shadowOffsetX ?: 0f,
+                icon.shadowOffsetY ?: 0f,
+                (icon.shadowColor ?: 0x55000000).toInt()
+            )
+        }
+
+        // Step 7: transform (scale + rotation)
+        canvas.withSave {
+
+            val scaleX = icon.scaleX ?: 1f
+            val scaleY = icon.scaleY ?: 1f
+            val rotation = icon.rotationDeg ?: 0f
+
+            canvas.translate(sizePx / 2f, sizePx / 2f)
+            canvas.rotate(rotation)
+            canvas.scale(scaleX, scaleY)
+            canvas.translate(-sizePx / 2f, -sizePx / 2f)
+
+            // Step 8: draw bitmap
+            canvas.drawBitmap(
+                sourceBitmap.asAndroidBitmap(),
+                null,
+                Rect(0, 0, sizePx, sizePx),
+                paint
+            )
+
+        }
+
+        // Step 9: stroke (rectangular, corner clipping is UI-level)
+        if (icon.strokeWidth != null && icon.strokeColor != null) {
+            val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = icon.strokeWidth
+                color = icon.strokeColor.toInt()
+            }
+            canvas.drawRect(
+                0f,
+                0f,
+                sizePx.toFloat(),
+                sizePx.toFloat(),
+                strokePaint
+            )
+        }
+
+        return outBitmap.asImageBitmap()
     }
 }

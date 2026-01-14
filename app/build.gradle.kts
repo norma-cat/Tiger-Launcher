@@ -172,9 +172,9 @@ dependencies {
 
     implementation(project(":core:ui"))
     implementation(project(":core:enumsui"))
-    implementation(project(":core:data"))
     implementation(project(":core:common"))
     implementation(project(":core:settings"))
+    implementation(project(":core:models"))
 }
 
 

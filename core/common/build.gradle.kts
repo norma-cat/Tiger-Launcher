@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -52,14 +53,10 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.gson)
-
-    /* For states and viewModels things*/
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
 
     /* Image Bitmap*/
     implementation(libs.androidx.ui.graphics)
-
-
-    /* AppObjectColors */
-    implementation(libs.androidx.compose.material3)
 }

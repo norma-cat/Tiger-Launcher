@@ -50,20 +50,21 @@ import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
 import kotlinx.coroutines.launch
-import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.serializables.CircleNest
 import org.elnix.dragonlauncher.common.serializables.CustomIconSerializable
 import org.elnix.dragonlauncher.common.serializables.IconType
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
+import org.elnix.dragonlauncher.common.utils.ImageUtils
+import org.elnix.dragonlauncher.common.utils.ImageUtils.uriToBase64
+import org.elnix.dragonlauncher.ui.actions.actionColor
+import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
+import org.elnix.dragonlauncher.models.AppsViewModel
+import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.actionsInCircle
-import org.elnix.dragonlauncher.common.theme.LocalExtraColors
-import org.elnix.dragonlauncher.common.utils.ImageUtils
-import org.elnix.dragonlauncher.common.utils.ImageUtils.uriToBase64
-import org.elnix.dragonlauncher.common.utils.actions.actionColor
-import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
-import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
-import org.elnix.dragonlauncher.common.models.AppsViewModel
 
 @Composable
 fun IconEditorDialog(
@@ -158,7 +159,7 @@ fun IconEditorDialog(
                     actionsInCircle(
                         selected = false,
                         point = previewPoint,
-                        nests = emptyList(),
+                        nests = emptyList<CircleNest>(),
                         px = center.x - actionSpacing,
                         py = center.y,
                         ctx = ctx,
@@ -171,7 +172,7 @@ fun IconEditorDialog(
                     actionsInCircle(
                         selected = true,
                         point = previewPoint,
-                        nests = emptyList(),
+                        nests = emptyList<CircleNest>(),
                         px = center.x + actionSpacing,
                         py = center.y,
                         ctx = ctx,

@@ -57,5 +57,4 @@ dependencies {
 
     implementation(project(":core:common"))
     implementation(project(":core:enumsui"))
-    implementation(project(":core:data"))
 }

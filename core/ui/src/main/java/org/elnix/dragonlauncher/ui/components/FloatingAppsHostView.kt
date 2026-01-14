@@ -2,7 +2,6 @@
 
 package org.elnix.dragonlauncher.ui.components
 
-import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -18,10 +17,10 @@ import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import org.elnix.dragonlauncher.MainActivity
-import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.FloatingAppObject
-import org.elnix.dragonlauncher.common.utils.actions.ActionIcon
+import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.common.utils.WidgetHostProvider
+import org.elnix.dragonlauncher.ui.actions.ActionIcon
 import kotlin.math.min
 
 
@@ -32,25 +31,23 @@ fun FloatingAppsHostView(
     cellSizePx: Float,
     modifier: Modifier = Modifier,
     blockTouches: Boolean = false,
+    widgetHostProvider: WidgetHostProvider,
     onLaunchAction: () -> Unit
 ) {
     val ctx = LocalContext.current
 
 
     if (floatingAppObject.action is SwipeActionSerializable.OpenWidget) {
-        val activity = ctx as? MainActivity
-            ?: error("WidgetHostView must be hosted inside MainActivity")
 
         val appWidgetManager = remember {
             AppWidgetManager.getInstance(ctx)
         }
 
-        val hostView = remember(floatingAppObject.action.widgetId) {
-            val info = appWidgetManager.getAppWidgetInfo(floatingAppObject.action.widgetId)
-                ?: return@remember null
-
-            activity.appWidgetHost.createView(ctx, floatingAppObject.action.widgetId, info).apply {
-                AppWidgetHostView.setAppWidget(floatingAppObject.action.widgetId, info)
+        val hostView = remember((floatingAppObject.action as SwipeActionSerializable.OpenWidget).widgetId) {
+            widgetHostProvider.createAppWidgetView((floatingAppObject.action as SwipeActionSerializable.OpenWidget).widgetId)?.apply {
+                widgetHostProvider.getAppWidgetInfo((floatingAppObject.action as SwipeActionSerializable.OpenWidget).widgetId)?.let { info ->
+                    setAppWidget((floatingAppObject.action as SwipeActionSerializable.OpenWidget).widgetId, info)
+                }
             }
         } ?: return
 

@@ -33,9 +33,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import org.elnix.dragonlauncher.R
-import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
+import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 
 
 @Composable

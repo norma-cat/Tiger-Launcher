@@ -1,6 +1,5 @@
 package org.elnix.dragonlauncher.ui.dialogs
 
-import android.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -12,7 +11,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import org.elnix.dragonlauncher.common.utils.colors.AppObjectsColors
+import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 
 @Composable
 fun RenameAppDialog(

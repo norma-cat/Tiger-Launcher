@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
-import org.elnix.dragonlauncher.common.theme.LocalExtraColors
-import org.elnix.dragonlauncher.common.utils.actions.actionColor
-import org.elnix.dragonlauncher.common.utils.actions.actionLabel
+import org.elnix.dragonlauncher.ui.theme.LocalExtraColors
+import org.elnix.dragonlauncher.ui.actions.actionColor
+import org.elnix.dragonlauncher.ui.actions.actionLabel
 
 @Composable
 fun AppPreviewTitle(

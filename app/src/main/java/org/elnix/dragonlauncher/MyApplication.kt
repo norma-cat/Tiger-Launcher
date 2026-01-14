@@ -9,7 +9,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.settings.stores.LanguageSettingsStore
-import org.elnix.dragonlauncher.common.models.AppsViewModel
+import org.elnix.dragonlauncher.models.AppsViewModel
 
 class MyApplication : Application() {
 
@@ -38,6 +38,7 @@ class MyApplication : Application() {
     }
 
     override fun onTerminate() {
+        super.onTerminate()
         appScope.cancel()
     }
 }

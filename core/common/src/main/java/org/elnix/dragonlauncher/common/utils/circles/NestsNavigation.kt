@@ -5,7 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import org.elnix.dragonlauncher.data.CircleNest
+import org.elnix.dragonlauncher.common.serializables.CircleNest
+import kotlin.collections.find
 
 data class NestNavigationState(
     val nestId: Int,

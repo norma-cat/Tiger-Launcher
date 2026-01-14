@@ -8,7 +8,7 @@
     android:minResizeHeight="0dp"
     android:maxResizeWidth="1000dp"
     android:maxResizeHeight="1000dp"
-    android:initialLayout="@layout/glance_default_loading_layout"
+    android:initialLayout="@xml/glance_default_loading_layout"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
     android:previewImage="@drawable/ic_app_logo" />

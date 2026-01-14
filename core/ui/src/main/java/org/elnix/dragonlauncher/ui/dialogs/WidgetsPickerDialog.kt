@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.res.ResourcesCompat
-import org.elnix.dragonlauncher.R
+import org.elnix.dragonlauncher.common.R
 
 @Composable
 fun WidgetPickerDialog(

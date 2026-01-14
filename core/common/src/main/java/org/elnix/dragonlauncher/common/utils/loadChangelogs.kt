@@ -3,7 +3,6 @@ package org.elnix.dragonlauncher.common.utils
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.elnix.dragonlauncher.ui.whatsnew.Update
 import org.elnix.dragonlauncher.common.logging.logE
 import java.text.SimpleDateFormat
 import java.util.Date
