@@ -150,13 +150,13 @@ fun AppDrawerScreen(
 
     var appTarget by remember { mutableStateOf<AppModel?>(null) }
 
-
-    LaunchedEffect(autoShowKeyboard) {
-        if (autoShowKeyboard) {
-            yield()
-            focusRequester.requestFocus()
-        }
-    }
+    # ---Turning off until able to prevent via a setting
+    # LaunchedEffect(autoShowKeyboard) {
+    #     if (autoShowKeyboard) {
+    #         yield()
+    #         focusRequester.requestFocus()
+    #     }
+    # }
 
     LaunchedEffect(pagerState.currentPage) {
         workspaceId = workspaces.getOrNull(pagerState.currentPage)?.id ?: return@LaunchedEffect

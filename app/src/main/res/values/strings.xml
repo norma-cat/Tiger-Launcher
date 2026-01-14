@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Dragon Launcher</string>
-    <string name="accessibility_service_description">Allows DragonLauncher to open the notification shade, quick settings panel, open recent apps and check for current activity (for xiaomi users that cannot set Dragon as default launcher without losing gesture navigation</string>
+    <string name="app_name">Tiger Launcher</string>
+    <string name="accessibility_service_description">Allows TigerLauncher to open the notification shade, quick settings panel, open recent apps and check for current activity (for xiaomi users that cannot set Tiger as default launcher without losing gesture navigation</string>
     <string name="help">Help</string>
     <string name="back">Back</string>
     <string name="reset_default_settings">Reset default settings</string>
@@ -216,7 +216,7 @@
     <string name="padding">Padding</string>
     <string name="go_parent_nest">Go Parent Nest</string>
     <string name="control_panel">Control Panel</string>
-    <string name="dragon_launcher_settings">Dragon Launcher Settings</string>
+    <string name="Dragon_launcher_settings" translatable="false">Tiger Launcher Settings</string>
     <string name="lock">Lock</string>
     <string name="reload_apps">Reload Apps</string>
     <string name="auto_separate">Auto Separate</string>
@@ -232,7 +232,7 @@
     <string name="move_point_to_left">Move point to left</string>
     <string name="toggle_drag_distances_editing">Toggle drag circle editing</string>
     <string name="device_admin_description">Used to prevent Xiaomi to kill the app</string>
-    <string name="device_admin_label">Dragon Launcher</string>
+    <string name="device_admin_label">Tiger Launcher</string>
     <string name="ghosted">Ghosted</string>
     <string name="foreground">Foreground</string>
     <string name="app_label_icon_overlay_top_padding">App label/icon overlay top padding</string>
@@ -283,10 +283,10 @@
     <string name="line_preview_snap_to_action">Line Preview snap to action</string>
     <string name="icon_packs_found">%1$d icon packs found</string>
     <string name="default_text">Default</string>
-    <string name="app_icon_size">App Icon Size</string>
-    <string name="app_label_size">App Label Size</string>
-    <string name="every_setting_will_return_to_its_default_state_this_cannot_be_undone_the_app_will_kill_itself">EVERY setting will return to its default state, this cannot be undone, the app will kill itself</string>
-    <string name="reset_all_settings">Reset ALL settings ?!</string>
-    <string name="experimental">Experimental</string>
-    <string name="set_wallpaper">Set Wallpaper</string>
+    <string name="app_icon_size" translatable="false">App Icon Size</string>
+    <string name="app_label_size" translatable="false">App Label Size</string>
+    <string name="every_setting_will_return_to_its_default_state_this_cannot_be_undone_the_app_will_kill_itself" translatable="false">EVERY setting will return to its default state, this cannot be undone, the app will kill itself</string>
+    <string name="reset_all_settings" translatable="false">Reset ALL settings ?!</string>
+    <string name="experimental" translatable="false">Experimental</string>
+    <string name="set_wallpaper" translatable="false">Set Wallpaper</string>
 </resources>
