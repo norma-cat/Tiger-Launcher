@@ -63,7 +63,7 @@ jobs:
           echo "APK=$NAME" >> $GITHUB_ENV
           
           UNSIGNED="DragonLauncher-${{ env.VERSION }}-unsigned.apk"
-          mv app/build/outputs/apk/fdroid/release/app-fdroid-release-unsigned.apk "UNSIGNED"
+          mv app/build/outputs/apk/fdroid/release/app-fdroid-release-unsigned.apk "$UNSIGNED"
           echo "UNSIGNED=$UNSIGNED" >> $GITHUB_ENV
 
       - name: Create GitHub Release
